@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1742188480967,
+      "tag": "0000_low_sugar_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1744598390420,
+      "tag": "0001_groovy_morg",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1744606188731,
+      "tag": "0002_calm_kronos",
+      "breakpoints": true
+    }
+  ]
+}

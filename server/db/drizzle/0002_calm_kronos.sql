@@ -1,0 +1,1 @@
+ALTER TABLE `kelompok_komunitas` ADD CONSTRAINT `kelompok_komunitas_name_unique` UNIQUE(`name`);

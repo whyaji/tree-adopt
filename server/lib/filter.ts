@@ -16,6 +16,8 @@ import {
 } from 'drizzle-orm';
 import type { MySqlTableWithColumns } from 'drizzle-orm/mysql-core';
 
+import { toCamelCase } from './utils.js';
+
 type FilterOperator =
   | 'in'
   | 'notin'
@@ -49,7 +51,7 @@ export function parseFilterQuery(filterQuery: string | null): FilterCondition | 
       continue;
     }
 
-    const key = toSnakeCase(filterPartParts[0]);
+    const key = toCamelCase(filterPartParts[0]);
     const valueParts = filterPartParts[1].split(',');
     const operator = (filterPartParts[2] || 'in') as FilterOperator;
 
@@ -192,11 +194,6 @@ export function applyDrizzleYearMonthFilters(filters: FilterCondition, column: a
   }
 
   return conditions;
-}
-
-// Helper function to convert camelCase to snake_case
-function toSnakeCase(str: string): string {
-  return str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
 }
 
 export function getAllConditions(

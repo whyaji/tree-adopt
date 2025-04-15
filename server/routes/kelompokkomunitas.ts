@@ -1,11 +1,11 @@
-import { and, count, eq, like } from 'drizzle-orm';
+import { count, eq } from 'drizzle-orm';
 import { Hono } from 'hono';
 import path from 'path';
 import { z } from 'zod';
 
 import { db } from '../db/database.js';
 import { kelompokKomunitasSchema } from '../db/schema/schema.js';
-import { getAllConditions, parseFilterQuery } from '../lib/filter.js';
+import { getPaginationData } from '../lib/pagination.js';
 import { deleteImage, uploadFile } from '../lib/upload.js';
 import authMiddleware from '../middleware/jwt.js';
 
@@ -54,39 +54,7 @@ export const kelompokKomunitasRoute = new Hono()
   .use(authMiddleware)
 
   .get('/', async (c) => {
-    const search = c.req.query('search') ?? '';
-    const page = parseInt(c.req.query('page') ?? '1');
-    const limit = parseInt(c.req.query('limit') ?? '10');
-    const offset = (page - 1) * limit;
-
-    const filters = parseFilterQuery(c.req.query('filter') ?? null);
-    const conditions = getAllConditions(filters, kelompokKomunitasSchema);
-
-    const whereClause = search
-      ? and(like(kelompokKomunitasSchema.name, `%${search}%`), ...(conditions || []))
-      : and(...(conditions || []));
-
-    const data = await db
-      .select()
-      .from(kelompokKomunitasSchema)
-      .where(whereClause)
-      .limit(limit)
-      .offset(offset);
-
-    const totalResult = await db
-      .select({ count: count() })
-      .from(kelompokKomunitasSchema)
-      .where(search ? like(kelompokKomunitasSchema.name, `%${search}%`) : undefined);
-
-    const total = totalResult[0].count;
-
-    return c.json({
-      data,
-      total,
-      totalPage: Math.ceil(total / limit),
-      page,
-      limit,
-    });
+    return await getPaginationData(c, kelompokKomunitasSchema, 'name');
   })
 
   .get('/total', async (c) => {

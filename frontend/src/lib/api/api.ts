@@ -10,6 +10,6 @@ const client = hc<ApiRoutes>('/', {
   },
 });
 
-const api = client.api.v1;
-
-export default api;
+export const api = client.api.v1;
+export const baseUrl = window.location.origin;
+export const baseApiUrl = baseUrl + '/api/v1';

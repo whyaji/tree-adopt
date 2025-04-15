@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 
+import { baseUrl } from '@/lib/api/api';
 import { getKelompokKomunitas } from '@/lib/api/kelompokKomunitasApi';
 
 export function KelompokKomunitasScreen() {
@@ -36,7 +37,11 @@ export function KelompokKomunitasScreen() {
                 {' '}
                 {/* 16:9 aspect ratio */}
                 <img
-                  src={'https://place.abh.ai/s3fs-public/placeholder/DSC_0110_400x400.JPG'}
+                  src={
+                    item.image
+                      ? `${baseUrl}/${item.image}`
+                      : 'https://place.abh.ai/s3fs-public/placeholder/DSC_0110_400x400.JPG'
+                  }
                   alt={item.name}
                   className="absolute top-0 left-0 w-full h-full object-cover"
                 />

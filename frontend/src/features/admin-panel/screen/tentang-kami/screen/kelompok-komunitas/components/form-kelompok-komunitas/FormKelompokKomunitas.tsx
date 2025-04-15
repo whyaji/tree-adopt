@@ -38,6 +38,9 @@ export const FormKelompokKomunitas: FC<{
       : [-2.5489, 118.0149]
   );
 
+  const [file, setFile] = useState<File | null>(null);
+  const imageUrl = kelompokKomunitas?.image;
+
   const form = useForm({
     defaultValues: {
       name: kelompokKomunitas?.name ?? '',
@@ -50,14 +53,20 @@ export const FormKelompokKomunitas: FC<{
     },
     onSubmit: async ({ value }) => {
       try {
+        const formData = new FormData();
+        Object.entries(value).forEach(([key, value]) => {
+          formData.append(key, String(value));
+        });
+        if (file) {
+          formData.append('image', file);
+        } else if (kelompokKomunitas?.image) {
+          formData.append('image', kelompokKomunitas.image);
+        }
         if (kelompokKomunitas) {
-          await updateKelompokKomunitas({
-            id: Number.parseInt(kelompokKomunitas.id.toString()),
-            ...value,
-          });
+          await updateKelompokKomunitas(kelompokKomunitas.id, formData);
           toast('Komunitas updated successfully');
         } else {
-          await createKelompokKomunitas(value);
+          await createKelompokKomunitas(formData);
           toast('Komunitas added successfully');
         }
         form.reset();
@@ -147,7 +156,6 @@ export const FormKelompokKomunitas: FC<{
           )}
         </form.Field>
       ))}
-
       <div className="mt-4">
         <Label>Pilih Lokasi</Label>
         <div className="h-92 w-full rounded-md overflow-hidden">
@@ -169,7 +177,6 @@ export const FormKelompokKomunitas: FC<{
           </MapContainer>
         </div>
       </div>
-
       <div className="grid grid-cols-2 gap-4">
         <form.Field name="latitude">
           {(field) => (
@@ -203,6 +210,36 @@ export const FormKelompokKomunitas: FC<{
             </div>
           )}
         </form.Field>
+      </div>
+      <div className="mt-4">
+        <Label>Upload Image</Label>
+        <Input
+          type="file"
+          accept="image/*"
+          onChange={(e) => {
+            const files = e.target.files;
+            if (files && files.length > 0) {
+              setFile(files[0]);
+            }
+          }}
+        />
+        {file && <p className="text-sm text-gray-500">{file.name}</p>}
+        <p className="text-sm text-gray-500">Max size: 5MB</p>
+        <p className="text-sm text-gray-500">Accepted formats: jpg, png</p>
+        {(file || imageUrl) && (
+          <div className="mt-1">
+            <img
+              src={file ? URL.createObjectURL(file) : imageUrl}
+              alt="Preview"
+              className="h-48 object-cover rounded-md"
+            />
+            {file && (
+              <Button type="button" className="mt-2" onClick={() => setFile(null)}>
+                Cancel
+              </Button>
+            )}
+          </div>
+        )}
       </div>
 
       <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>

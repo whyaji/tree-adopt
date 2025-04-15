@@ -1,6 +1,6 @@
 import { queryOptions } from '@tanstack/react-query';
 
-import api from './api';
+import { api } from './api';
 
 export async function getCurrentUser() {
   const res = await api.profile.$get();

@@ -19,6 +19,7 @@ export const kelompokKomunitasSchema = mysqlTable('kelompok_komunitas', {
   programUnggulan: varchar('program_unggulan', { length: 255 }).notNull(),
   latitude: varchar('latitude', { length: 255 }).notNull(),
   longitude: varchar('longitude', { length: 255 }).notNull(),
+  image: varchar('image', { length: 255 }),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 });

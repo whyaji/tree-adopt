@@ -23,3 +23,11 @@ export const kelompokKomunitasSchema = mysqlTable('kelompok_komunitas', {
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 });
+
+export const masterTreeSchema = mysqlTable('master_tree', {
+  id: bigint('id', { mode: 'number', unsigned: true }).autoincrement().notNull().primaryKey(),
+  latinName: varchar('latin_name', { length: 255 }).notNull(),
+  localName: varchar('local_name', { length: 255 }).notNull(),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});

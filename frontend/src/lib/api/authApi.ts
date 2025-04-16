@@ -1,6 +1,8 @@
 import { queryOptions } from '@tanstack/react-query';
 
-import { api } from './api';
+import { UserType } from '@/types/user.type';
+
+import { api, baseApiUrl } from './api';
 
 export async function getCurrentUser() {
   const res = await api.profile.$get();
@@ -8,6 +10,17 @@ export async function getCurrentUser() {
     throw new Error('server error');
   }
   return res.json();
+}
+
+export async function getCurrentUserWithToken(authToken: string) {
+  const res = await fetch(`${baseApiUrl}/profile`, {
+    method: 'GET',
+    headers: {
+      Authorization: authToken ? `Bearer ${authToken}` : '',
+    },
+  });
+  if (!res.ok) throw new Error(res.statusText);
+  return res.json() as Promise<{ data: UserType }>;
 }
 
 export const userQueryOptions = queryOptions({

@@ -17,13 +17,17 @@ const JWT_SECRET = env.JWT_SECRET;
 
 const userSchemaZod = z.object({
   id: z.number().int().positive(),
+  avatar: z.string().optional(),
+  role: z.number().int().positive(),
   name: z.string().min(3),
   email: z.string().email().min(3),
   password: z.string().min(6),
 });
 
-const loginSchema = userSchemaZod.omit({ name: true, id: true });
-const registerSchema = userSchemaZod.omit({ id: true });
+const loginSchema = userSchemaZod.omit({ name: true, id: true, role: true });
+const registerSchema = userSchemaZod.omit({ id: true, role: true });
+
+export type User = z.infer<typeof userSchemaZod>;
 
 export const authRoute = new Hono()
   .post('/login', zValidator('json', loginSchema), async (c) => {

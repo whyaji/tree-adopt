@@ -1,5 +1,6 @@
 import { useRouterState } from '@tanstack/react-router';
 import { Link } from '@tanstack/react-router';
+import Cookies from 'js-cookie';
 import {
   BellIcon,
   CreditCardIcon,
@@ -29,14 +30,14 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Separator } from '@/components/ui/separator';
 import { SidebarMenuButton, SidebarTrigger } from '@/components/ui/sidebar';
+import { UserType } from '@/types/user.type';
 
 export function SiteHeader() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const user = {
-    name: 'User',
-    email: 'user@example.com',
-    avatar: '/avatars/shadcn.jpg',
-  };
+  const stringUser = Cookies.get('user');
+  const user: UserType = stringUser ? JSON.parse(stringUser) : null;
+
+  console.log('user', user);
 
   const pathSegments = pathname.split('/').filter(Boolean);
 
@@ -78,31 +79,14 @@ export function SiteHeader() {
         </Breadcrumb>
       </div>
       {/* Avatar Account */}
-      <div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <SidebarMenuButton
-              size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
-              <Avatar className="h-8 w-8 rounded-lg grayscale">
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
-              </Avatar>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.name}</span>
-                <span className="truncate text-xs text-muted-foreground">{user.email}</span>
-              </div>
-              <MoreVerticalIcon className="ml-auto size-4" />
-            </SidebarMenuButton>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-            side={'bottom'}
-            align="end"
-            sideOffset={4}>
-            <DropdownMenuLabel className="p-0 font-normal">
-              <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <Avatar className="h-8 w-8 rounded-lg">
+      {user && (
+        <div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <SidebarMenuButton
+                size="lg"
+                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
+                <Avatar className="h-8 w-8 rounded-lg grayscale">
                   <AvatarImage src={user.avatar} alt={user.name} />
                   <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                 </Avatar>
@@ -110,33 +94,52 @@ export function SiteHeader() {
                   <span className="truncate font-medium">{user.name}</span>
                   <span className="truncate text-xs text-muted-foreground">{user.email}</span>
                 </div>
-              </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <Link to="/profile" className="w-full">
+                <MoreVerticalIcon className="ml-auto size-4" />
+              </SidebarMenuButton>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+              side={'bottom'}
+              align="end"
+              sideOffset={4}>
+              <DropdownMenuLabel className="p-0 font-normal">
+                <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                  <Avatar className="h-8 w-8 rounded-lg">
+                    <AvatarImage src={user.avatar ?? '/avatars/shadcn.jpg'} alt={user.name} />
+                    <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                  </Avatar>
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-medium">{user.name}</span>
+                    <span className="truncate text-xs text-muted-foreground">{user.email}</span>
+                  </div>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
+                <Link to="/profile" className="w-full">
+                  <DropdownMenuItem>
+                    <UserCircleIcon />
+                    Account
+                  </DropdownMenuItem>
+                </Link>
                 <DropdownMenuItem>
-                  <UserCircleIcon />
-                  Account
+                  <CreditCardIcon />
+                  Billing
                 </DropdownMenuItem>
-              </Link>
+                <DropdownMenuItem>
+                  <BellIcon />
+                  Notifications
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
               <DropdownMenuItem>
-                <CreditCardIcon />
-                Billing
+                <LogOutIcon />
+                Log out
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <BellIcon />
-                Notifications
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <LogOutIcon />
-              Log out
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      )}
     </header>
   );
 }

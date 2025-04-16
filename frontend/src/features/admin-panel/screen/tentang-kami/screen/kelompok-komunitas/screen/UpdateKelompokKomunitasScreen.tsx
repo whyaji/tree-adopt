@@ -1,4 +1,4 @@
-import { Route } from '@/routes/_authenticated/tentang-kami/kelompok-komunitas/list-komunitas/update-komunitas/$kelompokKomunitasId';
+import { Route } from '@/routes/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/update-komunitas/$kelompokKomunitasId';
 
 import { FormKelompokKomunitas } from '../components/form-kelompok-komunitas/FormKelompokKomunitas';
 

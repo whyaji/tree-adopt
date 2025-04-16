@@ -1,40 +1,141 @@
 import { QueryClient } from '@tanstack/react-query';
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router';
+import Cookies from 'js-cookie';
+import {
+  Database,
+  HomeIcon,
+  Info,
+  LogOut,
+  LucideIcon,
+  Map,
+  MoreHorizontal,
+  Users,
+} from 'lucide-react';
 
 import { AppSidebar } from '@/components/app-sidebar';
 import { SiteHeader } from '@/components/site-header';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { Toaster } from '@/components/ui/sonner';
+import { UserType } from '@/types/user.type';
 
-// const Root = () => (
-//   <div className="flex h-screen">
-//     <NavDrawer />
-//     <div className="flex-1 p-4 overflow-auto">
-//       <Outlet />
-//       {/* <TanStackRouterDevtools /> */}
-//       <Toaster />
-//     </div>
-//   </div>
-// );
+const navMain: {
+  title: string;
+  url?: string;
+  icon?: LucideIcon;
+  items?: {
+    title: string;
+    url: string;
+    icon?: LucideIcon;
+  }[];
+}[] = [
+  {
+    title: 'Beranda',
+    icon: HomeIcon,
+    url: '/',
+  },
+  {
+    title: 'Tentang Kami',
+    icon: Info,
+    items: [
+      { title: 'Apa itu Adopsi Pohon', url: '/tentang-kami/apa-itu-adopsi-pohon' },
+      { title: 'Kelompok komunitas', url: '/tentang-kami/kelompok-komunitas' },
+      { title: 'Laporan-laporan', url: '/tentang-kami/laporan-laporan' },
+    ],
+  },
+  {
+    title: 'Program Kami',
+    icon: Users,
+    url: '/program-kami',
+    items: [
+      { title: 'Adopsi Pohon', url: '/program-kami/adopsi-pohon' },
+      { title: 'Pemberdayaan Masyarakat', url: '/program-kami/pemberdayaan-masyarakat' },
+      { title: 'Patroli & Geo-Tagging', url: '/program-kami/patroli-&-geo-tagging' },
+      { title: 'Monitor Biodiversity', url: '/program-kami/monitor-biodiversity' },
+    ],
+  },
+  {
+    title: 'Data',
+    icon: Database,
+    items: [
+      { title: 'Pohon', url: '/data/pohon' },
+      { title: 'Adopter', url: '/data/adopter' },
+    ],
+  },
+  {
+    title: 'Pemetaan',
+    icon: Map,
+    url: '/pemetaan',
+  },
+  {
+    title: 'Lain-lain',
+    icon: MoreHorizontal,
+    items: [
+      { title: 'FAQ', url: '/lain/faq' },
+      { title: 'Kontak Kami', url: '/lain/kontak' },
+    ],
+  },
+];
+
+const navSecondary = [
+  {
+    title: 'Logout',
+    url: '/profile',
+    icon: LogOut,
+  },
+];
+
+const navMainAdmin: {
+  title: string;
+  url?: string;
+  icon?: LucideIcon;
+  items?: {
+    title: string;
+    url: string;
+    icon?: LucideIcon;
+  }[];
+}[] = [
+  {
+    title: 'Dashboard',
+    icon: HomeIcon,
+    url: '/admin',
+  },
+  {
+    title: 'Master',
+    icon: Database,
+    items: [{ title: 'Pohon', url: '/admin/master/pohon' }],
+  },
+  {
+    title: 'Tentang Kami',
+    icon: Info,
+    items: [
+      { title: 'Apa itu Adopsi Pohon', url: '/admin/tentang-kami/apa-itu-adopsi-pohon' },
+      { title: 'Kelompok komunitas', url: '/admin/tentang-kami/kelompok-komunitas' },
+      { title: 'Laporan-laporan', url: '/admin/tentang-kami/laporan-laporan' },
+    ],
+  },
+];
+
+const navSecondaryAdmin = [
+  {
+    title: 'Logout',
+    url: '/admin/profile',
+    icon: LogOut,
+  },
+];
+
+const userString = Cookies.get('user');
+const user: UserType = userString ? JSON.parse(userString) : null;
 
 const Root = () => (
   <SidebarProvider>
-    <AppSidebar />
+    {user?.role === 0 && <AppSidebar navItem={navMainAdmin} navSecondary={navSecondaryAdmin} />}
+    {user?.role === 1 && <AppSidebar navItem={navMain} navSecondary={navSecondary} />}
     <SidebarInset>
-      <div className="sticky top-0 z-10 bg-background">
-        <SiteHeader />
-      </div>
-      {/* <div className="flex flex-1 flex-col">
-      <div className="@container/main flex flex-1 flex-col gap-2">
-        <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-          <SectionCards />
-          <div className="px-4 lg:px-6">
-            <ChartAreaInteractive />
-          </div>
-          <DataTable data={data} />
+      {user && (
+        <div className="sticky top-0 z-10 bg-background">
+          <SiteHeader />
         </div>
-      </div>
-    </div> */}
+      )}
       <div className="flex-1 p-4 overflow-auto">
         <Outlet />
         {/* <TanStackRouterDevtools /> */}

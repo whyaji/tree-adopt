@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { FieldInfo } from '@/components/ui/field-info';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { login } from '@/lib/api/authApi';
+import { getCurrentUserWithToken, login } from '@/lib/api/authApi';
 
 export const Route = createFileRoute('/login')({
   component: Login,
@@ -25,8 +25,18 @@ function Login() {
         const res = await login(value.email, value.password);
         toast('Login successfully');
         Cookies.set('auth_token', res.data.token, { expires: 7, secure: true });
-        form.reset();
-        window.location.href = '/';
+        try {
+          const resUser = await getCurrentUserWithToken(res.data.token);
+          Cookies.set('user', JSON.stringify(resUser.data));
+          form.reset();
+          window.location.href = resUser.data.role === 0 ? '/admin' : '/';
+        } catch (error) {
+          Cookies.remove('auth_token');
+          Cookies.remove('user');
+          console.error('Error fetching user data:', error);
+          toast('Error fetching user data');
+          throw error;
+        }
       } catch {
         toast('Invalid email or password');
       }

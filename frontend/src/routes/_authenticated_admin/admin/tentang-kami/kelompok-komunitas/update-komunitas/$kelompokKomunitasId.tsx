@@ -4,7 +4,7 @@ import { UpdateKelompokKomunitasScreen } from '@/features/admin-panel/screen/ten
 import { getKelompokKomunitasById } from '@/lib/api/kelompokKomunitasApi';
 
 export const Route = createFileRoute(
-  '/_authenticated/tentang-kami/kelompok-komunitas/list-komunitas/update-komunitas/$kelompokKomunitasId'
+  '/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/update-komunitas/$kelompokKomunitasId'
 )({
   loader: async ({ params }) => {
     try {

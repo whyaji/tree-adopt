@@ -14,21 +14,24 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as RegisterImport } from './routes/register'
 import { Route as LoginImport } from './routes/login'
 import { Route as AboutImport } from './routes/about'
+import { Route as AuthenticatedadminImport } from './routes/_authenticated_admin'
 import { Route as AuthenticatedImport } from './routes/_authenticated'
 import { Route as TentangKamiIndexImport } from './routes/tentang-kami/index'
 import { Route as AuthenticatedIndexImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedProfileImport } from './routes/_authenticated/profile'
 import { Route as TentangKamiApaItuAdopsiPohonIndexImport } from './routes/tentang-kami/apa-itu-adopsi-pohon/index'
+import { Route as AuthenticatedadminAdminIndexImport } from './routes/_authenticated_admin/admin/index'
 import { Route as AuthenticatedProgramKamiIndexImport } from './routes/_authenticated/program-kami/index'
+import { Route as AuthenticatedadminAdminProfileImport } from './routes/_authenticated_admin/admin/profile'
 import { Route as AuthenticatedTentangKamiKelompokKomunitasIndexImport } from './routes/_authenticated/tentang-kami/kelompok-komunitas/index'
 import { Route as AuthenticatedProgramKamiPemberdayaanMasyarakatIndexImport } from './routes/_authenticated/program-kami/pemberdayaan-masyarakat/index'
 import { Route as AuthenticatedProgramKamiPatroliGeoTaggingIndexImport } from './routes/_authenticated/program-kami/patroli-&-geo-tagging/index'
 import { Route as AuthenticatedProgramKamiMonitorBiodiversityIndexImport } from './routes/_authenticated/program-kami/monitor-biodiversity/index'
 import { Route as AuthenticatedProgramKamiAdopsiPohonIndexImport } from './routes/_authenticated/program-kami/adopsi-pohon/index'
 import { Route as AuthenticatedTentangKamiKelompokKomunitasKelompokKomunitasNameImport } from './routes/_authenticated/tentang-kami/kelompok-komunitas/$kelompokKomunitasName'
-import { Route as AuthenticatedTentangKamiKelompokKomunitasListKomunitasIndexImport } from './routes/_authenticated/tentang-kami/kelompok-komunitas/list-komunitas/index'
-import { Route as AuthenticatedTentangKamiKelompokKomunitasListKomunitasAddKomunitasImport } from './routes/_authenticated/tentang-kami/kelompok-komunitas/list-komunitas/add-komunitas'
-import { Route as AuthenticatedTentangKamiKelompokKomunitasListKomunitasUpdateKomunitasKelompokKomunitasIdImport } from './routes/_authenticated/tentang-kami/kelompok-komunitas/list-komunitas/update-komunitas/$kelompokKomunitasId'
+import { Route as AuthenticatedadminAdminTentangKamiKelompokKomunitasIndexImport } from './routes/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/index'
+import { Route as AuthenticatedadminAdminTentangKamiKelompokKomunitasAddKomunitasImport } from './routes/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/add-komunitas'
+import { Route as AuthenticatedadminAdminTentangKamiKelompokKomunitasUpdateKomunitasKelompokKomunitasIdImport } from './routes/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/update-komunitas/$kelompokKomunitasId'
 
 // Create/Update Routes
 
@@ -47,6 +50,11 @@ const LoginRoute = LoginImport.update({
 const AboutRoute = AboutImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AuthenticatedadminRoute = AuthenticatedadminImport.update({
+  id: '/_authenticated_admin',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -80,11 +88,25 @@ const TentangKamiApaItuAdopsiPohonIndexRoute =
     getParentRoute: () => rootRoute,
   } as any)
 
+const AuthenticatedadminAdminIndexRoute =
+  AuthenticatedadminAdminIndexImport.update({
+    id: '/admin/',
+    path: '/admin/',
+    getParentRoute: () => AuthenticatedadminRoute,
+  } as any)
+
 const AuthenticatedProgramKamiIndexRoute =
   AuthenticatedProgramKamiIndexImport.update({
     id: '/program-kami/',
     path: '/program-kami/',
     getParentRoute: () => AuthenticatedRoute,
+  } as any)
+
+const AuthenticatedadminAdminProfileRoute =
+  AuthenticatedadminAdminProfileImport.update({
+    id: '/admin/profile',
+    path: '/admin/profile',
+    getParentRoute: () => AuthenticatedadminRoute,
   } as any)
 
 const AuthenticatedTentangKamiKelompokKomunitasIndexRoute =
@@ -129,28 +151,26 @@ const AuthenticatedTentangKamiKelompokKomunitasKelompokKomunitasNameRoute =
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 
-const AuthenticatedTentangKamiKelompokKomunitasListKomunitasIndexRoute =
-  AuthenticatedTentangKamiKelompokKomunitasListKomunitasIndexImport.update({
-    id: '/tentang-kami/kelompok-komunitas/list-komunitas/',
-    path: '/tentang-kami/kelompok-komunitas/list-komunitas/',
-    getParentRoute: () => AuthenticatedRoute,
+const AuthenticatedadminAdminTentangKamiKelompokKomunitasIndexRoute =
+  AuthenticatedadminAdminTentangKamiKelompokKomunitasIndexImport.update({
+    id: '/admin/tentang-kami/kelompok-komunitas/',
+    path: '/admin/tentang-kami/kelompok-komunitas/',
+    getParentRoute: () => AuthenticatedadminRoute,
   } as any)
 
-const AuthenticatedTentangKamiKelompokKomunitasListKomunitasAddKomunitasRoute =
-  AuthenticatedTentangKamiKelompokKomunitasListKomunitasAddKomunitasImport.update(
-    {
-      id: '/tentang-kami/kelompok-komunitas/list-komunitas/add-komunitas',
-      path: '/tentang-kami/kelompok-komunitas/list-komunitas/add-komunitas',
-      getParentRoute: () => AuthenticatedRoute,
-    } as any,
-  )
+const AuthenticatedadminAdminTentangKamiKelompokKomunitasAddKomunitasRoute =
+  AuthenticatedadminAdminTentangKamiKelompokKomunitasAddKomunitasImport.update({
+    id: '/admin/tentang-kami/kelompok-komunitas/add-komunitas',
+    path: '/admin/tentang-kami/kelompok-komunitas/add-komunitas',
+    getParentRoute: () => AuthenticatedadminRoute,
+  } as any)
 
-const AuthenticatedTentangKamiKelompokKomunitasListKomunitasUpdateKomunitasKelompokKomunitasIdRoute =
-  AuthenticatedTentangKamiKelompokKomunitasListKomunitasUpdateKomunitasKelompokKomunitasIdImport.update(
+const AuthenticatedadminAdminTentangKamiKelompokKomunitasUpdateKomunitasKelompokKomunitasIdRoute =
+  AuthenticatedadminAdminTentangKamiKelompokKomunitasUpdateKomunitasKelompokKomunitasIdImport.update(
     {
-      id: '/tentang-kami/kelompok-komunitas/list-komunitas/update-komunitas/$kelompokKomunitasId',
-      path: '/tentang-kami/kelompok-komunitas/list-komunitas/update-komunitas/$kelompokKomunitasId',
-      getParentRoute: () => AuthenticatedRoute,
+      id: '/admin/tentang-kami/kelompok-komunitas/update-komunitas/$kelompokKomunitasId',
+      path: '/admin/tentang-kami/kelompok-komunitas/update-komunitas/$kelompokKomunitasId',
+      getParentRoute: () => AuthenticatedadminRoute,
     } as any,
   )
 
@@ -163,6 +183,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: ''
       preLoaderRoute: typeof AuthenticatedImport
+      parentRoute: typeof rootRoute
+    }
+    '/_authenticated_admin': {
+      id: '/_authenticated_admin'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthenticatedadminImport
       parentRoute: typeof rootRoute
     }
     '/about': {
@@ -207,12 +234,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TentangKamiIndexImport
       parentRoute: typeof rootRoute
     }
+    '/_authenticated_admin/admin/profile': {
+      id: '/_authenticated_admin/admin/profile'
+      path: '/admin/profile'
+      fullPath: '/admin/profile'
+      preLoaderRoute: typeof AuthenticatedadminAdminProfileImport
+      parentRoute: typeof AuthenticatedadminImport
+    }
     '/_authenticated/program-kami/': {
       id: '/_authenticated/program-kami/'
       path: '/program-kami'
       fullPath: '/program-kami'
       preLoaderRoute: typeof AuthenticatedProgramKamiIndexImport
       parentRoute: typeof AuthenticatedImport
+    }
+    '/_authenticated_admin/admin/': {
+      id: '/_authenticated_admin/admin/'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedadminAdminIndexImport
+      parentRoute: typeof AuthenticatedadminImport
     }
     '/tentang-kami/apa-itu-adopsi-pohon/': {
       id: '/tentang-kami/apa-itu-adopsi-pohon/'
@@ -263,26 +304,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTentangKamiKelompokKomunitasIndexImport
       parentRoute: typeof AuthenticatedImport
     }
-    '/_authenticated/tentang-kami/kelompok-komunitas/list-komunitas/add-komunitas': {
-      id: '/_authenticated/tentang-kami/kelompok-komunitas/list-komunitas/add-komunitas'
-      path: '/tentang-kami/kelompok-komunitas/list-komunitas/add-komunitas'
-      fullPath: '/tentang-kami/kelompok-komunitas/list-komunitas/add-komunitas'
-      preLoaderRoute: typeof AuthenticatedTentangKamiKelompokKomunitasListKomunitasAddKomunitasImport
-      parentRoute: typeof AuthenticatedImport
+    '/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/add-komunitas': {
+      id: '/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/add-komunitas'
+      path: '/admin/tentang-kami/kelompok-komunitas/add-komunitas'
+      fullPath: '/admin/tentang-kami/kelompok-komunitas/add-komunitas'
+      preLoaderRoute: typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasAddKomunitasImport
+      parentRoute: typeof AuthenticatedadminImport
     }
-    '/_authenticated/tentang-kami/kelompok-komunitas/list-komunitas/': {
-      id: '/_authenticated/tentang-kami/kelompok-komunitas/list-komunitas/'
-      path: '/tentang-kami/kelompok-komunitas/list-komunitas'
-      fullPath: '/tentang-kami/kelompok-komunitas/list-komunitas'
-      preLoaderRoute: typeof AuthenticatedTentangKamiKelompokKomunitasListKomunitasIndexImport
-      parentRoute: typeof AuthenticatedImport
+    '/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/': {
+      id: '/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/'
+      path: '/admin/tentang-kami/kelompok-komunitas'
+      fullPath: '/admin/tentang-kami/kelompok-komunitas'
+      preLoaderRoute: typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasIndexImport
+      parentRoute: typeof AuthenticatedadminImport
     }
-    '/_authenticated/tentang-kami/kelompok-komunitas/list-komunitas/update-komunitas/$kelompokKomunitasId': {
-      id: '/_authenticated/tentang-kami/kelompok-komunitas/list-komunitas/update-komunitas/$kelompokKomunitasId'
-      path: '/tentang-kami/kelompok-komunitas/list-komunitas/update-komunitas/$kelompokKomunitasId'
-      fullPath: '/tentang-kami/kelompok-komunitas/list-komunitas/update-komunitas/$kelompokKomunitasId'
-      preLoaderRoute: typeof AuthenticatedTentangKamiKelompokKomunitasListKomunitasUpdateKomunitasKelompokKomunitasIdImport
-      parentRoute: typeof AuthenticatedImport
+    '/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/update-komunitas/$kelompokKomunitasId': {
+      id: '/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/update-komunitas/$kelompokKomunitasId'
+      path: '/admin/tentang-kami/kelompok-komunitas/update-komunitas/$kelompokKomunitasId'
+      fullPath: '/admin/tentang-kami/kelompok-komunitas/update-komunitas/$kelompokKomunitasId'
+      preLoaderRoute: typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasUpdateKomunitasKelompokKomunitasIdImport
+      parentRoute: typeof AuthenticatedadminImport
     }
   }
 }
@@ -299,9 +340,6 @@ interface AuthenticatedRouteChildren {
   AuthenticatedProgramKamiPatroliGeoTaggingIndexRoute: typeof AuthenticatedProgramKamiPatroliGeoTaggingIndexRoute
   AuthenticatedProgramKamiPemberdayaanMasyarakatIndexRoute: typeof AuthenticatedProgramKamiPemberdayaanMasyarakatIndexRoute
   AuthenticatedTentangKamiKelompokKomunitasIndexRoute: typeof AuthenticatedTentangKamiKelompokKomunitasIndexRoute
-  AuthenticatedTentangKamiKelompokKomunitasListKomunitasAddKomunitasRoute: typeof AuthenticatedTentangKamiKelompokKomunitasListKomunitasAddKomunitasRoute
-  AuthenticatedTentangKamiKelompokKomunitasListKomunitasIndexRoute: typeof AuthenticatedTentangKamiKelompokKomunitasListKomunitasIndexRoute
-  AuthenticatedTentangKamiKelompokKomunitasListKomunitasUpdateKomunitasKelompokKomunitasIdRoute: typeof AuthenticatedTentangKamiKelompokKomunitasListKomunitasUpdateKomunitasKelompokKomunitasIdRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -320,27 +358,45 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
     AuthenticatedProgramKamiPemberdayaanMasyarakatIndexRoute,
   AuthenticatedTentangKamiKelompokKomunitasIndexRoute:
     AuthenticatedTentangKamiKelompokKomunitasIndexRoute,
-  AuthenticatedTentangKamiKelompokKomunitasListKomunitasAddKomunitasRoute:
-    AuthenticatedTentangKamiKelompokKomunitasListKomunitasAddKomunitasRoute,
-  AuthenticatedTentangKamiKelompokKomunitasListKomunitasIndexRoute:
-    AuthenticatedTentangKamiKelompokKomunitasListKomunitasIndexRoute,
-  AuthenticatedTentangKamiKelompokKomunitasListKomunitasUpdateKomunitasKelompokKomunitasIdRoute:
-    AuthenticatedTentangKamiKelompokKomunitasListKomunitasUpdateKomunitasKelompokKomunitasIdRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
+interface AuthenticatedadminRouteChildren {
+  AuthenticatedadminAdminProfileRoute: typeof AuthenticatedadminAdminProfileRoute
+  AuthenticatedadminAdminIndexRoute: typeof AuthenticatedadminAdminIndexRoute
+  AuthenticatedadminAdminTentangKamiKelompokKomunitasAddKomunitasRoute: typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasAddKomunitasRoute
+  AuthenticatedadminAdminTentangKamiKelompokKomunitasIndexRoute: typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasIndexRoute
+  AuthenticatedadminAdminTentangKamiKelompokKomunitasUpdateKomunitasKelompokKomunitasIdRoute: typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasUpdateKomunitasKelompokKomunitasIdRoute
+}
+
+const AuthenticatedadminRouteChildren: AuthenticatedadminRouteChildren = {
+  AuthenticatedadminAdminProfileRoute: AuthenticatedadminAdminProfileRoute,
+  AuthenticatedadminAdminIndexRoute: AuthenticatedadminAdminIndexRoute,
+  AuthenticatedadminAdminTentangKamiKelompokKomunitasAddKomunitasRoute:
+    AuthenticatedadminAdminTentangKamiKelompokKomunitasAddKomunitasRoute,
+  AuthenticatedadminAdminTentangKamiKelompokKomunitasIndexRoute:
+    AuthenticatedadminAdminTentangKamiKelompokKomunitasIndexRoute,
+  AuthenticatedadminAdminTentangKamiKelompokKomunitasUpdateKomunitasKelompokKomunitasIdRoute:
+    AuthenticatedadminAdminTentangKamiKelompokKomunitasUpdateKomunitasKelompokKomunitasIdRoute,
+}
+
+const AuthenticatedadminRouteWithChildren =
+  AuthenticatedadminRoute._addFileChildren(AuthenticatedadminRouteChildren)
+
 export interface FileRoutesByFullPath {
-  '': typeof AuthenticatedRouteWithChildren
+  '': typeof AuthenticatedadminRouteWithChildren
   '/about': typeof AboutRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/': typeof AuthenticatedIndexRoute
   '/tentang-kami': typeof TentangKamiIndexRoute
+  '/admin/profile': typeof AuthenticatedadminAdminProfileRoute
   '/program-kami': typeof AuthenticatedProgramKamiIndexRoute
+  '/admin': typeof AuthenticatedadminAdminIndexRoute
   '/tentang-kami/apa-itu-adopsi-pohon': typeof TentangKamiApaItuAdopsiPohonIndexRoute
   '/tentang-kami/kelompok-komunitas/$kelompokKomunitasName': typeof AuthenticatedTentangKamiKelompokKomunitasKelompokKomunitasNameRoute
   '/program-kami/adopsi-pohon': typeof AuthenticatedProgramKamiAdopsiPohonIndexRoute
@@ -348,19 +404,22 @@ export interface FileRoutesByFullPath {
   '/program-kami/patroli-&-geo-tagging': typeof AuthenticatedProgramKamiPatroliGeoTaggingIndexRoute
   '/program-kami/pemberdayaan-masyarakat': typeof AuthenticatedProgramKamiPemberdayaanMasyarakatIndexRoute
   '/tentang-kami/kelompok-komunitas': typeof AuthenticatedTentangKamiKelompokKomunitasIndexRoute
-  '/tentang-kami/kelompok-komunitas/list-komunitas/add-komunitas': typeof AuthenticatedTentangKamiKelompokKomunitasListKomunitasAddKomunitasRoute
-  '/tentang-kami/kelompok-komunitas/list-komunitas': typeof AuthenticatedTentangKamiKelompokKomunitasListKomunitasIndexRoute
-  '/tentang-kami/kelompok-komunitas/list-komunitas/update-komunitas/$kelompokKomunitasId': typeof AuthenticatedTentangKamiKelompokKomunitasListKomunitasUpdateKomunitasKelompokKomunitasIdRoute
+  '/admin/tentang-kami/kelompok-komunitas/add-komunitas': typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasAddKomunitasRoute
+  '/admin/tentang-kami/kelompok-komunitas': typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasIndexRoute
+  '/admin/tentang-kami/kelompok-komunitas/update-komunitas/$kelompokKomunitasId': typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasUpdateKomunitasKelompokKomunitasIdRoute
 }
 
 export interface FileRoutesByTo {
+  '': typeof AuthenticatedadminRouteWithChildren
   '/about': typeof AboutRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/': typeof AuthenticatedIndexRoute
   '/tentang-kami': typeof TentangKamiIndexRoute
+  '/admin/profile': typeof AuthenticatedadminAdminProfileRoute
   '/program-kami': typeof AuthenticatedProgramKamiIndexRoute
+  '/admin': typeof AuthenticatedadminAdminIndexRoute
   '/tentang-kami/apa-itu-adopsi-pohon': typeof TentangKamiApaItuAdopsiPohonIndexRoute
   '/tentang-kami/kelompok-komunitas/$kelompokKomunitasName': typeof AuthenticatedTentangKamiKelompokKomunitasKelompokKomunitasNameRoute
   '/program-kami/adopsi-pohon': typeof AuthenticatedProgramKamiAdopsiPohonIndexRoute
@@ -368,21 +427,24 @@ export interface FileRoutesByTo {
   '/program-kami/patroli-&-geo-tagging': typeof AuthenticatedProgramKamiPatroliGeoTaggingIndexRoute
   '/program-kami/pemberdayaan-masyarakat': typeof AuthenticatedProgramKamiPemberdayaanMasyarakatIndexRoute
   '/tentang-kami/kelompok-komunitas': typeof AuthenticatedTentangKamiKelompokKomunitasIndexRoute
-  '/tentang-kami/kelompok-komunitas/list-komunitas/add-komunitas': typeof AuthenticatedTentangKamiKelompokKomunitasListKomunitasAddKomunitasRoute
-  '/tentang-kami/kelompok-komunitas/list-komunitas': typeof AuthenticatedTentangKamiKelompokKomunitasListKomunitasIndexRoute
-  '/tentang-kami/kelompok-komunitas/list-komunitas/update-komunitas/$kelompokKomunitasId': typeof AuthenticatedTentangKamiKelompokKomunitasListKomunitasUpdateKomunitasKelompokKomunitasIdRoute
+  '/admin/tentang-kami/kelompok-komunitas/add-komunitas': typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasAddKomunitasRoute
+  '/admin/tentang-kami/kelompok-komunitas': typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasIndexRoute
+  '/admin/tentang-kami/kelompok-komunitas/update-komunitas/$kelompokKomunitasId': typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasUpdateKomunitasKelompokKomunitasIdRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/_authenticated_admin': typeof AuthenticatedadminRouteWithChildren
   '/about': typeof AboutRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/tentang-kami/': typeof TentangKamiIndexRoute
+  '/_authenticated_admin/admin/profile': typeof AuthenticatedadminAdminProfileRoute
   '/_authenticated/program-kami/': typeof AuthenticatedProgramKamiIndexRoute
+  '/_authenticated_admin/admin/': typeof AuthenticatedadminAdminIndexRoute
   '/tentang-kami/apa-itu-adopsi-pohon/': typeof TentangKamiApaItuAdopsiPohonIndexRoute
   '/_authenticated/tentang-kami/kelompok-komunitas/$kelompokKomunitasName': typeof AuthenticatedTentangKamiKelompokKomunitasKelompokKomunitasNameRoute
   '/_authenticated/program-kami/adopsi-pohon/': typeof AuthenticatedProgramKamiAdopsiPohonIndexRoute
@@ -390,9 +452,9 @@ export interface FileRoutesById {
   '/_authenticated/program-kami/patroli-&-geo-tagging/': typeof AuthenticatedProgramKamiPatroliGeoTaggingIndexRoute
   '/_authenticated/program-kami/pemberdayaan-masyarakat/': typeof AuthenticatedProgramKamiPemberdayaanMasyarakatIndexRoute
   '/_authenticated/tentang-kami/kelompok-komunitas/': typeof AuthenticatedTentangKamiKelompokKomunitasIndexRoute
-  '/_authenticated/tentang-kami/kelompok-komunitas/list-komunitas/add-komunitas': typeof AuthenticatedTentangKamiKelompokKomunitasListKomunitasAddKomunitasRoute
-  '/_authenticated/tentang-kami/kelompok-komunitas/list-komunitas/': typeof AuthenticatedTentangKamiKelompokKomunitasListKomunitasIndexRoute
-  '/_authenticated/tentang-kami/kelompok-komunitas/list-komunitas/update-komunitas/$kelompokKomunitasId': typeof AuthenticatedTentangKamiKelompokKomunitasListKomunitasUpdateKomunitasKelompokKomunitasIdRoute
+  '/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/add-komunitas': typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasAddKomunitasRoute
+  '/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/': typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasIndexRoute
+  '/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/update-komunitas/$kelompokKomunitasId': typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasUpdateKomunitasKelompokKomunitasIdRoute
 }
 
 export interface FileRouteTypes {
@@ -405,7 +467,9 @@ export interface FileRouteTypes {
     | '/profile'
     | '/'
     | '/tentang-kami'
+    | '/admin/profile'
     | '/program-kami'
+    | '/admin'
     | '/tentang-kami/apa-itu-adopsi-pohon'
     | '/tentang-kami/kelompok-komunitas/$kelompokKomunitasName'
     | '/program-kami/adopsi-pohon'
@@ -413,18 +477,21 @@ export interface FileRouteTypes {
     | '/program-kami/patroli-&-geo-tagging'
     | '/program-kami/pemberdayaan-masyarakat'
     | '/tentang-kami/kelompok-komunitas'
-    | '/tentang-kami/kelompok-komunitas/list-komunitas/add-komunitas'
-    | '/tentang-kami/kelompok-komunitas/list-komunitas'
-    | '/tentang-kami/kelompok-komunitas/list-komunitas/update-komunitas/$kelompokKomunitasId'
+    | '/admin/tentang-kami/kelompok-komunitas/add-komunitas'
+    | '/admin/tentang-kami/kelompok-komunitas'
+    | '/admin/tentang-kami/kelompok-komunitas/update-komunitas/$kelompokKomunitasId'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | ''
     | '/about'
     | '/login'
     | '/register'
     | '/profile'
     | '/'
     | '/tentang-kami'
+    | '/admin/profile'
     | '/program-kami'
+    | '/admin'
     | '/tentang-kami/apa-itu-adopsi-pohon'
     | '/tentang-kami/kelompok-komunitas/$kelompokKomunitasName'
     | '/program-kami/adopsi-pohon'
@@ -432,19 +499,22 @@ export interface FileRouteTypes {
     | '/program-kami/patroli-&-geo-tagging'
     | '/program-kami/pemberdayaan-masyarakat'
     | '/tentang-kami/kelompok-komunitas'
-    | '/tentang-kami/kelompok-komunitas/list-komunitas/add-komunitas'
-    | '/tentang-kami/kelompok-komunitas/list-komunitas'
-    | '/tentang-kami/kelompok-komunitas/list-komunitas/update-komunitas/$kelompokKomunitasId'
+    | '/admin/tentang-kami/kelompok-komunitas/add-komunitas'
+    | '/admin/tentang-kami/kelompok-komunitas'
+    | '/admin/tentang-kami/kelompok-komunitas/update-komunitas/$kelompokKomunitasId'
   id:
     | '__root__'
     | '/_authenticated'
+    | '/_authenticated_admin'
     | '/about'
     | '/login'
     | '/register'
     | '/_authenticated/profile'
     | '/_authenticated/'
     | '/tentang-kami/'
+    | '/_authenticated_admin/admin/profile'
     | '/_authenticated/program-kami/'
+    | '/_authenticated_admin/admin/'
     | '/tentang-kami/apa-itu-adopsi-pohon/'
     | '/_authenticated/tentang-kami/kelompok-komunitas/$kelompokKomunitasName'
     | '/_authenticated/program-kami/adopsi-pohon/'
@@ -452,14 +522,15 @@ export interface FileRouteTypes {
     | '/_authenticated/program-kami/patroli-&-geo-tagging/'
     | '/_authenticated/program-kami/pemberdayaan-masyarakat/'
     | '/_authenticated/tentang-kami/kelompok-komunitas/'
-    | '/_authenticated/tentang-kami/kelompok-komunitas/list-komunitas/add-komunitas'
-    | '/_authenticated/tentang-kami/kelompok-komunitas/list-komunitas/'
-    | '/_authenticated/tentang-kami/kelompok-komunitas/list-komunitas/update-komunitas/$kelompokKomunitasId'
+    | '/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/add-komunitas'
+    | '/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/'
+    | '/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/update-komunitas/$kelompokKomunitasId'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  AuthenticatedadminRoute: typeof AuthenticatedadminRouteWithChildren
   AboutRoute: typeof AboutRoute
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
@@ -469,6 +540,7 @@ export interface RootRouteChildren {
 
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  AuthenticatedadminRoute: AuthenticatedadminRouteWithChildren,
   AboutRoute: AboutRoute,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
@@ -488,6 +560,7 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/_authenticated",
+        "/_authenticated_admin",
         "/about",
         "/login",
         "/register",
@@ -506,10 +579,17 @@ export const routeTree = rootRoute
         "/_authenticated/program-kami/monitor-biodiversity/",
         "/_authenticated/program-kami/patroli-&-geo-tagging/",
         "/_authenticated/program-kami/pemberdayaan-masyarakat/",
-        "/_authenticated/tentang-kami/kelompok-komunitas/",
-        "/_authenticated/tentang-kami/kelompok-komunitas/list-komunitas/add-komunitas",
-        "/_authenticated/tentang-kami/kelompok-komunitas/list-komunitas/",
-        "/_authenticated/tentang-kami/kelompok-komunitas/list-komunitas/update-komunitas/$kelompokKomunitasId"
+        "/_authenticated/tentang-kami/kelompok-komunitas/"
+      ]
+    },
+    "/_authenticated_admin": {
+      "filePath": "_authenticated_admin.tsx",
+      "children": [
+        "/_authenticated_admin/admin/profile",
+        "/_authenticated_admin/admin/",
+        "/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/add-komunitas",
+        "/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/",
+        "/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/update-komunitas/$kelompokKomunitasId"
       ]
     },
     "/about": {
@@ -532,9 +612,17 @@ export const routeTree = rootRoute
     "/tentang-kami/": {
       "filePath": "tentang-kami/index.tsx"
     },
+    "/_authenticated_admin/admin/profile": {
+      "filePath": "_authenticated_admin/admin/profile.tsx",
+      "parent": "/_authenticated_admin"
+    },
     "/_authenticated/program-kami/": {
       "filePath": "_authenticated/program-kami/index.tsx",
       "parent": "/_authenticated"
+    },
+    "/_authenticated_admin/admin/": {
+      "filePath": "_authenticated_admin/admin/index.tsx",
+      "parent": "/_authenticated_admin"
     },
     "/tentang-kami/apa-itu-adopsi-pohon/": {
       "filePath": "tentang-kami/apa-itu-adopsi-pohon/index.tsx"
@@ -563,17 +651,17 @@ export const routeTree = rootRoute
       "filePath": "_authenticated/tentang-kami/kelompok-komunitas/index.tsx",
       "parent": "/_authenticated"
     },
-    "/_authenticated/tentang-kami/kelompok-komunitas/list-komunitas/add-komunitas": {
-      "filePath": "_authenticated/tentang-kami/kelompok-komunitas/list-komunitas/add-komunitas.tsx",
-      "parent": "/_authenticated"
+    "/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/add-komunitas": {
+      "filePath": "_authenticated_admin/admin/tentang-kami/kelompok-komunitas/add-komunitas.tsx",
+      "parent": "/_authenticated_admin"
     },
-    "/_authenticated/tentang-kami/kelompok-komunitas/list-komunitas/": {
-      "filePath": "_authenticated/tentang-kami/kelompok-komunitas/list-komunitas/index.tsx",
-      "parent": "/_authenticated"
+    "/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/": {
+      "filePath": "_authenticated_admin/admin/tentang-kami/kelompok-komunitas/index.tsx",
+      "parent": "/_authenticated_admin"
     },
-    "/_authenticated/tentang-kami/kelompok-komunitas/list-komunitas/update-komunitas/$kelompokKomunitasId": {
-      "filePath": "_authenticated/tentang-kami/kelompok-komunitas/list-komunitas/update-komunitas/$kelompokKomunitasId.tsx",
-      "parent": "/_authenticated"
+    "/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/update-komunitas/$kelompokKomunitasId": {
+      "filePath": "_authenticated_admin/admin/tentang-kami/kelompok-komunitas/update-komunitas/$kelompokKomunitasId.tsx",
+      "parent": "/_authenticated_admin"
     }
   }
 }

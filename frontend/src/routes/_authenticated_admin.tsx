@@ -26,18 +26,14 @@ const Component = () => {
     return <Onboard />;
   }
 
-  if (user.data.role === 0) {
-    window.location.href = '/admin';
-  }
-
-  if (user.data.role !== 1) {
+  if (user.data.role !== 0) {
     return <Onboard />;
   }
 
   return <Outlet />;
 };
 
-export const Route = createFileRoute('/_authenticated')({
+export const Route = createFileRoute('/_authenticated_admin')({
   beforeLoad: async ({ context }) => {
     const queryClient = context.queryClient;
 

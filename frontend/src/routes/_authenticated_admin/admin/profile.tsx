@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { getCurrentUser } from '@/lib/api/authApi';
 
-export const Route = createFileRoute('/_authenticated/profile')({
+export const Route = createFileRoute('/_authenticated_admin/admin/profile')({
   component: Profile,
 });
 

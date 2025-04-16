@@ -116,7 +116,7 @@ export function KelompokKomunitasListScreen() {
           <Button
             variant="outline"
             onClick={() =>
-              navigate({ to: '/tentang-kami/kelompok-komunitas/list-komunitas/add-komunitas' })
+              navigate({ to: '/admin/tentang-kami/kelompok-komunitas/add-komunitas' })
             }>
             +
           </Button>
@@ -177,7 +177,7 @@ export function KelompokKomunitasListScreen() {
                       className="w-20"
                       onClick={() =>
                         navigate({
-                          to: `/tentang-kami/kelompok-komunitas/list-komunitas/update-komunitas/${komunitas.id}`,
+                          to: `/admin/tentang-kami/kelompok-komunitas/update-komunitas/${komunitas.id}`,
                         })
                       }>
                       Edit

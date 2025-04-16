@@ -16,6 +16,7 @@ import { AppSidebar } from '@/components/app-sidebar';
 import { SiteHeader } from '@/components/site-header';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { Toaster } from '@/components/ui/sonner';
+import { ROLE } from '@/enum/role.enum';
 import { UserType } from '@/types/user.type';
 
 const navMain: {
@@ -128,8 +129,10 @@ const user: UserType = userString ? JSON.parse(userString) : null;
 
 const Root = () => (
   <SidebarProvider>
-    {user?.role === 0 && <AppSidebar navItem={navMainAdmin} navSecondary={navSecondaryAdmin} />}
-    {user?.role === 1 && <AppSidebar navItem={navMain} navSecondary={navSecondary} />}
+    {user?.role === ROLE.ADMIN && (
+      <AppSidebar navItem={navMainAdmin} navSecondary={navSecondaryAdmin} />
+    )}
+    {user?.role === ROLE.USER && <AppSidebar navItem={navMain} navSecondary={navSecondary} />}
     <SidebarInset>
       {user && (
         <div className="sticky top-0 z-10 bg-background">

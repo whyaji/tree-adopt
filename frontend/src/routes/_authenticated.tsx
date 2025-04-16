@@ -2,6 +2,7 @@ import { createFileRoute, Outlet } from '@tanstack/react-router';
 import Cookies from 'js-cookie';
 
 import { Button } from '@/components/ui/button';
+import { ROLE } from '@/enum/role.enum';
 import { userQueryOptions } from '@/lib/api/authApi';
 
 const Onboard = () => {
@@ -26,11 +27,11 @@ const Component = () => {
     return <Onboard />;
   }
 
-  if (user.data.role === 0) {
+  if (user.data.role === ROLE.ADMIN) {
     window.location.href = '/admin';
   }
 
-  if (user.data.role !== 1) {
+  if (user.data.role !== ROLE.USER) {
     return <Onboard />;
   }
 

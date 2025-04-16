@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { FieldInfo } from '@/components/ui/field-info';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { ROLE } from '@/enum/role.enum';
 import { getCurrentUserWithToken, login } from '@/lib/api/authApi';
 
 export const Route = createFileRoute('/login')({
@@ -29,7 +30,7 @@ function Login() {
           const resUser = await getCurrentUserWithToken(res.data.token);
           Cookies.set('user', JSON.stringify(resUser.data));
           form.reset();
-          window.location.href = resUser.data.role === 0 ? '/admin' : '/';
+          window.location.href = resUser.data.role === ROLE.ADMIN ? '/admin' : '/';
         } catch (error) {
           Cookies.remove('auth_token');
           Cookies.remove('user');

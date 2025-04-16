@@ -1,25 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
 
 import { TableData } from '@/components/table-data';
+import { usePaginationFilter } from '@/hooks/use-pagination-filter';
 import { getKelompokKomunitas } from '@/lib/api/kelompokKomunitasApi';
 import { KelompokKomunitasType } from '@/types/kelompokKomunitas.type';
 
 import { KomunitasTable } from '../components/komunitas-table/KomunitasTable';
 
 export function KelompokKomunitasListScreen() {
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
-  const [search, setSearch] = useState('');
-  const [tempSearch, setTempSearch] = useState('');
-
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setSearch(tempSearch);
-      setPage(1);
-    }, 500);
-    return () => clearTimeout(timeout);
-  }, [tempSearch]);
+  const { page, setPage, limit, setLimit, search, tempSearch, setTempSearch } =
+    usePaginationFilter();
 
   const { isPending, error, data } = useQuery({
     queryKey: ['get-komunitas', search, page, limit],

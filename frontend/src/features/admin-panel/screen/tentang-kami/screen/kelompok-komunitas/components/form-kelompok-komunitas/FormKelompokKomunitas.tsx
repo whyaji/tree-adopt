@@ -6,6 +6,7 @@ import { FC, useEffect, useRef, useState } from 'react';
 import { MapContainer, Marker, Popup, TileLayer, useMapEvents } from 'react-leaflet';
 import { toast } from 'sonner';
 
+import { ConfirmationDialog } from '@/components/confimation-dialog';
 import { Button } from '@/components/ui/button';
 import { FieldInfo } from '@/components/ui/field-info';
 import { Input } from '@/components/ui/input';
@@ -75,9 +76,9 @@ export const FormKelompokKomunitas: FC<{
         navigate({ to: '/admin/tentang-kami/kelompok-komunitas' });
       } catch {
         if (kelompokKomunitas) {
-          alert('Failed to update komunitas');
+          toast.error('Failed to update komunitas');
         } else {
-          alert('Failed to add komunitas');
+          toast.error('Failed to add komunitas');
         }
       }
     },
@@ -158,7 +159,7 @@ export const FormKelompokKomunitas: FC<{
       ))}
       <div className="mt-4">
         <Label>Pilih Lokasi</Label>
-        <div className="h-92 w-full rounded-md overflow-hidden">
+        <div className="h-92 w-full rounded-md overflow-hidden relative z-0">
           <MapContainer
             ref={mapRef}
             center={mapCenter}
@@ -244,13 +245,38 @@ export const FormKelompokKomunitas: FC<{
 
       <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
         {([canSubmit, isSubmitting]) => (
-          <Button type="submit" disabled={!canSubmit} className="mt-4">
-            {isSubmitting
-              ? 'Submitting...'
-              : kelompokKomunitas
-                ? 'Update Kelompok Komunitas'
-                : 'Tambah Kelompok Komunitas'}
-          </Button>
+          <ConfirmationDialog
+            title={
+              kelompokKomunitas
+                ? 'Apakah anda yakin untuk mengupdate?'
+                : 'Apakah anda yakin untuk menambah?'
+            }
+            message={
+              kelompokKomunitas
+                ? 'Data yang sudah ada akan diupdate'
+                : 'Data akan ditambahkan ke dalam database kelompok komunitas'
+            }
+            confirmText={
+              isSubmitting
+                ? 'Submitting...'
+                : kelompokKomunitas
+                  ? 'Update Kelompok Komunitas'
+                  : 'Tambah Kelompok Komunitas'
+            }
+            onConfirm={async () => {
+              try {
+                await form.handleSubmit();
+              } catch (error) {
+                console.error(error);
+                toast.error('Failed to submit form');
+              }
+            }}
+            triggerButton={
+              <Button disabled={!canSubmit} className="mt-4">
+                {kelompokKomunitas ? 'Update Kelompok Komunitas' : 'Tambah Kelompok Komunitas'}
+              </Button>
+            }
+          />
         )}
       </form.Subscribe>
     </form>

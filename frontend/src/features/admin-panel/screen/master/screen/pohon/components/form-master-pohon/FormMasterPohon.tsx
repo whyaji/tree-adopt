@@ -3,6 +3,7 @@ import { useNavigate } from '@tanstack/react-router';
 import { FC } from 'react';
 import { toast } from 'sonner';
 
+import { ConfirmationDialog } from '@/components/confimation-dialog';
 import { Button } from '@/components/ui/button';
 import { FieldInfo } from '@/components/ui/field-info';
 import { Input } from '@/components/ui/input';
@@ -33,9 +34,9 @@ export const FormMasterPohon: FC<{
         navigate({ to: '/admin/master/pohon' });
       } catch {
         if (masterTree) {
-          alert('Failed to update Master pohon');
+          toast.error('Failed to update Master pohon');
         } else {
-          alert('Failed to add Master pohon');
+          toast.error('Failed to add Master pohon');
         }
       }
     },
@@ -80,13 +81,38 @@ export const FormMasterPohon: FC<{
 
       <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
         {([canSubmit, isSubmitting]) => (
-          <Button type="submit" disabled={!canSubmit} className="mt-4">
-            {isSubmitting
-              ? 'Submitting...'
-              : masterTree
-                ? 'Update Master Pohon'
-                : 'Tambah Master Pohon'}
-          </Button>
+          <ConfirmationDialog
+            title={
+              masterTree
+                ? 'Apakah anda yakin untuk mengupdate?'
+                : 'Apakah anda yakin untuk menambah?'
+            }
+            message={
+              masterTree
+                ? 'Data yang sudah ada akan diupdate'
+                : 'Data akan ditambahkan ke dalam database master pohon'
+            }
+            confirmText={
+              isSubmitting
+                ? 'Submitting...'
+                : masterTree
+                  ? 'Update Master Pohon'
+                  : 'Tambah Master Pohon'
+            }
+            onConfirm={async () => {
+              try {
+                await form.handleSubmit();
+              } catch (error) {
+                console.error(error);
+                toast.error('Failed to submit form');
+              }
+            }}
+            triggerButton={
+              <Button disabled={!canSubmit} className="mt-4">
+                {masterTree ? 'Update Master Pohon' : 'Tambah Master Pohon'}
+              </Button>
+            }
+          />
         )}
       </form.Subscribe>
     </form>

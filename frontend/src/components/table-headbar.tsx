@@ -20,7 +20,7 @@ export function TableHeadbar({
       <h1>{title}</h1>
       <div className="flex items-center gap-2">
         {addUrl && (
-          <Button variant="outline" onClick={() => navigate({ to: addUrl })}>
+          <Button variant="default" onClick={() => navigate({ to: addUrl })}>
             +
           </Button>
         )}

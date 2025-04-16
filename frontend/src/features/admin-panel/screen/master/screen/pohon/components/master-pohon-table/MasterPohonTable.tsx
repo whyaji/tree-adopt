@@ -1,5 +1,7 @@
 import { useNavigate } from '@tanstack/react-router';
+import { toast } from 'sonner';
 
+import { ConfirmationDialog } from '@/components/confimation-dialog';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -62,15 +64,26 @@ export function MasterPohonTable({
                     }>
                     Edit
                   </Button>
-                  <Button
-                    variant="outline"
-                    className="w-20"
-                    onClick={async () => {
-                      await deleteMasterTree(String(masterTree.id));
-                      window.location.reload();
-                    }}>
-                    Delete
-                  </Button>
+                  <ConfirmationDialog
+                    title="Apakah anda yakin untuk menghapus?"
+                    message="Data yang dihapus tidak dapat dikembalikan."
+                    confirmText="Delete"
+                    onConfirm={async () => {
+                      try {
+                        await deleteMasterTree(String(masterTree.id));
+                        window.location.reload();
+                      } catch (error) {
+                        console.error(error);
+                        toast.error('Failed to delete komunitas');
+                      }
+                    }}
+                    confirmVarriant="destructive"
+                    triggerButton={
+                      <Button variant="destructive" className="w-20">
+                        Delete
+                      </Button>
+                    }
+                  />
                 </TableCell>
               </TableRow>
             ))}

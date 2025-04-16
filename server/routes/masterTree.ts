@@ -45,4 +45,13 @@ export const masterTreeRoute = new Hono()
       return c.notFound();
     }
     return c.json({ message: 'Tree updated' });
+  })
+
+  .delete('/:id{[0-9]+}', async (c) => {
+    const id = parseInt(c.req.param('id'));
+    const deleted = await db.delete(masterTreeSchema).where(eq(masterTreeSchema.id, id));
+    if (!deleted) {
+      return c.notFound();
+    }
+    return c.json({ message: 'Tree deleted' });
   });

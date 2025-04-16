@@ -72,7 +72,7 @@ export const FormKelompokKomunitas: FC<{
         form.reset();
         setMarkerPosition(null);
         setMapCenter([-2.5489, 118.0149]);
-        navigate({ to: '/tentang-kami/kelompok-komunitas/list-komunitas' });
+        navigate({ to: '/admin/tentang-kami/kelompok-komunitas' });
       } catch {
         if (kelompokKomunitas) {
           alert('Failed to update komunitas');

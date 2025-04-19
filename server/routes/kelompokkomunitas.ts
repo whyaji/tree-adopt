@@ -4,8 +4,10 @@ import path from 'path';
 import { z } from 'zod';
 
 import { db } from '../db/database.js';
-import { kelompokKomunitasSchema } from '../db/schema/schema.js';
+import { kelompokKomunitasSchema, treeSchema } from '../db/schema/schema.js';
+import { getDataBy } from '../lib/dataBy.js';
 import { getPaginationData } from '../lib/pagination.js';
+import type { RelationsType } from '../lib/relation.js';
 import { deleteImage, uploadFile } from '../lib/upload.js';
 import authMiddleware from '../middleware/jwt.js';
 
@@ -24,6 +26,15 @@ const kelompokKomunitasSchemaZod = z.object({
 
 const createPostSchema = kelompokKomunitasSchemaZod.omit({ id: true, image: true });
 export type KelompokKomunitas = z.infer<typeof kelompokKomunitasSchemaZod>;
+
+// === RELATIONS ===
+const relations: RelationsType = {
+  tree: {
+    type: 'one-to-many',
+    table: treeSchema,
+    on: 'kelompokKomunitasId',
+  },
+};
 
 // === IMAGE VALIDATION ===
 const validateImage = (image: File | string | undefined) => {
@@ -54,7 +65,12 @@ export const kelompokKomunitasRoute = new Hono()
   .use(authMiddleware)
 
   .get('/', async (c) => {
-    return await getPaginationData(c, kelompokKomunitasSchema, 'name');
+    return await getPaginationData({
+      c,
+      table: kelompokKomunitasSchema,
+      searchBy: 'name',
+      relations,
+    });
   })
 
   .get('/total', async (c) => {
@@ -63,14 +79,7 @@ export const kelompokKomunitasRoute = new Hono()
   })
 
   .get('/:id{[0-9]+}', async (c) => {
-    const id = parseInt(c.req.param('id'));
-    const data = await db
-      .select()
-      .from(kelompokKomunitasSchema)
-      .where(eq(kelompokKomunitasSchema.id, id))
-      .limit(1);
-
-    return data[0] ? c.json({ data: data[0] }) : c.notFound();
+    return await getDataBy({ c, table: kelompokKomunitasSchema, relations });
   })
 
   .post('/', async (c) => {

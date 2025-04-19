@@ -5,6 +5,7 @@ import { logger } from 'hono/logger';
 import { authRoute } from './routes/auth.js';
 import { kelompokKomunitasRoute } from './routes/kelompokkomunitas.js';
 import { masterTreeRoute } from './routes/masterTree.js';
+import { treeRoute } from './routes/tree.js';
 
 const app = new Hono();
 
@@ -15,7 +16,8 @@ const apiRoutes = app
   .basePath('/api/v1')
   .route('/', authRoute)
   .route('/kelompok-komunitas', kelompokKomunitasRoute)
-  .route('/master-tree', masterTreeRoute);
+  .route('/master-tree', masterTreeRoute)
+  .route('/tree', treeRoute);
 
 app.get('*', serveStatic({ root: './frontend/dist' }));
 app.get('*', serveStatic({ path: './frontend/dist/index.html' }));

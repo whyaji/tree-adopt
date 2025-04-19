@@ -7,18 +7,33 @@ import type { BlankInput } from 'hono/types';
 import { db } from '../db/database.js';
 import { getAllConditions, parseFilterQuery } from './filter.js';
 import { getSortDirection } from './order.js';
+import {
+  generateQueryOneToOne,
+  getDataQueryOneToMany,
+  reformatMainKey,
+  type RelationsType,
+} from './relation.js';
 import { getSearchConditions } from './search.js';
 
-export async function getPaginationData(
-  c: Context<object, any, BlankInput>,
-  table: MySqlTableWithColumns<any>,
-  searchBy: string
-) {
+export async function getPaginationData({
+  c,
+  table,
+  searchBy,
+  relations,
+  primaryKey = 'id',
+}: {
+  c: Context<object, any, BlankInput>;
+  table: MySqlTableWithColumns<any>;
+  searchBy: string;
+  relations?: RelationsType;
+  primaryKey?: string;
+}) {
   const search = c.req.query('search') ?? '';
   const page = parseInt(c.req.query('page') ?? '1');
   const limit = parseInt(c.req.query('limit') ?? '10');
   const offset = (page - 1) * limit;
   const reqSearchBy = c.req.query('searchBy') ?? searchBy;
+  const withString = c.req.query('with') ?? null;
 
   const sortBy = c.req.query('sortBy') ?? 'createdAt';
   const order = c.req.query('order') ?? 'desc';
@@ -38,16 +53,33 @@ export async function getPaginationData(
     ...(conditions || [])
   );
 
-  const [data, totalData] = await Promise.all([
-    db
-      .select()
-      .from(table)
+  let query = db.select().from(table).where(whereClause).limit(limit);
+
+  const withArray = withString ? (withString as string).split(',') : null;
+
+  const oneToOneRelation = Object.keys(relations ?? {}).filter(
+    (key) => relations?.[key].type === 'one-to-one'
+  );
+
+  query = generateQueryOneToOne(query, table, oneToOneRelation, relations, withArray);
+
+  const [rawData, totalData] = await Promise.all([
+    (query as any)
       .where(whereClause)
+      .orderBy(getSortDirection(sortBy, order, table))
       .offset(offset)
-      .limit(limit)
-      .orderBy(getSortDirection(sortBy, order, table)),
+      .limit(limit),
     db.select({ count: count() }).from(table).where(whereClause),
   ]);
+
+  let data = !(withArray && relations && oneToOneRelation.length > 0)
+    ? rawData
+    : reformatMainKey(rawData, withArray);
+
+  data =
+    data.length > 0
+      ? await getDataQueryOneToMany(data, primaryKey, sortBy, order, relations, withArray)
+      : [];
 
   const total = totalData[0]?.count ?? 0;
 

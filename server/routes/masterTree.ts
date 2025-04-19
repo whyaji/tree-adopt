@@ -24,7 +24,7 @@ export const masterTreeRoute = new Hono()
   .use(authMiddleware)
 
   .get('/', async (c) => {
-    return await getPaginationData(c, masterTreeSchema, 'latinName,localName');
+    return await getPaginationData({ c, table: masterTreeSchema, searchBy: 'latinName,localName' });
   })
 
   .post('/', zValidator('json', createMasterTreeSchema), async (c) => {
@@ -34,7 +34,7 @@ export const masterTreeRoute = new Hono()
   })
 
   .get('/:id{[0-9]+}', async (c) => {
-    return await getDataBy(c, masterTreeSchema);
+    return await getDataBy({ c, table: masterTreeSchema });
   })
 
   .put('/:id{[0-9]+}', zValidator('json', masterTreeSchemaZod), async (c) => {

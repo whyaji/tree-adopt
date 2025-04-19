@@ -114,6 +114,11 @@ const navMainAdmin: {
       { title: 'Laporan-laporan', url: '/admin/tentang-kami/laporan-laporan' },
     ],
   },
+  {
+    title: 'Data',
+    icon: Database,
+    items: [{ title: 'Pohon', url: '/admin/data/pohon' }],
+  },
 ];
 
 const navSecondaryAdmin = [

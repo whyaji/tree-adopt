@@ -7,6 +7,7 @@ import type { BlankInput } from 'hono/types';
 import { db } from '../db/database.js';
 import {
   generateQueryOneToOne,
+  getDataQueryLatestInserted,
   getDataQueryOneToMany,
   reformatMainKey,
   type RelationsType,
@@ -51,6 +52,18 @@ export async function getDataBy({
   data =
     data.length > 0
       ? await getDataQueryOneToMany(data, primaryKey, undefined, undefined, relations, withArray)
+      : [];
+
+  data =
+    data.length > 0
+      ? await getDataQueryLatestInserted(
+          data,
+          primaryKey,
+          'createdAt',
+          'desc',
+          relations,
+          withArray
+        )
       : [];
 
   return data[0] ? c.json({ data: data[0] }) : c.notFound();

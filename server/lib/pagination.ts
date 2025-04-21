@@ -9,6 +9,7 @@ import { getAllConditions, parseFilterQuery } from './filter.js';
 import { getSortDirection } from './order.js';
 import {
   generateQueryOneToOne,
+  getDataQueryLatestInserted,
   getDataQueryOneToMany,
   reformatMainKey,
   type RelationsType,
@@ -79,6 +80,18 @@ export async function getPaginationData({
   data =
     data.length > 0
       ? await getDataQueryOneToMany(data, primaryKey, sortBy, order, relations, withArray)
+      : [];
+
+  data =
+    data.length > 0
+      ? await getDataQueryLatestInserted(
+          data,
+          primaryKey,
+          'createdAt',
+          'desc',
+          relations,
+          withArray
+        )
       : [];
 
   const total = totalData[0]?.count ?? 0;

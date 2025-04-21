@@ -19,7 +19,16 @@ type OneToManyRelation = {
   on: string;
 };
 
-export type RelationsType = Record<string, OneToOneRelation | OneToManyRelation>;
+type LatestInsertedRelation = {
+  type: 'latest-inserted';
+  table: MySqlTableWithColumns<any>;
+  on: string;
+};
+
+export type RelationsType = Record<
+  string,
+  OneToOneRelation | OneToManyRelation | LatestInsertedRelation
+>;
 
 export function reformatMainKey(rawData: any, withArray?: string[]) {
   return rawData.map((row: { [s: string]: unknown } | ArrayLike<unknown>) => {
@@ -102,6 +111,53 @@ export async function getDataQueryOneToMany(
               return (row as any)[primaryKey] === (item as any)[relationObj.on];
             }
           ),
+        };
+      });
+    }
+  }
+  return dataInFunction;
+}
+
+export async function getDataQueryLatestInserted(
+  data: any,
+  primaryKey: string,
+  sortBy?: string,
+  order?: string,
+  relations?: RelationsType,
+  withArray?: string[] | null
+) {
+  let dataInFunction = data;
+  const latestInsertedRelation = Object.keys(relations ?? {}).filter(
+    (key) => relations?.[key].type === 'latest-inserted'
+  );
+
+  const idsString: string = dataInFunction
+    .map((row: { [s: string]: unknown } | ArrayLike<unknown>) => {
+      return (row as any)[primaryKey] as string;
+    })
+    .join(',');
+
+  if (withArray && relations && latestInsertedRelation.length > 0) {
+    for (const relation of withArray) {
+      const relationObj = relations?.[relation];
+      if (!relationObj || relationObj.type !== 'latest-inserted') continue;
+      const queryOneToMany = db.select().from(relationObj.table);
+      const filterDataOneToManyString = `${relationObj.on}:${idsString}:in`;
+      const filterDataOneToMany = parseFilterQuery(filterDataOneToManyString);
+      const conditionsOneToMany = getAllConditions(filterDataOneToMany, relationObj.table);
+      const whereClauseOneToMany = and(...(conditionsOneToMany || []));
+      const dataOneToManyQuery = queryOneToMany.where(whereClauseOneToMany);
+      if (sortBy && order) {
+        dataOneToManyQuery.orderBy(getSortDirection(sortBy, order, relationObj.table));
+      }
+      const dataOneToManyResult = await dataOneToManyQuery;
+      dataInFunction = dataInFunction.map((row: { [s: string]: unknown } | ArrayLike<unknown>) => {
+        return {
+          ...row,
+          [relation]:
+            dataOneToManyResult.filter((item: { [s: string]: unknown } | ArrayLike<unknown>) => {
+              return (row as any)[primaryKey] === (item as any)[relationObj.on];
+            })?.[0] ?? null,
         };
       });
     }

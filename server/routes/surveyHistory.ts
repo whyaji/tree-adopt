@@ -60,12 +60,6 @@ export const surveyHistoryRoute = new Hono()
     });
   })
 
-  // .post('/', zValidator('json', createSurveyHistorySchema), async (c) => {
-  //   const surveyHistory = c.req.valid('json');
-  //   await db.insert(surveyHistorySchema).values(surveyHistory);
-  //   return c.json({ message: 'Survey History created' }, 201);
-  // })
-
   .post('/', async (c) => {
     const formData = await c.req.parseBody();
     const image = formData.image as File | undefined;

@@ -5,6 +5,7 @@ import { z } from 'zod';
 
 import { db } from '../db/database.js';
 import {
+  adoptHistorySchema,
   kelompokKomunitasSchema,
   masterTreeSchema,
   surveyHistorySchema,
@@ -34,6 +35,12 @@ const treeSchemaZod = z.object({
 const createTreeSchema = treeSchemaZod.omit({ id: true, status: true });
 export type Tree = z.infer<typeof treeSchemaZod>;
 
+const adoptTreeJsonSchema = z.object({
+  userId: z.number().int().positive(),
+  startDate: z.string().datetime(),
+  endDate: z.string().datetime(),
+});
+
 // === RELATIONS ===
 const relations: RelationsType = {
   surveyorId: {
@@ -54,6 +61,16 @@ const relations: RelationsType = {
   surveyHistory: {
     type: 'one-to-many',
     table: surveyHistorySchema,
+    on: 'treeId',
+  },
+  adoptHistory: {
+    type: 'one-to-many',
+    table: adoptHistorySchema,
+    on: 'treeId',
+  },
+  adopter: {
+    type: 'latest-inserted',
+    table: adoptHistorySchema,
     on: 'treeId',
   },
 };
@@ -89,6 +106,27 @@ export const treeRoute = new Hono()
       return c.notFound();
     }
     return c.json({ message: 'Tree updated' });
+  })
+
+  // adopt
+  .post('/:id{[0-9]+}/adopt', zValidator('json', adoptTreeJsonSchema), async (c) => {
+    const id = parseInt(c.req.param('id'));
+    const adoptDataReq = c.req.valid('json');
+
+    const adoptData: z.infer<typeof adoptTreeJsonSchema> & {
+      treeId: number;
+    } = {
+      ...adoptDataReq,
+      treeId: id,
+    };
+
+    try {
+      await db.insert(adoptHistorySchema).values(adoptData);
+      return c.json({ message: 'Tree adopted' });
+    } catch (error) {
+      console.error('Error adopting tree:', error);
+      return c.json({ error: 'Failed to adopt tree' }, 500);
+    }
   })
 
   .delete('/:id{[0-9]+}', async (c) => {

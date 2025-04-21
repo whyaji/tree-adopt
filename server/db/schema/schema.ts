@@ -10,6 +10,7 @@ export const userSchema = mysqlTable('users', {
   reset_token: varchar('reset_token', { length: 100 }),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
+  deletedAt: timestamp('deleted_at'),
 });
 
 export const kelompokKomunitasSchema = mysqlTable('kelompok_komunitas', {
@@ -24,6 +25,7 @@ export const kelompokKomunitasSchema = mysqlTable('kelompok_komunitas', {
   image: varchar('image', { length: 255 }),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
+  deletedAt: timestamp('deleted_at'),
 });
 
 export const masterTreeSchema = mysqlTable('master_tree', {
@@ -32,25 +34,62 @@ export const masterTreeSchema = mysqlTable('master_tree', {
   localName: varchar('local_name', { length: 255 }).notNull(),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
+  deletedAt: timestamp('deleted_at'),
 });
 
 export const treeSchema = mysqlTable('tree', {
   id: bigint('id', { mode: 'number', unsigned: true }).autoincrement().notNull().primaryKey(),
   code: varchar('code', { length: 255 }).notNull(),
-  treeId: bigint('tree_id', { mode: 'number', unsigned: true })
+  masterTreeId: bigint('master_tree_id', { mode: 'number', unsigned: true })
     .notNull()
     .references(() => masterTreeSchema.id),
   kelompokKomunitasId: bigint('kelompok_komunitas_id', { mode: 'number', unsigned: true })
     .notNull()
     .references(() => kelompokKomunitasSchema.id),
-  status: int('status').default(1), // 0 = inactive, 1 = active, 2 = adopted
-  adoptedBy: bigint('adopted_by', { mode: 'number', unsigned: true }).references(
-    () => userSchema.id
-  ),
-  category: int('category').notNull(), // 1 = pohon dewasa, 2 = pohon remaja, 3 = bibit
-  diameter: float('diameter').notNull(),
-  serapanCo2: float('serapan_co2').notNull(),
+  surveyorId: bigint('surveyor_id', { mode: 'number', unsigned: true })
+    .notNull()
+    .references(() => userSchema.id),
+  status: int('status').default(1), // 0 = inactive, 1 = active
+  elevation: float('elevation').notNull(),
   landType: int('land_type').notNull(),
+  address: varchar('address', { length: 255 }).notNull(),
+  latitude: float('latitude').notNull(),
+  longitude: float('longitude').notNull(),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
+  deletedAt: timestamp('deleted_at'),
+});
+
+export const adoptHistorySchema = mysqlTable('adopt_history', {
+  id: bigint('id', { mode: 'number', unsigned: true }).autoincrement().notNull().primaryKey(),
+  treeId: bigint('tree_id', { mode: 'number', unsigned: true })
+    .notNull()
+    .references(() => treeSchema.id),
+  userId: bigint('user_id', { mode: 'number', unsigned: true })
+    .notNull()
+    .references(() => userSchema.id),
+  startDate: varchar('adopted_at', { length: 255 }).notNull(),
+  endDate: varchar('end_date', { length: 255 }).notNull(),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+  deletedAt: timestamp('deleted_at'),
+});
+
+export const surveyHistorySchema = mysqlTable('survey_history', {
+  id: bigint('id', { mode: 'number', unsigned: true }).autoincrement().notNull().primaryKey(),
+  treeId: bigint('tree_id', { mode: 'number', unsigned: true })
+    .notNull()
+    .references(() => treeSchema.id),
+  userId: bigint('user_id', { mode: 'number', unsigned: true })
+    .notNull()
+    .references(() => userSchema.id),
+  surveyDate: varchar('survey_date', { length: 255 }).notNull(),
+  category: int('category').notNull(), // 1 = pohon dewasa, 2 = pohon remaja, 3 = bibit
+  diameter: float('diameter').notNull(),
+  height: float('height').notNull(),
+  serapanCo2: float('serapan_co2').notNull(),
+  image: varchar('image', { length: 255 }),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+  deletedAt: timestamp('deleted_at'),
 });

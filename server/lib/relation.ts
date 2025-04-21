@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { and, eq } from 'drizzle-orm';
+import { aliasedTable, and, eq } from 'drizzle-orm';
 import type { MySqlTableWithColumns } from 'drizzle-orm/mysql-core';
 
 import { db } from '../db/database.js';
@@ -50,9 +50,10 @@ export function generateQueryOneToOne(
     for (const relation of withArray) {
       const relationObj = relations?.[relation];
       if (relationObj && relationObj.type === 'one-to-one') {
+        const alias = aliasedTable(relationObj.table, relation.replace(/Id$/, ''));
         queryInFunction = queryInFunction.leftJoin(
-          relationObj.table,
-          eq(table[relation], relationObj.table[relationObj.on])
+          alias,
+          eq(table[relation], alias[relationObj.on])
         );
       }
     }

@@ -12,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { LandTypeLabel } from '@/enum/landType.enum';
 import { deleteTree } from '@/lib/api/treeApi';
 import { TreeType } from '@/types/tree.type';
 
@@ -26,7 +27,7 @@ export function PohonTable({ data, isPending }: { data?: TreeType[]; isPending: 
     <Table>
       <TableHeader>
         <TableRow>
-          {['ID', 'Action'].map((head) => (
+          {['ID', 'Kode', 'Nama Pohon', 'Komunitas', 'Deskripsi', 'Action'].map((head) => (
             <TableHead key={head}>{head}</TableHead>
           ))}
         </TableRow>
@@ -45,6 +46,30 @@ export function PohonTable({ data, isPending }: { data?: TreeType[]; isPending: 
           : data?.map((tree) => (
               <TableRow key={tree.id}>
                 <TableCell>{tree.id}</TableCell>
+                <TableCell>{tree.code}</TableCell>
+                <TableCell>
+                  <div>
+                    <strong>Latin:</strong> {tree.masterTree?.latinName}
+                  </div>
+                  <div>
+                    <strong>Lokal:</strong> {tree.masterTree?.localName}
+                  </div>
+                </TableCell>
+                <TableCell>{tree.kelompokKomunitas?.name}</TableCell>
+                <TableCell>
+                  {/* <div>
+                    <strong>Kategori:</strong> {TreeCategoryLabel[tree.category]}
+                  </div>
+                  <div>
+                    <strong>Diameter:</strong> {tree.diameter} cm
+                  </div>
+                  <div>
+                    <strong>Serapan Karbon (CO2):</strong> {tree.serapanCo2} kg
+                  </div> */}
+                  <div>
+                    <strong>Jenis Tanah:</strong> {LandTypeLabel[tree.landType]}
+                  </div>
+                </TableCell>
                 <TableCell className="flex flex-row gap-4">
                   <Button
                     variant="outline"

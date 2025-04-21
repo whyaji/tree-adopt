@@ -7,6 +7,7 @@ import { db } from '../db/database.js';
 import {
   kelompokKomunitasSchema,
   masterTreeSchema,
+  surveyHistorySchema,
   treeSchema,
   userSchema,
 } from '../db/schema/schema.js';
@@ -19,22 +20,23 @@ import authMiddleware from '../middleware/jwt.js';
 const treeSchemaZod = z.object({
   id: z.number().int().positive(),
   code: z.string().min(1),
-  treeId: z.number().int().positive(),
+  masterTreeId: z.number().int().positive(),
   kelompokKomunitasId: z.number().int().positive(),
-  status: z.number().int().default(1), // 0 = inactive, 1 = active, 2 = adopted
-  adoptedBy: z.number().int().nullable(),
-  category: z.number().int().positive(), // 1 = pohon dewasa, 2 = pohon remaja, 3 = bibit
-  diameter: z.number().positive(),
-  serapanCo2: z.number().positive(),
+  surveyorId: z.number().int().positive(),
+  status: z.number().int().default(1), // 0 = inactive, 1 = active
+  elevation: z.number(),
+  address: z.string().min(1),
+  latitude: z.number(),
+  longitude: z.number(),
   landType: z.number().int().positive(),
 });
 
-const createTreeSchema = treeSchemaZod.omit({ id: true, status: true, adoptedBy: true });
+const createTreeSchema = treeSchemaZod.omit({ id: true, status: true });
 export type Tree = z.infer<typeof treeSchemaZod>;
 
 // === RELATIONS ===
 const relations: RelationsType = {
-  adoptedBy: {
+  surveyorId: {
     type: 'one-to-one',
     table: userSchema,
     on: 'id',
@@ -44,10 +46,15 @@ const relations: RelationsType = {
     table: kelompokKomunitasSchema,
     on: 'id',
   },
-  treeId: {
+  masterTreeId: {
     type: 'one-to-one',
     table: masterTreeSchema,
     on: 'id',
+  },
+  surveyHistory: {
+    type: 'one-to-many',
+    table: surveyHistorySchema,
+    on: 'treeId',
   },
 };
 

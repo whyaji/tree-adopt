@@ -9,28 +9,29 @@ import { toCamelCase } from './utils.js';
 
 type OneToOneRelation = {
   type: 'one-to-one';
-  table: MySqlTableWithColumns<any>;
-  on: string;
 };
 
 type OneToManyRelation = {
   type: 'one-to-many';
-  table: MySqlTableWithColumns<any>;
-  on: string;
 };
 
 type LatestInsertedRelation = {
   type: 'latest-inserted';
-  table: MySqlTableWithColumns<any>;
-  on: string;
 };
 
 export type RelationsType = Record<
   string,
-  OneToOneRelation | OneToManyRelation | LatestInsertedRelation
+  (OneToOneRelation | OneToManyRelation | LatestInsertedRelation) & {
+    table: MySqlTableWithColumns<any>;
+    on: string;
+    from?: string;
+    alias?: string;
+    child?: RelationsType;
+  }
 >;
 
 export function reformatMainKey(rawData: any, withArray?: string[]) {
+  console.log('reformat');
   return rawData.map((row: { [s: string]: unknown } | ArrayLike<unknown>) => {
     const mainKey = Object.keys(row).find((key) => !withArray?.includes(key));
 
@@ -59,10 +60,13 @@ export function generateQueryOneToOne(
     for (const relation of withArray) {
       const relationObj = relations?.[relation];
       if (relationObj && relationObj.type === 'one-to-one') {
-        const alias = aliasedTable(relationObj.table, relation.replace(/Id$/, ''));
+        const alias = aliasedTable(
+          relationObj.table,
+          relationObj.alias ?? relation.replace(/Id$/, '')
+        );
         queryInFunction = queryInFunction.leftJoin(
           alias,
-          eq(table[relation], alias[relationObj.on])
+          eq(table[relationObj.from ?? relation], alias[relationObj.on])
         );
       }
     }
@@ -80,7 +84,7 @@ export async function getDataQueryOneToMany(
 ) {
   let dataInFunction = data;
   const oneToManyRelation = Object.keys(relations ?? {}).filter(
-    (key) => relations?.[key].type === 'one-to-many'
+    (key) => relations?.[key].type === 'one-to-many' && withArray?.includes(key)
   );
 
   const idsString: string = dataInFunction
@@ -102,11 +106,16 @@ export async function getDataQueryOneToMany(
       if (sortBy && order) {
         dataOneToManyQuery.orderBy(getSortDirection(sortBy, order, relationObj.table));
       }
-      const dataOneToManyResult = await dataOneToManyQuery;
+      const dataOneToManyResult = await recursionDataRelationChild(
+        dataOneToManyQuery,
+        primaryKey,
+        relationObj,
+        withArray
+      );
       dataInFunction = dataInFunction.map((row: { [s: string]: unknown } | ArrayLike<unknown>) => {
         return {
           ...row,
-          [relation]: dataOneToManyResult.filter(
+          [relationObj.alias ?? relation]: dataOneToManyResult.filter(
             (item: { [s: string]: unknown } | ArrayLike<unknown>) => {
               return (row as any)[primaryKey] === (item as any)[relationObj.on];
             }
@@ -128,7 +137,7 @@ export async function getDataQueryLatestInserted(
 ) {
   let dataInFunction = data;
   const latestInsertedRelation = Object.keys(relations ?? {}).filter(
-    (key) => relations?.[key].type === 'latest-inserted'
+    (key) => relations?.[key].type === 'latest-inserted' && withArray?.includes(key)
   );
 
   const idsString: string = dataInFunction
@@ -150,11 +159,16 @@ export async function getDataQueryLatestInserted(
       if (sortBy && order) {
         dataOneToManyQuery.orderBy(getSortDirection(sortBy, order, relationObj.table));
       }
-      const dataOneToManyResult = await dataOneToManyQuery;
+      const dataOneToManyResult = await recursionDataRelationChild(
+        dataOneToManyQuery,
+        primaryKey,
+        relationObj,
+        withArray
+      );
       dataInFunction = dataInFunction.map((row: { [s: string]: unknown } | ArrayLike<unknown>) => {
         return {
           ...row,
-          [relation]:
+          [relationObj.alias ?? relation]:
             dataOneToManyResult.filter((item: { [s: string]: unknown } | ArrayLike<unknown>) => {
               return (row as any)[primaryKey] === (item as any)[relationObj.on];
             })?.[0] ?? null,
@@ -163,4 +177,59 @@ export async function getDataQueryLatestInserted(
     }
   }
   return dataInFunction;
+}
+
+async function recursionDataRelationChild(
+  dataOneToManyQuery: any,
+  primaryKey: string,
+  relationObj: RelationsType[string],
+  withArray?: string[] | null
+) {
+  if (relationObj.child) {
+    return await recursionDataRelation(
+      dataOneToManyQuery,
+      primaryKey,
+      relationObj.table,
+      relationObj.child,
+      withArray
+    );
+  } else {
+    return await dataOneToManyQuery;
+  }
+}
+
+async function recursionDataRelation(
+  query: any,
+  primaryKey: string,
+  table: MySqlTableWithColumns<any>,
+  relations?: RelationsType,
+  withArray?: string[] | null
+) {
+  const oneToOneRelation = Object.keys(relations ?? {}).filter(
+    (key) => relations?.[key].type === 'one-to-one' && withArray?.includes(key)
+  );
+  query = generateQueryOneToOne(query, table, oneToOneRelation, relations, withArray);
+
+  const rawData = await query;
+  let data =
+    withArray && relations && oneToOneRelation.length > 0
+      ? reformatMainKey(rawData, withArray)
+      : rawData;
+  data =
+    data.length > 0
+      ? await getDataQueryOneToMany(data, primaryKey, undefined, undefined, relations, withArray)
+      : [];
+
+  data =
+    data.length > 0
+      ? await getDataQueryLatestInserted(
+          data,
+          primaryKey,
+          'createdAt',
+          'desc',
+          relations,
+          withArray
+        )
+      : [];
+  return data;
 }

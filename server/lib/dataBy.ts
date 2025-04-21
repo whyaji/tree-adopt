@@ -38,16 +38,17 @@ export async function getDataBy({
     .where(eq(table[toCamelCase(getBy) as keyof typeof table as string], valueId));
 
   const oneToOneRelation = Object.keys(relations ?? {}).filter(
-    (key) => relations?.[key].type === 'one-to-one'
+    (key) => relations?.[key].type === 'one-to-one' && withArray?.includes(key)
   );
 
   query = generateQueryOneToOne(query, table, oneToOneRelation, relations, withArray);
 
   const rawData = await query.limit(1);
 
-  let data = !(withArray && relations && oneToOneRelation.length > 0)
-    ? rawData
-    : reformatMainKey(rawData, withArray);
+  let data =
+    withArray && relations && oneToOneRelation.length > 0
+      ? reformatMainKey(rawData, withArray)
+      : rawData;
 
   data =
     data.length > 0

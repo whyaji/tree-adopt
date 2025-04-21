@@ -62,6 +62,15 @@ const relations: RelationsType = {
     type: 'one-to-many',
     table: surveyHistorySchema,
     on: 'treeId',
+    child: {
+      'surveyHistory.userId': {
+        type: 'one-to-one',
+        table: userSchema,
+        on: 'id',
+        from: 'userId',
+        alias: 'user',
+      },
+    },
   },
   adoptHistory: {
     type: 'one-to-many',
@@ -72,6 +81,15 @@ const relations: RelationsType = {
     type: 'latest-inserted',
     table: adoptHistorySchema,
     on: 'treeId',
+    child: {
+      'adopter.userId': {
+        type: 'one-to-one',
+        table: userSchema,
+        on: 'id',
+        from: 'userId',
+        alias: 'user',
+      },
+    },
   },
 };
 
@@ -108,7 +126,7 @@ export const treeRoute = new Hono()
     return c.json({ message: 'Tree updated' });
   })
 
-  // adopt
+  // adopt tree
   .post('/:id{[0-9]+}/adopt', zValidator('json', adoptTreeJsonSchema), async (c) => {
     const id = parseInt(c.req.param('id'));
     const adoptDataReq = c.req.valid('json');

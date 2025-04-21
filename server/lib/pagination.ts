@@ -59,7 +59,7 @@ export async function getPaginationData({
   const withArray = withString ? (withString as string).split(',') : null;
 
   const oneToOneRelation = Object.keys(relations ?? {}).filter(
-    (key) => relations?.[key].type === 'one-to-one'
+    (key) => relations?.[key].type === 'one-to-one' && withArray?.includes(key)
   );
 
   query = generateQueryOneToOne(query, table, oneToOneRelation, relations, withArray);
@@ -73,9 +73,10 @@ export async function getPaginationData({
     db.select({ count: count() }).from(table).where(whereClause),
   ]);
 
-  let data = !(withArray && relations && oneToOneRelation.length > 0)
-    ? rawData
-    : reformatMainKey(rawData, withArray);
+  let data =
+    withArray && relations && oneToOneRelation.length > 0
+      ? reformatMainKey(rawData, withArray)
+      : rawData;
 
   data =
     data.length > 0

@@ -19,7 +19,8 @@ const apiRoutes = app
   .route('/kelompok-komunitas', kelompokKomunitasRoute)
   .route('/master-tree', masterTreeRoute)
   .route('/tree', treeRoute)
-  .route('/survey-history', surveyHistoryRoute);
+  .route('/survey-history', surveyHistoryRoute)
+  .route('/adopt-history', authRoute);
 
 app.get('*', serveStatic({ root: './frontend/dist' }));
 app.get('*', serveStatic({ path: './frontend/dist/index.html' }));

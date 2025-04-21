@@ -1,9 +1,8 @@
-import { SurveyHistory } from '@server/routes/surveyHistory';
+import { AdoptHistory } from '@server/routes/adoptHistory';
 
 import { TreeType } from './tree.type';
 import { UserType } from './user.type';
-
-export type SurveyHistoryType = SurveyHistory & {
+export type AdoptHistoryType = AdoptHistory & {
   user: UserType | null;
   tree: TreeType | null;
 };

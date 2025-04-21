@@ -13,6 +13,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { LandTypeLabel } from '@/enum/landType.enum';
+import { TreeCategoryLabel } from '@/enum/treeCategory.enum';
 import { deleteTree } from '@/lib/api/treeApi';
 import { TreeType } from '@/types/tree.type';
 
@@ -27,9 +28,11 @@ export function PohonTable({ data, isPending }: { data?: TreeType[]; isPending: 
     <Table>
       <TableHeader>
         <TableRow>
-          {['ID', 'Kode', 'Nama Pohon', 'Komunitas', 'Deskripsi', 'Action'].map((head) => (
-            <TableHead key={head}>{head}</TableHead>
-          ))}
+          {['ID', 'Kode', 'Nama Pohon', 'Komunitas', 'Deskripsi', 'Adopter', 'Action'].map(
+            (head) => (
+              <TableHead key={head}>{head}</TableHead>
+            )
+          )}
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -57,19 +60,24 @@ export function PohonTable({ data, isPending }: { data?: TreeType[]; isPending: 
                 </TableCell>
                 <TableCell>{tree.kelompokKomunitas?.name}</TableCell>
                 <TableCell>
-                  {/* <div>
-                    <strong>Kategori:</strong> {TreeCategoryLabel[tree.category]}
-                  </div>
-                  <div>
-                    <strong>Diameter:</strong> {tree.diameter} cm
-                  </div>
-                  <div>
-                    <strong>Serapan Karbon (CO2):</strong> {tree.serapanCo2} kg
-                  </div> */}
+                  {tree.survey && (
+                    <div>
+                      <div>
+                        <strong>Kategori:</strong> {TreeCategoryLabel[tree.survey.category]}
+                      </div>
+                      <div>
+                        <strong>Diameter:</strong> {tree.survey.diameter} cm
+                      </div>
+                      <div>
+                        <strong>Serapan Karbon (CO2):</strong> {tree.survey.serapanCo2} kg
+                      </div>
+                    </div>
+                  )}
                   <div>
                     <strong>Jenis Tanah:</strong> {LandTypeLabel[tree.landType]}
                   </div>
                 </TableCell>
+                <TableCell>{tree.adopter?.user?.name ?? '-'}</TableCell>
                 <TableCell className="flex flex-row gap-4">
                   <Button
                     variant="outline"

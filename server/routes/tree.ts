@@ -72,6 +72,20 @@ const relations: RelationsType = {
       },
     },
   },
+  survey: {
+    type: 'latest-inserted',
+    table: surveyHistorySchema,
+    on: 'treeId',
+    child: {
+      'survey.userId': {
+        type: 'one-to-one',
+        table: userSchema,
+        on: 'id',
+        from: 'userId',
+        alias: 'user',
+      },
+    },
+  },
   adoptHistory: {
     type: 'one-to-many',
     table: adoptHistorySchema,

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { PaginationParams } from '@/interface/pagination.interface';
 
-export function usePaginationFilter(defaultParams?: {
+export function usePaginationFilter<T>(defaultParams?: {
   page?: number;
   limit?: number;
   search?: string;
@@ -19,6 +19,7 @@ export function usePaginationFilter(defaultParams?: {
   const [sortBy, setSortBy] = useState(defaultParams?.sortBy ?? 'createdAt');
   const [order, setOrder] = useState(defaultParams?.order ?? 'desc');
   const [tempSearch, setTempSearch] = useState(defaultParams?.search ?? '');
+  const [data, setData] = useState<T[]>([]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -55,5 +56,7 @@ export function usePaginationFilter(defaultParams?: {
     order,
     setOrder,
     paginationParams,
+    data,
+    setData,
   };
 }

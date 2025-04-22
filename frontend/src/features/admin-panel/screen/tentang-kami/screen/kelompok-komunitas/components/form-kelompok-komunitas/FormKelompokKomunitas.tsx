@@ -12,6 +12,7 @@ import { FieldInfo } from '@/components/ui/field-info';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { MAPS_CENTER } from '@/constants/maps';
 import { createKelompokKomunitas, updateKelompokKomunitas } from '@/lib/api/kelompokKomunitasApi';
 
 function ClickHandler({
@@ -36,7 +37,7 @@ export const FormKelompokKomunitas: FC<{
   const [mapCenter, setMapCenter] = useState<[number, number]>(
     kelompokKomunitas
       ? [parseFloat(kelompokKomunitas.latitude), parseFloat(kelompokKomunitas.longitude)]
-      : [-2.5489, 118.0149]
+      : MAPS_CENTER.DEFAULT
   );
 
   const [file, setFile] = useState<File | null>(null);
@@ -72,7 +73,7 @@ export const FormKelompokKomunitas: FC<{
         }
         form.reset();
         setMarkerPosition(null);
-        setMapCenter([-2.5489, 118.0149]);
+        setMapCenter(MAPS_CENTER.DEFAULT);
         navigate({ to: '/admin/tentang-kami/kelompok-komunitas' });
       } catch {
         if (kelompokKomunitas) {

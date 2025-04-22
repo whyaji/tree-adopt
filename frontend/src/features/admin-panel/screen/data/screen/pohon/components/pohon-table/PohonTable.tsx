@@ -78,37 +78,39 @@ export function PohonTable({ data, isPending }: { data?: TreeType[]; isPending: 
                   </div>
                 </TableCell>
                 <TableCell>{tree.adopter?.user?.name ?? '-'}</TableCell>
-                <TableCell className="flex flex-row gap-4">
-                  <Button
-                    variant="outline"
-                    className="w-20"
-                    onClick={() =>
-                      navigate({
-                        to: `/admin/data/pohon/update/${tree.id}`,
-                      })
-                    }>
-                    Edit
-                  </Button>
-                  <ConfirmationDialog
-                    title="Apakah anda yakin untuk menghapus?"
-                    message="Data yang dihapus tidak dapat dikembalikan."
-                    confirmText="Delete"
-                    onConfirm={async () => {
-                      try {
-                        await deleteTree(String(tree.id));
-                        window.location.reload();
-                      } catch (error) {
-                        console.error(error);
-                        toast.error('Failed to delete komunitas');
+                <TableCell>
+                  <div className="flex flex-row gap-4">
+                    <Button
+                      variant="outline"
+                      className="w-20"
+                      onClick={() =>
+                        navigate({
+                          to: `/admin/data/pohon/update/${tree.id}`,
+                        })
+                      }>
+                      Edit
+                    </Button>
+                    <ConfirmationDialog
+                      title="Apakah anda yakin untuk menghapus?"
+                      message="Data yang dihapus tidak dapat dikembalikan."
+                      confirmText="Delete"
+                      onConfirm={async () => {
+                        try {
+                          await deleteTree(String(tree.id));
+                          window.location.reload();
+                        } catch (error) {
+                          console.error(error);
+                          toast.error('Failed to delete komunitas');
+                        }
+                      }}
+                      confirmVarriant="destructive"
+                      triggerButton={
+                        <Button variant="destructive" className="w-20">
+                          Delete
+                        </Button>
                       }
-                    }}
-                    confirmVarriant="destructive"
-                    triggerButton={
-                      <Button variant="destructive" className="w-20">
-                        Delete
-                      </Button>
-                    }
-                  />
+                    />
+                  </div>
                 </TableCell>
               </TableRow>
             ))}

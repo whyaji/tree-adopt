@@ -1,3 +1,4 @@
+import { PaginationParams } from '@/interface/pagination.interface';
 import { MasterTreeType } from '@/types/masterTree.type';
 
 import { api } from './api';
@@ -12,9 +13,17 @@ export async function createMasterTree(masterTree: Omit<MasterTreeType, 'id'>) {
   return res.json();
 }
 
-export async function getMasterTrees(search: string, page: number, limit: number) {
+export async function getMasterTrees({
+  search,
+  page,
+  limit,
+  filter,
+  withData,
+  sortBy,
+  order,
+}: PaginationParams) {
   const res = await masterTreeApi.$get({
-    query: { search, page, limit },
+    query: { search, page, limit, with: withData, filter, sortBy, order },
   });
   if (!res.ok) throw new Error(res.statusText);
   return res.json();

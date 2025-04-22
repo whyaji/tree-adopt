@@ -9,3 +9,9 @@ export const LandTypeLabel: Record<number, string> = {
   [LAND_TYPE.ORGANIK]: 'Organik',
   [LAND_TYPE.LAHAN_BASAH]: 'Lahan Basah',
 };
+
+export const ListLandType = [
+  { label: 'Mineral', value: String(LAND_TYPE.MINERAL) },
+  { label: 'Organik', value: String(LAND_TYPE.ORGANIK) },
+  { label: 'Lahan Basah', value: String(LAND_TYPE.LAHAN_BASAH) },
+];

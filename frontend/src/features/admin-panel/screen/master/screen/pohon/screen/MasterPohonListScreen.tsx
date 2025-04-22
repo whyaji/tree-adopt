@@ -13,7 +13,7 @@ export function MasterPohonListScreen() {
 
   const { isPending, error, data } = useQuery({
     queryKey: ['get-master-tree', search, page, limit],
-    queryFn: () => getMasterTrees(search, page, limit),
+    queryFn: () => getMasterTrees({ search, page, limit }),
   });
 
   const totalPage = data?.totalPage ?? 0;

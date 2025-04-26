@@ -85,6 +85,16 @@ export function PohonTable({ data, isPending }: { data?: TreeType[]; isPending: 
                       className="w-20"
                       onClick={() =>
                         navigate({
+                          to: `/admin/data/pohon/survey-history/${tree.id}`,
+                        })
+                      }>
+                      Survey
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="w-20"
+                      onClick={() =>
+                        navigate({
                           to: `/admin/data/pohon/update/${tree.id}`,
                         })
                       }>

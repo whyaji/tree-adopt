@@ -29,9 +29,10 @@ export async function getTrees({
   return res.json();
 }
 
-export async function getTree(id: string) {
+export async function getTree(id: string, withData?: string) {
   const res = await treeApi[':id{[0-9]+}'].$get({
     param: { id },
+    ...(withData ? { query: { with: withData } } : {}),
   });
   if (!res.ok) throw new Error(res.statusText);
   return res.json() as Promise<{ data: TreeType }>;

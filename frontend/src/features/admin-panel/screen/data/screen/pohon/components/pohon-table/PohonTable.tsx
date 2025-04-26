@@ -81,11 +81,12 @@ export function PohonTable({ data, isPending }: { data?: TreeType[]; isPending: 
                 <TableCell>
                   <div className="flex flex-row gap-4">
                     <Button
+                      disabled={tree.surveyorId === null}
                       variant="outline"
                       className="w-20"
                       onClick={() =>
                         navigate({
-                          to: `/admin/data/pohon/survey-history/${tree.id}`,
+                          to: `/admin/data/pohon/${tree.id}/survey-history`,
                         })
                       }>
                       Survey

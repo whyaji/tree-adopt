@@ -37,8 +37,6 @@ export function SiteHeader() {
   const stringUser = Cookies.get('user');
   const user: UserType = stringUser ? JSON.parse(stringUser) : null;
 
-  console.log('user', user);
-
   const pathSegments = pathname.split('/').filter(Boolean);
 
   return (

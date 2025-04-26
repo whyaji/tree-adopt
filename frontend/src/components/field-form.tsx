@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { PaginationParamsOptional } from '@/interface/pagination.interface';
 
+import { DatePicker } from './date-picker';
 import {
   DropdownComunityGroupList,
   DropdownDataList,
@@ -21,6 +22,7 @@ export type FieldItemType<T> = {
     value: string;
   }[];
   paginationParams?: PaginationParamsOptional;
+  disabled?: boolean;
 };
 
 export type FieldType =
@@ -32,7 +34,8 @@ export type FieldType =
   | 'dropdown'
   | 'dropdown-master-tree'
   | 'dropdown-surveyor'
-  | 'dropdown-comunity-group';
+  | 'dropdown-comunity-group'
+  | 'date';
 
 export function FieldForm<T>({
   item,
@@ -56,6 +59,7 @@ export function FieldForm<T>({
           case 'area':
             return (
               <Textarea
+                disabled={item.disabled}
                 id={field.name}
                 name={field.name}
                 value={field.state.value}
@@ -101,9 +105,19 @@ export function FieldForm<T>({
               />
             );
 
+          case 'date':
+            return (
+              <DatePicker
+                label={item.label}
+                value={field.state.value}
+                onChange={(value) => field.handleChange(value)}
+              />
+            );
+
           default:
             return (
               <Input
+                disabled={item.disabled}
                 id={field.name}
                 name={field.name}
                 type={item.type}

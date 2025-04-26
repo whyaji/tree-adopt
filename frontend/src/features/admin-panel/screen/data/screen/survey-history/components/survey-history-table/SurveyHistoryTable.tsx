@@ -62,7 +62,7 @@ export function SurveyHistoryTable({
             : data?.map((survey) => (
                 <TableRow key={survey.id}>
                   <TableCell>{survey.id}</TableCell>
-                  <TableCell>{dateTimeFormat(survey.surveyDate)}</TableCell>
+                  <TableCell>{dateTimeFormat(survey.surveyDate, { dateOnly: true })}</TableCell>
                   <TableCell>{TreeCategoryLabel[survey.category]}</TableCell>
                   <TableCell>{survey.diameter} cm</TableCell>
                   <TableCell>{survey.height} cm</TableCell>
@@ -74,7 +74,7 @@ export function SurveyHistoryTable({
                         className="w-20"
                         onClick={() =>
                           navigate({
-                            to: `/admin/data/pohon/survey-history/${survey.id}/update`,
+                            to: `/admin/data/pohon/${survey.treeId}/survey-history/${survey.id}/update`,
                           })
                         }>
                         Edit

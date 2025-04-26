@@ -4,7 +4,7 @@ import { SurveyHistoryTreeScreen } from '@/features/admin-panel/screen/data/scre
 import { getTree } from '@/lib/api/treeApi';
 
 export const Route = createFileRoute(
-  '/_authenticated_admin/admin/data/pohon/survey-history/$treeId'
+  '/_authenticated_admin/admin/data/pohon/$treeId/survey-history/'
 )({
   loader: async ({ params }) => {
     try {

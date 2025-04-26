@@ -9,8 +9,8 @@ export function dateTimeFormat(
     dateOnly?: boolean;
     timeOnly?: boolean;
   } = {
-    format: 'YYYY-MM-DD HH:mm:ss',
-    dateFormat: 'YYYY-MM-DD',
+    format: 'D MMMM YYYY HH:mm:ss',
+    dateFormat: 'D MMMM YYYY',
     timeFormat: 'HH:mm:ss',
     dateOnly: false,
     timeOnly: false,
@@ -22,12 +22,25 @@ export function dateTimeFormat(
 
   const { format, dateOnly, timeOnly, dateFormat, timeFormat } = options;
 
-  if (dateOnly) return date.format(dateFormat ?? 'YYYY-MM-DD');
+  if (dateOnly) return date.format(dateFormat ?? 'D MMMM YYYY');
   if (timeOnly) return date.format(timeFormat ?? 'HH:mm:ss');
 
-  return date.format(format || 'YYYY-MM-DD HH:mm:ss');
+  return date.format(format || 'D MMMM YYYY HH:mm:ss');
 }
 
 export function toIsoDate(date: Date) {
   return moment(date).local().toISOString();
+}
+
+export function toDbDate(
+  date: string,
+  options: {
+    fromFormat?: string;
+    toFormat?: string;
+  } = {
+    fromFormat: undefined,
+    toFormat: 'YYYY-MM-DD',
+  }
+) {
+  return moment(date, options.fromFormat).format(options.toFormat);
 }

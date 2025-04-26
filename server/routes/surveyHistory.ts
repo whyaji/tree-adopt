@@ -1,11 +1,10 @@
-import { zValidator } from '@hono/zod-validator';
 import { eq } from 'drizzle-orm';
 import { Hono } from 'hono';
 import path from 'path';
 import { z } from 'zod';
 
 import { db } from '../db/database.js';
-import { surveyHistorySchema, userSchema } from '../db/schema/schema.js';
+import { surveyHistorySchema, treeSchema, userSchema } from '../db/schema/schema.js';
 import { getDataBy } from '../lib/dataBy.js';
 import { validateImage } from '../lib/image.js';
 import { getPaginationData } from '../lib/pagination.js';
@@ -14,6 +13,7 @@ import { deleteImage, uploadFile } from '../lib/upload.js';
 import authMiddleware from '../middleware/jwt.js';
 
 // === ZOD SCHEMAS ===
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const surveyHistorySchemaZod = z.object({
   id: z.number().int().positive(),
   treeId: z.number().int().positive(),
@@ -29,7 +29,7 @@ const surveyHistorySchemaZod = z.object({
 const createSurveyHistorySchemaFormData = z.object({
   treeId: z.string().min(1),
   userId: z.string().min(1),
-  surveyDate: z.string().datetime(),
+  surveyDate: z.string().date(),
   category: z.string().min(1),
   diameter: z.string().min(1),
   height: z.string().min(1),
@@ -43,6 +43,11 @@ const relations: RelationsType = {
   userId: {
     type: 'one-to-one',
     table: userSchema,
+    on: 'id',
+  },
+  treeId: {
+    type: 'one-to-one',
+    table: treeSchema,
     on: 'id',
   },
 };
@@ -109,16 +114,52 @@ export const surveyHistoryRoute = new Hono()
     return await getDataBy({ c, table: surveyHistorySchema, relations });
   })
 
-  .put('/:id{[0-9]+}', zValidator('json', surveyHistorySchemaZod), async (c) => {
+  .put('/:id{[0-9]+}', async (c) => {
     const id = parseInt(c.req.param('id'));
-    const surveyHistory = c.req.valid('json');
-    const updated = await db
-      .update(surveyHistorySchema)
-      .set(surveyHistory)
-      .where(eq(surveyHistorySchema.id, id));
-    if (!updated) {
-      return c.notFound();
+    const formData = await c.req.parseBody();
+    const image = formData.image as File | undefined;
+
+    console.log('Form Data:', formData);
+
+    const validation = createSurveyHistorySchemaFormData.safeParse(formData);
+    const imageErrors = typeof image !== 'string' ? validateImage(image) : [];
+
+    if (!validation.success || imageErrors.length > 0) {
+      return c.json({ errors: [...(validation.error?.errors || []), ...imageErrors] }, 400);
     }
+
+    const existing = await db
+      .select()
+      .from(surveyHistorySchema)
+      .where(eq(surveyHistorySchema.id, id))
+      .limit(1);
+
+    if (!existing[0]) return c.notFound();
+
+    let newImagePath = existing[0].image;
+
+    if (image instanceof File) {
+      const dir = 'uploads/survey-history';
+      try {
+        const uploadedPath = await uploadFile(image, dir);
+        newImagePath = `/${dir}/${path.basename(uploadedPath)}`;
+        if (existing[0].image && existing[0].image !== newImagePath) deleteImage(existing[0].image);
+      } catch {
+        return c.json({ error: 'Failed to upload image' }, 500);
+      }
+    }
+
+    const data = { ...validation.data, image: newImagePath };
+    const surveyHistory = {
+      ...data,
+      treeId: parseInt(data.treeId),
+      userId: parseInt(data.userId),
+      category: parseInt(data.category),
+      diameter: parseFloat(data.diameter),
+      height: parseFloat(data.height),
+      serapanCo2: parseFloat(data.serapanCo2),
+    };
+    await db.update(surveyHistorySchema).set(surveyHistory).where(eq(surveyHistorySchema.id, id));
     return c.json({ message: 'Survey History updated' });
   })
 

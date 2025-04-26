@@ -38,7 +38,9 @@ import { Route as AuthenticatedadminAdminDataPohonAddIndexImport } from './route
 import { Route as AuthenticatedadminAdminTentangKamiKelompokKomunitasUpdateKomunitasKelompokKomunitasIdImport } from './routes/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/update-komunitas/$kelompokKomunitasId'
 import { Route as AuthenticatedadminAdminMasterPohonUpdateMasterTreeIdImport } from './routes/_authenticated_admin/admin/master/pohon/update/$masterTreeId'
 import { Route as AuthenticatedadminAdminDataPohonUpdateTreeIdImport } from './routes/_authenticated_admin/admin/data/pohon/update/$treeId'
-import { Route as AuthenticatedadminAdminDataPohonSurveyHistoryTreeIdImport } from './routes/_authenticated_admin/admin/data/pohon/survey-history/$treeId'
+import { Route as AuthenticatedadminAdminDataPohonTreeIdSurveyHistoryIndexImport } from './routes/_authenticated_admin/admin/data/pohon/$treeId/survey-history/index'
+import { Route as AuthenticatedadminAdminDataPohonTreeIdSurveyHistoryAddIndexImport } from './routes/_authenticated_admin/admin/data/pohon/$treeId/survey-history/add/index'
+import { Route as AuthenticatedadminAdminDataPohonTreeIdSurveyHistorySurveyHistoryIdUpdateIndexImport } from './routes/_authenticated_admin/admin/data/pohon/$treeId/survey-history/$surveyHistoryId/update/index'
 
 // Create/Update Routes
 
@@ -223,12 +225,28 @@ const AuthenticatedadminAdminDataPohonUpdateTreeIdRoute =
     getParentRoute: () => AuthenticatedadminRoute,
   } as any)
 
-const AuthenticatedadminAdminDataPohonSurveyHistoryTreeIdRoute =
-  AuthenticatedadminAdminDataPohonSurveyHistoryTreeIdImport.update({
-    id: '/admin/data/pohon/survey-history/$treeId',
-    path: '/admin/data/pohon/survey-history/$treeId',
+const AuthenticatedadminAdminDataPohonTreeIdSurveyHistoryIndexRoute =
+  AuthenticatedadminAdminDataPohonTreeIdSurveyHistoryIndexImport.update({
+    id: '/admin/data/pohon/$treeId/survey-history/',
+    path: '/admin/data/pohon/$treeId/survey-history/',
     getParentRoute: () => AuthenticatedadminRoute,
   } as any)
+
+const AuthenticatedadminAdminDataPohonTreeIdSurveyHistoryAddIndexRoute =
+  AuthenticatedadminAdminDataPohonTreeIdSurveyHistoryAddIndexImport.update({
+    id: '/admin/data/pohon/$treeId/survey-history/add/',
+    path: '/admin/data/pohon/$treeId/survey-history/add/',
+    getParentRoute: () => AuthenticatedadminRoute,
+  } as any)
+
+const AuthenticatedadminAdminDataPohonTreeIdSurveyHistorySurveyHistoryIdUpdateIndexRoute =
+  AuthenticatedadminAdminDataPohonTreeIdSurveyHistorySurveyHistoryIdUpdateIndexImport.update(
+    {
+      id: '/admin/data/pohon/$treeId/survey-history/$surveyHistoryId/update/',
+      path: '/admin/data/pohon/$treeId/survey-history/$surveyHistoryId/update/',
+      getParentRoute: () => AuthenticatedadminRoute,
+    } as any,
+  )
 
 // Populate the FileRoutesByPath interface
 
@@ -395,13 +413,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasIndexImport
       parentRoute: typeof AuthenticatedadminImport
     }
-    '/_authenticated_admin/admin/data/pohon/survey-history/$treeId': {
-      id: '/_authenticated_admin/admin/data/pohon/survey-history/$treeId'
-      path: '/admin/data/pohon/survey-history/$treeId'
-      fullPath: '/admin/data/pohon/survey-history/$treeId'
-      preLoaderRoute: typeof AuthenticatedadminAdminDataPohonSurveyHistoryTreeIdImport
-      parentRoute: typeof AuthenticatedadminImport
-    }
     '/_authenticated_admin/admin/data/pohon/update/$treeId': {
       id: '/_authenticated_admin/admin/data/pohon/update/$treeId'
       path: '/admin/data/pohon/update/$treeId'
@@ -428,6 +439,27 @@ declare module '@tanstack/react-router' {
       path: '/admin/data/pohon/add'
       fullPath: '/admin/data/pohon/add'
       preLoaderRoute: typeof AuthenticatedadminAdminDataPohonAddIndexImport
+      parentRoute: typeof AuthenticatedadminImport
+    }
+    '/_authenticated_admin/admin/data/pohon/$treeId/survey-history/': {
+      id: '/_authenticated_admin/admin/data/pohon/$treeId/survey-history/'
+      path: '/admin/data/pohon/$treeId/survey-history'
+      fullPath: '/admin/data/pohon/$treeId/survey-history'
+      preLoaderRoute: typeof AuthenticatedadminAdminDataPohonTreeIdSurveyHistoryIndexImport
+      parentRoute: typeof AuthenticatedadminImport
+    }
+    '/_authenticated_admin/admin/data/pohon/$treeId/survey-history/add/': {
+      id: '/_authenticated_admin/admin/data/pohon/$treeId/survey-history/add/'
+      path: '/admin/data/pohon/$treeId/survey-history/add'
+      fullPath: '/admin/data/pohon/$treeId/survey-history/add'
+      preLoaderRoute: typeof AuthenticatedadminAdminDataPohonTreeIdSurveyHistoryAddIndexImport
+      parentRoute: typeof AuthenticatedadminImport
+    }
+    '/_authenticated_admin/admin/data/pohon/$treeId/survey-history/$surveyHistoryId/update/': {
+      id: '/_authenticated_admin/admin/data/pohon/$treeId/survey-history/$surveyHistoryId/update/'
+      path: '/admin/data/pohon/$treeId/survey-history/$surveyHistoryId/update'
+      fullPath: '/admin/data/pohon/$treeId/survey-history/$surveyHistoryId/update'
+      preLoaderRoute: typeof AuthenticatedadminAdminDataPohonTreeIdSurveyHistorySurveyHistoryIdUpdateIndexImport
       parentRoute: typeof AuthenticatedadminImport
     }
   }
@@ -477,11 +509,13 @@ interface AuthenticatedadminRouteChildren {
   AuthenticatedadminAdminDataPohonIndexRoute: typeof AuthenticatedadminAdminDataPohonIndexRoute
   AuthenticatedadminAdminMasterPohonIndexRoute: typeof AuthenticatedadminAdminMasterPohonIndexRoute
   AuthenticatedadminAdminTentangKamiKelompokKomunitasIndexRoute: typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasIndexRoute
-  AuthenticatedadminAdminDataPohonSurveyHistoryTreeIdRoute: typeof AuthenticatedadminAdminDataPohonSurveyHistoryTreeIdRoute
   AuthenticatedadminAdminDataPohonUpdateTreeIdRoute: typeof AuthenticatedadminAdminDataPohonUpdateTreeIdRoute
   AuthenticatedadminAdminMasterPohonUpdateMasterTreeIdRoute: typeof AuthenticatedadminAdminMasterPohonUpdateMasterTreeIdRoute
   AuthenticatedadminAdminTentangKamiKelompokKomunitasUpdateKomunitasKelompokKomunitasIdRoute: typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasUpdateKomunitasKelompokKomunitasIdRoute
   AuthenticatedadminAdminDataPohonAddIndexRoute: typeof AuthenticatedadminAdminDataPohonAddIndexRoute
+  AuthenticatedadminAdminDataPohonTreeIdSurveyHistoryIndexRoute: typeof AuthenticatedadminAdminDataPohonTreeIdSurveyHistoryIndexRoute
+  AuthenticatedadminAdminDataPohonTreeIdSurveyHistoryAddIndexRoute: typeof AuthenticatedadminAdminDataPohonTreeIdSurveyHistoryAddIndexRoute
+  AuthenticatedadminAdminDataPohonTreeIdSurveyHistorySurveyHistoryIdUpdateIndexRoute: typeof AuthenticatedadminAdminDataPohonTreeIdSurveyHistorySurveyHistoryIdUpdateIndexRoute
 }
 
 const AuthenticatedadminRouteChildren: AuthenticatedadminRouteChildren = {
@@ -497,8 +531,6 @@ const AuthenticatedadminRouteChildren: AuthenticatedadminRouteChildren = {
     AuthenticatedadminAdminMasterPohonIndexRoute,
   AuthenticatedadminAdminTentangKamiKelompokKomunitasIndexRoute:
     AuthenticatedadminAdminTentangKamiKelompokKomunitasIndexRoute,
-  AuthenticatedadminAdminDataPohonSurveyHistoryTreeIdRoute:
-    AuthenticatedadminAdminDataPohonSurveyHistoryTreeIdRoute,
   AuthenticatedadminAdminDataPohonUpdateTreeIdRoute:
     AuthenticatedadminAdminDataPohonUpdateTreeIdRoute,
   AuthenticatedadminAdminMasterPohonUpdateMasterTreeIdRoute:
@@ -507,6 +539,12 @@ const AuthenticatedadminRouteChildren: AuthenticatedadminRouteChildren = {
     AuthenticatedadminAdminTentangKamiKelompokKomunitasUpdateKomunitasKelompokKomunitasIdRoute,
   AuthenticatedadminAdminDataPohonAddIndexRoute:
     AuthenticatedadminAdminDataPohonAddIndexRoute,
+  AuthenticatedadminAdminDataPohonTreeIdSurveyHistoryIndexRoute:
+    AuthenticatedadminAdminDataPohonTreeIdSurveyHistoryIndexRoute,
+  AuthenticatedadminAdminDataPohonTreeIdSurveyHistoryAddIndexRoute:
+    AuthenticatedadminAdminDataPohonTreeIdSurveyHistoryAddIndexRoute,
+  AuthenticatedadminAdminDataPohonTreeIdSurveyHistorySurveyHistoryIdUpdateIndexRoute:
+    AuthenticatedadminAdminDataPohonTreeIdSurveyHistorySurveyHistoryIdUpdateIndexRoute,
 }
 
 const AuthenticatedadminRouteWithChildren =
@@ -535,11 +573,13 @@ export interface FileRoutesByFullPath {
   '/admin/data/pohon': typeof AuthenticatedadminAdminDataPohonIndexRoute
   '/admin/master/pohon': typeof AuthenticatedadminAdminMasterPohonIndexRoute
   '/admin/tentang-kami/kelompok-komunitas': typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasIndexRoute
-  '/admin/data/pohon/survey-history/$treeId': typeof AuthenticatedadminAdminDataPohonSurveyHistoryTreeIdRoute
   '/admin/data/pohon/update/$treeId': typeof AuthenticatedadminAdminDataPohonUpdateTreeIdRoute
   '/admin/master/pohon/update/$masterTreeId': typeof AuthenticatedadminAdminMasterPohonUpdateMasterTreeIdRoute
   '/admin/tentang-kami/kelompok-komunitas/update-komunitas/$kelompokKomunitasId': typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasUpdateKomunitasKelompokKomunitasIdRoute
   '/admin/data/pohon/add': typeof AuthenticatedadminAdminDataPohonAddIndexRoute
+  '/admin/data/pohon/$treeId/survey-history': typeof AuthenticatedadminAdminDataPohonTreeIdSurveyHistoryIndexRoute
+  '/admin/data/pohon/$treeId/survey-history/add': typeof AuthenticatedadminAdminDataPohonTreeIdSurveyHistoryAddIndexRoute
+  '/admin/data/pohon/$treeId/survey-history/$surveyHistoryId/update': typeof AuthenticatedadminAdminDataPohonTreeIdSurveyHistorySurveyHistoryIdUpdateIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -565,11 +605,13 @@ export interface FileRoutesByTo {
   '/admin/data/pohon': typeof AuthenticatedadminAdminDataPohonIndexRoute
   '/admin/master/pohon': typeof AuthenticatedadminAdminMasterPohonIndexRoute
   '/admin/tentang-kami/kelompok-komunitas': typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasIndexRoute
-  '/admin/data/pohon/survey-history/$treeId': typeof AuthenticatedadminAdminDataPohonSurveyHistoryTreeIdRoute
   '/admin/data/pohon/update/$treeId': typeof AuthenticatedadminAdminDataPohonUpdateTreeIdRoute
   '/admin/master/pohon/update/$masterTreeId': typeof AuthenticatedadminAdminMasterPohonUpdateMasterTreeIdRoute
   '/admin/tentang-kami/kelompok-komunitas/update-komunitas/$kelompokKomunitasId': typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasUpdateKomunitasKelompokKomunitasIdRoute
   '/admin/data/pohon/add': typeof AuthenticatedadminAdminDataPohonAddIndexRoute
+  '/admin/data/pohon/$treeId/survey-history': typeof AuthenticatedadminAdminDataPohonTreeIdSurveyHistoryIndexRoute
+  '/admin/data/pohon/$treeId/survey-history/add': typeof AuthenticatedadminAdminDataPohonTreeIdSurveyHistoryAddIndexRoute
+  '/admin/data/pohon/$treeId/survey-history/$surveyHistoryId/update': typeof AuthenticatedadminAdminDataPohonTreeIdSurveyHistorySurveyHistoryIdUpdateIndexRoute
 }
 
 export interface FileRoutesById {
@@ -597,11 +639,13 @@ export interface FileRoutesById {
   '/_authenticated_admin/admin/data/pohon/': typeof AuthenticatedadminAdminDataPohonIndexRoute
   '/_authenticated_admin/admin/master/pohon/': typeof AuthenticatedadminAdminMasterPohonIndexRoute
   '/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/': typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasIndexRoute
-  '/_authenticated_admin/admin/data/pohon/survey-history/$treeId': typeof AuthenticatedadminAdminDataPohonSurveyHistoryTreeIdRoute
   '/_authenticated_admin/admin/data/pohon/update/$treeId': typeof AuthenticatedadminAdminDataPohonUpdateTreeIdRoute
   '/_authenticated_admin/admin/master/pohon/update/$masterTreeId': typeof AuthenticatedadminAdminMasterPohonUpdateMasterTreeIdRoute
   '/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/update-komunitas/$kelompokKomunitasId': typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasUpdateKomunitasKelompokKomunitasIdRoute
   '/_authenticated_admin/admin/data/pohon/add/': typeof AuthenticatedadminAdminDataPohonAddIndexRoute
+  '/_authenticated_admin/admin/data/pohon/$treeId/survey-history/': typeof AuthenticatedadminAdminDataPohonTreeIdSurveyHistoryIndexRoute
+  '/_authenticated_admin/admin/data/pohon/$treeId/survey-history/add/': typeof AuthenticatedadminAdminDataPohonTreeIdSurveyHistoryAddIndexRoute
+  '/_authenticated_admin/admin/data/pohon/$treeId/survey-history/$surveyHistoryId/update/': typeof AuthenticatedadminAdminDataPohonTreeIdSurveyHistorySurveyHistoryIdUpdateIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -629,11 +673,13 @@ export interface FileRouteTypes {
     | '/admin/data/pohon'
     | '/admin/master/pohon'
     | '/admin/tentang-kami/kelompok-komunitas'
-    | '/admin/data/pohon/survey-history/$treeId'
     | '/admin/data/pohon/update/$treeId'
     | '/admin/master/pohon/update/$masterTreeId'
     | '/admin/tentang-kami/kelompok-komunitas/update-komunitas/$kelompokKomunitasId'
     | '/admin/data/pohon/add'
+    | '/admin/data/pohon/$treeId/survey-history'
+    | '/admin/data/pohon/$treeId/survey-history/add'
+    | '/admin/data/pohon/$treeId/survey-history/$surveyHistoryId/update'
   fileRoutesByTo: FileRoutesByTo
   to:
     | ''
@@ -658,11 +704,13 @@ export interface FileRouteTypes {
     | '/admin/data/pohon'
     | '/admin/master/pohon'
     | '/admin/tentang-kami/kelompok-komunitas'
-    | '/admin/data/pohon/survey-history/$treeId'
     | '/admin/data/pohon/update/$treeId'
     | '/admin/master/pohon/update/$masterTreeId'
     | '/admin/tentang-kami/kelompok-komunitas/update-komunitas/$kelompokKomunitasId'
     | '/admin/data/pohon/add'
+    | '/admin/data/pohon/$treeId/survey-history'
+    | '/admin/data/pohon/$treeId/survey-history/add'
+    | '/admin/data/pohon/$treeId/survey-history/$surveyHistoryId/update'
   id:
     | '__root__'
     | '/_authenticated'
@@ -688,11 +736,13 @@ export interface FileRouteTypes {
     | '/_authenticated_admin/admin/data/pohon/'
     | '/_authenticated_admin/admin/master/pohon/'
     | '/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/'
-    | '/_authenticated_admin/admin/data/pohon/survey-history/$treeId'
     | '/_authenticated_admin/admin/data/pohon/update/$treeId'
     | '/_authenticated_admin/admin/master/pohon/update/$masterTreeId'
     | '/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/update-komunitas/$kelompokKomunitasId'
     | '/_authenticated_admin/admin/data/pohon/add/'
+    | '/_authenticated_admin/admin/data/pohon/$treeId/survey-history/'
+    | '/_authenticated_admin/admin/data/pohon/$treeId/survey-history/add/'
+    | '/_authenticated_admin/admin/data/pohon/$treeId/survey-history/$surveyHistoryId/update/'
   fileRoutesById: FileRoutesById
 }
 
@@ -760,11 +810,13 @@ export const routeTree = rootRoute
         "/_authenticated_admin/admin/data/pohon/",
         "/_authenticated_admin/admin/master/pohon/",
         "/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/",
-        "/_authenticated_admin/admin/data/pohon/survey-history/$treeId",
         "/_authenticated_admin/admin/data/pohon/update/$treeId",
         "/_authenticated_admin/admin/master/pohon/update/$masterTreeId",
         "/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/update-komunitas/$kelompokKomunitasId",
-        "/_authenticated_admin/admin/data/pohon/add/"
+        "/_authenticated_admin/admin/data/pohon/add/",
+        "/_authenticated_admin/admin/data/pohon/$treeId/survey-history/",
+        "/_authenticated_admin/admin/data/pohon/$treeId/survey-history/add/",
+        "/_authenticated_admin/admin/data/pohon/$treeId/survey-history/$surveyHistoryId/update/"
       ]
     },
     "/about": {
@@ -846,10 +898,6 @@ export const routeTree = rootRoute
       "filePath": "_authenticated_admin/admin/tentang-kami/kelompok-komunitas/index.tsx",
       "parent": "/_authenticated_admin"
     },
-    "/_authenticated_admin/admin/data/pohon/survey-history/$treeId": {
-      "filePath": "_authenticated_admin/admin/data/pohon/survey-history/$treeId.tsx",
-      "parent": "/_authenticated_admin"
-    },
     "/_authenticated_admin/admin/data/pohon/update/$treeId": {
       "filePath": "_authenticated_admin/admin/data/pohon/update/$treeId.tsx",
       "parent": "/_authenticated_admin"
@@ -864,6 +912,18 @@ export const routeTree = rootRoute
     },
     "/_authenticated_admin/admin/data/pohon/add/": {
       "filePath": "_authenticated_admin/admin/data/pohon/add/index.tsx",
+      "parent": "/_authenticated_admin"
+    },
+    "/_authenticated_admin/admin/data/pohon/$treeId/survey-history/": {
+      "filePath": "_authenticated_admin/admin/data/pohon/$treeId/survey-history/index.tsx",
+      "parent": "/_authenticated_admin"
+    },
+    "/_authenticated_admin/admin/data/pohon/$treeId/survey-history/add/": {
+      "filePath": "_authenticated_admin/admin/data/pohon/$treeId/survey-history/add/index.tsx",
+      "parent": "/_authenticated_admin"
+    },
+    "/_authenticated_admin/admin/data/pohon/$treeId/survey-history/$surveyHistoryId/update/": {
+      "filePath": "_authenticated_admin/admin/data/pohon/$treeId/survey-history/$surveyHistoryId/update/index.tsx",
       "parent": "/_authenticated_admin"
     }
   }

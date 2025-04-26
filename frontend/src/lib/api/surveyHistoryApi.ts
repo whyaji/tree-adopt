@@ -1,7 +1,7 @@
-import { KelompokKomunitas } from '@server/routes/kelompokkomunitas';
 import Cookies from 'js-cookie';
 
 import { PaginationParams } from '@/interface/pagination.interface';
+import { SurveyHistoryType } from '@/types/surveyHistory.type';
 
 import { api, baseApiUrl } from './api';
 
@@ -37,12 +37,13 @@ export async function getSurveyHistories({
   return res.json();
 }
 
-export async function getSurveyHistory(id: string) {
+export async function getSurveyHistory(id: string, withData?: string) {
   const res = await surveyHistoryApi[':id{[0-9]+}'].$get({
     param: { id },
+    ...(withData ? { query: { with: withData } } : {}),
   });
   if (!res.ok) throw new Error(res.statusText);
-  return res.json() as Promise<{ data: KelompokKomunitas }>;
+  return res.json() as Promise<{ data: SurveyHistoryType }>;
 }
 
 export async function updateSurveyHistory(id: number, formData: FormData) {

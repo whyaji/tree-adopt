@@ -10,9 +10,13 @@ import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { usePaginationFilter } from '@/hooks/use-pagination-filter';
 import { PaginationParamsOptional } from '@/interface/pagination.interface';
+import { getKelompokKomunitas } from '@/lib/api/kelompokKomunitasApi';
 import { getMasterTrees } from '@/lib/api/masterTreeApi';
+import { getUsers } from '@/lib/api/userApi';
 import { cn } from '@/lib/utils';
-import { handleResponseData, onEndReached } from '@/lib/utils/paginationConfig';
+import { handleOnRefresh, handleResponseData, onEndReached } from '@/lib/utils/paginationConfig';
+import { KelompokKomunitasType } from '@/types/kelompokKomunitas.type';
+import { UserType } from '@/types/user.type';
 
 import { Input } from './ui/input';
 import { Label } from './ui/label';
@@ -33,6 +37,7 @@ export function Dropdown({
   data: {
     label: string;
     value: string;
+    secondaryLabel?: string;
   }[];
   value: string;
   setValue: (value: string) => void;
@@ -45,6 +50,7 @@ export function Dropdown({
 }) {
   const [open, setOpen] = React.useState(false);
   const triggerRef = React.useRef<HTMLButtonElement>(null);
+  const selectedItem = data.find((itemValue) => itemValue.value === value);
 
   return (
     <div className="w-full">
@@ -56,11 +62,18 @@ export function Dropdown({
             role="combobox"
             aria-expanded={open}
             className="w-full justify-between hover:bg-accent/20 transition-colors">
-            <span className="truncate">
-              {value
-                ? data.find((itemValue) => itemValue.value === value)?.label
-                : `Select ${label}...`}
-            </span>
+            {value ? (
+              <span className="truncate font-normal">
+                {selectedItem?.label}{' '}
+                {selectedItem?.secondaryLabel && (
+                  <span className="italic">- {selectedItem?.secondaryLabel}</span>
+                )}
+              </span>
+            ) : (
+              <span className={cn('truncate font-normal', 'text-muted-foreground')}>
+                {`- Select ${label} -`}
+              </span>
+            )}
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
@@ -126,7 +139,10 @@ export function Dropdown({
                       value === item.value ? 'opacity-100' : 'opacity-0'
                     )}
                   />
-                  <span className="truncate">{item.label}</span>
+                  <span className="truncate">
+                    {item.label}{' '}
+                    {item.secondaryLabel && <span className="italic">- {item.secondaryLabel}</span>}
+                  </span>
                 </div>
               ))
             )}
@@ -224,6 +240,7 @@ export function DropdownMasterTreeList({
     isPending,
     isError,
     data: responseData,
+    refetch,
   } = useQuery({
     queryKey: ['get-master-tree', search, page, limit],
     queryFn: () => getMasterTrees({ search, page, limit }),
@@ -239,11 +256,131 @@ export function DropdownMasterTreeList({
     });
   }, [isError, isPending, responseData, responseData?.data, responseData?.page, setData, setPage]);
 
+  const refresing = isPending;
+
+  const onRefresh = () => {
+    handleOnRefresh({ page, refetch, setPage });
+  };
+
   return (
     <Dropdown
       label={label}
       data={data.map((item) => ({
-        label: item.localName + ' - ' + item.latinName,
+        label: item.localName,
+        value: item.id.toString(),
+        secondaryLabel: item.latinName,
+      }))}
+      value={value}
+      setValue={setValue}
+      search={tempSearch}
+      setSearch={setTempSearch}
+      onEndReached={() => {
+        onEndReached({ isError, isPending, responseData, setPage });
+      }}
+      totalData={responseData?.total ?? undefined}
+      refreshing={refresing}
+      onRefresh={onRefresh}
+    />
+  );
+}
+
+export function DropdownUserList({
+  label = 'User',
+  value,
+  setValue,
+  defaultParams,
+}: PaginationDropdownProps) {
+  const { page, setPage, limit, search, tempSearch, setTempSearch, data, setData } =
+    usePaginationFilter<UserType>(defaultParams);
+
+  const {
+    isPending,
+    isError,
+    data: responseData,
+    refetch,
+  } = useQuery({
+    queryKey: ['get-users', search, page, limit],
+    queryFn: () => getUsers({ search, page, limit }),
+  });
+
+  React.useEffect(() => {
+    handleResponseData({
+      responseData,
+      isPending,
+      isError,
+      setData,
+      setPage,
+    });
+  }, [isError, isPending, responseData, responseData?.data, responseData?.page, setData, setPage]);
+
+  const refresing = isPending;
+
+  const onRefresh = () => {
+    handleOnRefresh({ page, refetch, setPage });
+  };
+
+  return (
+    <Dropdown
+      label={label}
+      data={data.map((item) => ({
+        label: item.name,
+        value: item.id.toString(),
+        secondaryLabel: item.email,
+      }))}
+      value={value}
+      setValue={setValue}
+      search={tempSearch}
+      setSearch={setTempSearch}
+      onEndReached={() => {
+        onEndReached({ isError, isPending, responseData, setPage });
+      }}
+      totalData={responseData?.total ?? undefined}
+      refreshing={refresing}
+      onRefresh={onRefresh}
+    />
+  );
+}
+
+export function DropdownComunityGroupList({
+  label = 'Comunity Group',
+  value,
+  setValue,
+  defaultParams,
+}: PaginationDropdownProps) {
+  const { page, setPage, limit, search, tempSearch, setTempSearch, data, setData } =
+    usePaginationFilter<KelompokKomunitasType>(defaultParams);
+
+  const {
+    isPending,
+    isError,
+    data: responseData,
+    refetch,
+  } = useQuery({
+    queryKey: ['get-kelompok-komunitas', search, page, limit],
+    queryFn: () => getKelompokKomunitas({ search, page, limit }),
+  });
+
+  React.useEffect(() => {
+    handleResponseData({
+      responseData,
+      isPending,
+      isError,
+      setData,
+      setPage,
+    });
+  }, [isError, isPending, responseData, responseData?.data, responseData?.page, setData, setPage]);
+
+  const refresing = isPending;
+
+  const onRefresh = () => {
+    handleOnRefresh({ page, refetch, setPage });
+  };
+
+  return (
+    <Dropdown
+      label={label}
+      data={data.map((item) => ({
+        label: item.name,
         value: item.id.toString(),
       }))}
       value={value}
@@ -254,10 +391,8 @@ export function DropdownMasterTreeList({
         onEndReached({ isError, isPending, responseData, setPage });
       }}
       totalData={responseData?.total ?? undefined}
-      refreshing={isPending}
-      onRefresh={() => {
-        setPage(1);
-      }}
+      refreshing={refresing}
+      onRefresh={onRefresh}
     />
   );
 }

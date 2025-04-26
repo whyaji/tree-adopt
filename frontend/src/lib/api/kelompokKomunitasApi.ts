@@ -1,6 +1,8 @@
 import { KelompokKomunitas } from '@server/routes/kelompokkomunitas';
 import Cookies from 'js-cookie';
 
+import { PaginationParams } from '@/interface/pagination.interface';
+
 import { api, baseApiUrl } from './api';
 
 const kelompokKomunitasApi = api['kelompok-komunitas'];
@@ -19,9 +21,17 @@ export async function createKelompokKomunitas(formData: FormData) {
   return res.json();
 }
 
-export async function getKelompokKomunitas(search: string, page: number, limit: number) {
+export async function getKelompokKomunitas({
+  search,
+  page,
+  limit,
+  filter,
+  withData,
+  sortBy,
+  order,
+}: PaginationParams) {
   const res = await kelompokKomunitasApi.$get({
-    query: { search, page, limit },
+    query: { search, page, limit, with: withData, filter, sortBy, order },
   });
   if (!res.ok) throw new Error(res.statusText);
   return res.json();

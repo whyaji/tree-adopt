@@ -71,8 +71,8 @@ export const FormPohon: FC<{
   const formItem: FieldItemType<keyof (typeof form)['state']['values']>[] = [
     { name: 'code', label: 'Code', type: 'text' },
     { name: 'masterTreeId', label: 'Tree', type: 'dropdown-master-tree' },
-    { name: 'kelompokKomunitasId', label: 'Kelompok Komunitas', type: 'text' },
-    { name: 'surveyorId', label: 'Surveyor', type: 'text' },
+    { name: 'kelompokKomunitasId', label: 'Kelompok Komunitas', type: 'dropdown-comunity-group' },
+    { name: 'surveyorId', label: 'Surveyor', type: 'dropdown-surveyor' },
     {
       name: 'status',
       label: 'Status',

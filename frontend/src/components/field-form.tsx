@@ -1,7 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { PaginationParamsOptional } from '@/interface/pagination.interface';
 
-import { DropdownDataList, DropdownMasterTreeList } from './dropdown';
+import {
+  DropdownComunityGroupList,
+  DropdownDataList,
+  DropdownMasterTreeList,
+  DropdownUserList,
+} from './dropdown';
 import { FieldInfo } from './ui/field-info';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
@@ -25,7 +30,9 @@ export type FieldType =
   | 'password'
   | 'area'
   | 'dropdown'
-  | 'dropdown-master-tree';
+  | 'dropdown-master-tree'
+  | 'dropdown-surveyor'
+  | 'dropdown-comunity-group';
 
 export function FieldForm<T>({
   item,
@@ -70,6 +77,24 @@ export function FieldForm<T>({
           case 'dropdown-master-tree':
             return (
               <DropdownMasterTreeList
+                label={item.label}
+                value={field.state.value}
+                setValue={(value) => field.handleChange(value)}
+              />
+            );
+
+          case 'dropdown-surveyor':
+            return (
+              <DropdownUserList
+                label={item.label}
+                value={field.state.value}
+                setValue={(value) => field.handleChange(value)}
+              />
+            );
+
+          case 'dropdown-comunity-group':
+            return (
+              <DropdownComunityGroupList
                 label={item.label}
                 value={field.state.value}
                 setValue={(value) => field.handleChange(value)}

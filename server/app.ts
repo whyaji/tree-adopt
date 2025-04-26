@@ -7,6 +7,7 @@ import { kelompokKomunitasRoute } from './routes/kelompokkomunitas.js';
 import { masterTreeRoute } from './routes/masterTree.js';
 import { surveyHistoryRoute } from './routes/surveyHistory.js';
 import { treeRoute } from './routes/tree.js';
+import { usersRoute } from './routes/users.js';
 
 const app = new Hono();
 
@@ -16,6 +17,7 @@ app.use('*', logger());
 const apiRoutes = app
   .basePath('/api/v1')
   .route('/', authRoute)
+  .route('/users', usersRoute)
   .route('/kelompok-komunitas', kelompokKomunitasRoute)
   .route('/master-tree', masterTreeRoute)
   .route('/tree', treeRoute)

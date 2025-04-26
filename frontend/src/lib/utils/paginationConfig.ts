@@ -40,3 +40,19 @@ export function onEndReached<T>({
     }
   }
 }
+
+export function handleOnRefresh({
+  page,
+  refetch,
+  setPage,
+}: {
+  page: number;
+  refetch: () => void;
+  setPage: React.Dispatch<React.SetStateAction<number>>;
+}) {
+  if (page === 1) {
+    refetch();
+  } else {
+    setPage(1);
+  }
+}

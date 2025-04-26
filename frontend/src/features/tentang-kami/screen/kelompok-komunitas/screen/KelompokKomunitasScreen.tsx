@@ -11,7 +11,7 @@ export function KelompokKomunitasScreen() {
 
   const { isPending, error, data } = useQuery({
     queryKey: ['get-kelompok-komunitas', search, page, limit],
-    queryFn: () => getKelompokKomunitas(search, page, limit),
+    queryFn: () => getKelompokKomunitas({ search, page, limit }),
   });
 
   if (error) return <div>Error: {error.message}</div>;

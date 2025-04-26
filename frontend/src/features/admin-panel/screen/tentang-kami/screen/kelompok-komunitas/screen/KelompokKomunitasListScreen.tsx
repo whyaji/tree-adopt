@@ -13,7 +13,7 @@ export function KelompokKomunitasListScreen() {
 
   const { isPending, error, data } = useQuery({
     queryKey: ['get-komunitas', search, page, limit],
-    queryFn: () => getKelompokKomunitas(search, page, limit),
+    queryFn: () => getKelompokKomunitas({ search, page, limit }),
   });
 
   const totalPage = data?.totalPage ?? 0;

@@ -90,6 +90,15 @@ const relations: RelationsType = {
     type: 'one-to-many',
     table: adoptHistorySchema,
     on: 'treeId',
+    child: {
+      'adoptHistory.userId': {
+        type: 'one-to-one',
+        table: userSchema,
+        on: 'id',
+        from: 'userId',
+        alias: 'user',
+      },
+    },
   },
   adopter: {
     type: 'latest-inserted',

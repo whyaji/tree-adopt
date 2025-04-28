@@ -1,0 +1,19 @@
+import { createFileRoute } from '@tanstack/react-router';
+
+import { DetailTreeScreen } from '@/features/admin-panel/screen/data/screen/pohon/screen/DetailTreeScreen';
+import { getTree } from '@/lib/api/treeApi';
+
+export const Route = createFileRoute('/_authenticated_admin/admin/data/pohon/$treeId/')({
+  loader: async ({ params }) => {
+    try {
+      const res = await getTree(
+        params.treeId,
+        'masterTreeId,adoptHistory,adoptHistory.userId,survey,survey.userId'
+      );
+      return { tree: res.data };
+    } catch {
+      return { tree: null };
+    }
+  },
+  component: DetailTreeScreen,
+});

@@ -1,4 +1,4 @@
-import { Route } from '@/routes/_authenticated_admin/admin/data/pohon/update/$treeId';
+import { Route } from '@/routes/_authenticated_admin/admin/data/pohon/$treeId/update';
 
 import { FormPohon } from '../components/form-pohon/FormPohon';
 

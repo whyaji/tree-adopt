@@ -11,6 +11,8 @@ import {
 } from '@/components/ui/alert-dialog';
 
 export function ConfirmationDialog({
+  open,
+  onOpenChange,
   title = 'Are you sure?',
   message = 'This action cannot be undone.',
   cancelText = 'Cancel',
@@ -20,18 +22,20 @@ export function ConfirmationDialog({
   triggerButton,
   confirmVarriant,
 }: {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
   title?: string;
   message?: string;
   cancelText?: string;
   confirmText?: string;
   onConfirm?: () => void;
   disabled?: boolean;
-  triggerButton: React.ReactNode;
+  triggerButton?: React.ReactNode;
   confirmVarriant?: 'default' | 'destructive' | 'link' | 'outline' | 'secondary' | 'ghost' | null;
 }) {
   return (
-    <AlertDialog>
-      <AlertDialogTrigger asChild>{triggerButton}</AlertDialogTrigger>
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      {triggerButton && <AlertDialogTrigger asChild>{triggerButton}</AlertDialogTrigger>}
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>

@@ -1,4 +1,5 @@
 import { useNavigate } from '@tanstack/react-router';
+import { Eye, FileText, Pen, Trash } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { ConfirmationDialog } from '@/components/confimation-dialog';
@@ -79,26 +80,36 @@ export function PohonTable({ data, isPending }: { data?: TreeType[]; isPending: 
                 </TableCell>
                 <TableCell>{tree.adopter?.user?.name ?? '-'}</TableCell>
                 <TableCell>
-                  <div className="flex flex-row gap-4">
+                  <div className="flex gap-2">
                     <Button
-                      disabled={tree.surveyorId === null}
                       variant="outline"
-                      className="w-20"
+                      onClick={() =>
+                        navigate({
+                          to: `/admin/data/pohon/${tree.id}`,
+                        })
+                      }>
+                      <Eye className="h-4 w-4" />
+                      Detail
+                    </Button>
+                    <Button
+                      variant="outline"
+                      disabled={tree.surveyorId === null}
                       onClick={() =>
                         navigate({
                           to: `/admin/data/pohon/${tree.id}/survey-history`,
                         })
                       }>
+                      <FileText className="h-4 w-4" />
                       Survey
                     </Button>
                     <Button
                       variant="outline"
-                      className="w-20"
                       onClick={() =>
                         navigate({
-                          to: `/admin/data/pohon/update/${tree.id}`,
+                          to: `/admin/data/pohon/${tree.id}/update`,
                         })
                       }>
+                      <Pen className="h-4 w-4" />
                       Edit
                     </Button>
                     <ConfirmationDialog
@@ -116,7 +127,8 @@ export function PohonTable({ data, isPending }: { data?: TreeType[]; isPending: 
                       }}
                       confirmVarriant="destructive"
                       triggerButton={
-                        <Button variant="destructive" className="w-20">
+                        <Button variant="destructive">
+                          <Trash className="h-4 w-4" />
                           Delete
                         </Button>
                       }

@@ -20,3 +20,18 @@ export const deleteImage = async (dir: string) => {
     console.error(`Error deleting file: ${dir}`, error);
   }
 };
+
+// Helper function to clean up uploaded images on error
+export async function cleanupUploadedImages(imageUploads: Record<string, string | undefined>) {
+  await Promise.all(
+    Object.values(imageUploads)
+      .filter((path): path is string => !!path)
+      .map(async (path) => {
+        try {
+          await deleteImage(path);
+        } catch (deleteErr) {
+          console.error('Error deleting image:', deleteErr);
+        }
+      })
+  );
+}

@@ -1,8 +1,18 @@
 import { Hono } from 'hono';
 
-import { userSchema } from '../db/schema/schema.js';
+import { kelompokKomunitasSchema, userSchema } from '../db/schema/schema.js';
 import { getPaginationData } from '../lib/pagination.js';
+import type { RelationsType } from '../lib/relation.js';
 import authMiddleware from '../middleware/jwt.js';
+
+// === RELATIONS ===
+const relations: RelationsType = {
+  groupId: {
+    type: 'one-to-one',
+    table: kelompokKomunitasSchema,
+    on: 'id',
+  },
+};
 
 export const usersRoute = new Hono()
   .use(authMiddleware)
@@ -12,5 +22,6 @@ export const usersRoute = new Hono()
       c,
       table: userSchema,
       searchBy: 'name,email',
+      relations,
     });
   });

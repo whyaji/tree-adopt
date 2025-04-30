@@ -7,9 +7,10 @@ import { sign } from 'hono/jwt';
 import { z } from 'zod';
 
 import { db } from '../db/database.js';
-import { userSchema } from '../db/schema/schema.js';
+import { kelompokKomunitasSchema, userSchema } from '../db/schema/schema.js';
 import env from '../lib/env.js';
 import { logger } from '../lib/logger.js';
+import { reformatMainKey } from '../lib/relation.js';
 import authMiddleware from '../middleware/jwt.js';
 
 // JWT secret key
@@ -19,13 +20,14 @@ const userSchemaZod = z.object({
   id: z.number().int().positive(),
   avatar: z.string().optional(),
   role: z.number().int().positive(),
+  groupId: z.number().int().optional(),
   name: z.string().min(3),
   email: z.string().email().min(3),
   password: z.string().min(6),
 });
 
-const loginSchema = userSchemaZod.omit({ name: true, id: true, role: true });
-const registerSchema = userSchemaZod.omit({ id: true, role: true });
+const loginSchema = userSchemaZod.omit({ name: true, id: true, role: true, groupId: true });
+const registerSchema = userSchemaZod.omit({ id: true, role: true, groupId: true });
 
 export type User = z.infer<typeof userSchemaZod>;
 
@@ -50,7 +52,19 @@ export const authRoute = new Hono()
       // Generate JWT
       const token = await sign({ userId: user[0].id, email: user[0].email }, JWT_SECRET);
 
-      return c.json({ data: { token } });
+      let userData = await db
+        .select()
+        .from(userSchema)
+        .where(eq(userSchema.id, user[0].id))
+        .limit(1)
+        .leftJoin(
+          kelompokKomunitasSchema,
+          eq(userSchema['groupId'], kelompokKomunitasSchema['id'])
+        );
+
+      userData = reformatMainKey(userData, ['groupId']);
+
+      return c.json({ data: { token, user: userData[0] } });
     } catch (error) {
       logger.error('Error during sign-in:', error);
       return c.json({ message: 'Internal server error.' }, 500);
@@ -71,13 +85,13 @@ export const authRoute = new Hono()
       const hashedPassword = await bcrypt.hash(password, 10);
 
       // Insert new user
-      const newUser = await db.insert(userSchema).values({
+      await db.insert(userSchema).values({
         name,
         email,
         password: hashedPassword,
       });
 
-      return c.json({ message: 'User created successfully.', users: newUser }, 201);
+      return c.json({ message: 'User created successfully.' }, 201);
     } catch (error) {
       logger.error('Error during sign-up:', error);
       return c.json({ message: 'Internal server error.' }, 500);

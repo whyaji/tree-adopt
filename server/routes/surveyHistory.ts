@@ -9,7 +9,7 @@ import { getDataBy } from '../lib/dataBy.js';
 import { validateImage } from '../lib/image.js';
 import { getPaginationData } from '../lib/pagination.js';
 import type { RelationsType } from '../lib/relation.js';
-import { deleteImage, uploadFile } from '../lib/upload.js';
+import { cleanupUploadedImages, deleteImage, uploadFile } from '../lib/upload.js';
 import authMiddleware from '../middleware/jwt.js';
 
 // === ZOD SCHEMAS ===
@@ -18,22 +18,31 @@ const surveyHistorySchemaZod = z.object({
   id: z.number().int().positive(),
   treeId: z.number().int().positive(),
   userId: z.number().int().positive(),
-  surveyDate: z.string().datetime(),
+  surveyDate: z.string().date(),
+  surveyTime: z.string().time(),
   category: z.number().int(),
   diameter: z.number(),
   height: z.number(),
   serapanCo2: z.number(),
-  image: z.string(),
+  treeImage: z.string(),
+  leafImage: z.string().optional(),
+  skinImage: z.string().optional(),
+  fruitImage: z.string().optional(),
+  flowerImage: z.string().optional(),
+  sapImage: z.string().optional(),
+  otherImage: z.string().optional(),
 });
 
 const createSurveyHistorySchemaFormData = z.object({
   treeId: z.string().min(1),
   userId: z.string().min(1),
   surveyDate: z.string().date(),
+  surveyTime: z.string().time(),
   category: z.string().min(1),
   diameter: z.string().min(1),
   height: z.string().min(1),
   serapanCo2: z.string().min(1),
+  treeImage: z.string(),
 });
 
 export type SurveyHistory = z.infer<typeof surveyHistorySchemaZod>;
@@ -67,46 +76,65 @@ export const surveyHistoryRoute = new Hono()
 
   .post('/', async (c) => {
     const formData = await c.req.parseBody();
-    const image = formData.image as File | undefined;
 
+    // Validate form data
     const validation = createSurveyHistorySchemaFormData.safeParse(formData);
-    const imageErrors = validateImage(image);
-
-    if (!validation.success || imageErrors.length > 0) {
-      return c.json({ errors: [...(validation.error?.errors || []), ...imageErrors] }, 400);
+    if (!validation.success) {
+      return c.json({ errors: validation.error.errors }, 400);
     }
 
     const dir = 'uploads/survey-history';
+    const imageFields = [
+      'treeImage',
+      'leafImage',
+      'skinImage',
+      'fruitImage',
+      'flowerImage',
+      'sapImage',
+      'otherImage',
+    ];
+
+    const imageUploads: Record<string, string | undefined> = {};
+
     try {
-      const imagePath = await uploadFile(image!, dir);
+      // Process all image fields
+
+      // Upload all images in parallel
+      await Promise.all(
+        imageFields.map(async (field) => {
+          const file = formData[field] as File | undefined;
+          if (file && file.size > 0) {
+            try {
+              const imagePath = await uploadFile(file, dir);
+              imageUploads[field] = `/${dir}/${path.basename(imagePath)}`;
+            } catch (err) {
+              console.error(`Error uploading ${field}:`, err);
+              throw new Error(`Failed to upload ${field}`);
+            }
+          }
+        })
+      );
+
+      // Prepare data for database insertion
       const data = {
         ...validation.data,
-        image: `/${dir}/${path.basename(imagePath)}`,
+        ...imageUploads,
+        treeId: parseInt(validation.data.treeId),
+        userId: parseInt(validation.data.userId),
+        category: parseInt(validation.data.category),
+        diameter: parseFloat(validation.data.diameter),
+        height: parseFloat(validation.data.height),
+        serapanCo2: parseFloat(validation.data.serapanCo2),
       };
-      try {
-        const surveyHistory = {
-          ...data,
-          treeId: parseInt(data.treeId),
-          userId: parseInt(data.userId),
-          category: parseInt(data.category),
-          diameter: parseFloat(data.diameter),
-          height: parseFloat(data.height),
-          serapanCo2: parseFloat(data.serapanCo2),
-        };
-        await db.insert(surveyHistorySchema).values(surveyHistory);
-        return c.json({ message: 'Survey History created' }, 201);
-      } catch (err) {
-        try {
-          await deleteImage(imagePath);
-        } catch (deleteErr) {
-          console.error('Error deleting image:', deleteErr);
-        }
-        console.error('Error inserting survey history:', err);
-        return c.json({ error: 'Failed to insert survey history' }, 500);
-      }
+
+      // Insert into database
+      await db.insert(surveyHistorySchema).values(data);
+      return c.json({ message: 'Survey History created' }, 201);
     } catch (err) {
-      console.error('Error uploading image:', err);
-      return c.json({ error: 'Failed to upload image' }, 500);
+      // Clean up any uploaded images if there was an error
+      await cleanupUploadedImages(imageUploads);
+      console.error('Error creating survey history:', err);
+      return c.json({ error: 'Failed to create survey history' }, 500);
     }
   })
 
@@ -117,12 +145,12 @@ export const surveyHistoryRoute = new Hono()
   .put('/:id{[0-9]+}', async (c) => {
     const id = parseInt(c.req.param('id'));
     const formData = await c.req.parseBody();
-    const image = formData.image as File | undefined;
+    const treeImage = formData.treeImage as File | undefined;
 
     console.log('Form Data:', formData);
 
     const validation = createSurveyHistorySchemaFormData.safeParse(formData);
-    const imageErrors = typeof image !== 'string' ? validateImage(image) : [];
+    const imageErrors = typeof treeImage !== 'string' ? validateImage(treeImage) : [];
 
     if (!validation.success || imageErrors.length > 0) {
       return c.json({ errors: [...(validation.error?.errors || []), ...imageErrors] }, 400);
@@ -136,14 +164,15 @@ export const surveyHistoryRoute = new Hono()
 
     if (!existing[0]) return c.notFound();
 
-    let newImagePath = existing[0].image;
+    let newImagePath = existing[0].treeImage;
 
-    if (image instanceof File) {
+    if (treeImage instanceof File) {
       const dir = 'uploads/survey-history';
       try {
-        const uploadedPath = await uploadFile(image, dir);
+        const uploadedPath = await uploadFile(treeImage, dir);
         newImagePath = `/${dir}/${path.basename(uploadedPath)}`;
-        if (existing[0].image && existing[0].image !== newImagePath) deleteImage(existing[0].image);
+        if (existing[0].treeImage && existing[0].treeImage !== newImagePath)
+          deleteImage(existing[0].treeImage);
       } catch {
         return c.json({ error: 'Failed to upload image' }, 500);
       }

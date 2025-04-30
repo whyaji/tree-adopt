@@ -1,0 +1,2 @@
+ALTER TABLE `users` ADD `group_id` bigint unsigned;--> statement-breakpoint
+ALTER TABLE `users` ADD CONSTRAINT `users_group_id_kelompok_komunitas_id_fk` FOREIGN KEY (`group_id`) REFERENCES `kelompok_komunitas`(`id`) ON DELETE no action ON UPDATE no action;

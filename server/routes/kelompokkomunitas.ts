@@ -72,7 +72,7 @@ export const kelompokKomunitasRoute = new Hono()
 
     const dir = 'uploads/kelompok-komunitas';
     try {
-      const imagePath = await uploadFile(image!, dir);
+      const imagePath = await uploadFile(image!, dir, { withTimeMilis: true });
       const data = {
         ...validation.data,
         image: `/${dir}/${path.basename(imagePath)}`,
@@ -110,7 +110,7 @@ export const kelompokKomunitasRoute = new Hono()
     if (image instanceof File) {
       const dir = 'uploads/kelompok-komunitas';
       try {
-        const uploadedPath = await uploadFile(image, dir);
+        const uploadedPath = await uploadFile(image, dir, { withTimeMilis: true });
         newImagePath = `/${dir}/${path.basename(uploadedPath)}`;
         if (existing[0].image && existing[0].image !== newImagePath) deleteImage(existing[0].image);
       } catch {

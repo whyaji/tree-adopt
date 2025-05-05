@@ -135,7 +135,7 @@ export const surveyHistoryRoute = new Hono()
           const file = formData[field] as File | undefined;
           if (file && file.size > 0) {
             try {
-              const imagePath = await uploadFile(file, dir);
+              const imagePath = await uploadFile(file, dir, { withTimeMilis: true });
               imageUploads[field as keyof ImagesType] = `/${dir}/${path.basename(imagePath)}`;
             } catch (err) {
               console.error(`Error uploading ${field}:`, err);
@@ -217,7 +217,7 @@ export const surveyHistoryRoute = new Hono()
           const file = formData[field] as File | undefined;
           if (file && file.size > 0) {
             try {
-              const imagePath = await uploadFile(file, dir);
+              const imagePath = await uploadFile(file, dir, { withTimeMilis: true });
               imageUploads[field as keyof ImagesType] = `/${dir}/${path.basename(imagePath)}`;
             } catch (err) {
               console.error(`Error uploading ${field}:`, err);
@@ -285,7 +285,7 @@ export const surveyHistoryRoute = new Hono()
     if (treeImage instanceof File) {
       const dir = 'uploads/survey-history';
       try {
-        const uploadedPath = await uploadFile(treeImage, dir);
+        const uploadedPath = await uploadFile(treeImage, dir, { withTimeMilis: true });
         newImagePath = `/${dir}/${path.basename(uploadedPath)}`;
         if (existing[0].treeImage && existing[0].treeImage !== newImagePath)
           deleteImage(existing[0].treeImage);

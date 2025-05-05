@@ -1,10 +1,20 @@
-export const uploadFile = async (imageFile: File, dir: string) => {
+export const uploadFile = async (
+  imageFile: File,
+  dir?: string,
+  options?: {
+    withTimeMilis?: boolean;
+    withoutDir?: boolean;
+  }
+) => {
   const fs = await import('fs/promises');
   const path = await import('path');
-  const uploadsDir = path.resolve(`frontend/public/${dir}`);
+  const uploadsDir = path.resolve(`frontend/public/${dir ?? ''}`);
   await fs.mkdir(uploadsDir, { recursive: true });
 
-  const filePath = path.join(uploadsDir, `${Date.now()}-${imageFile.name}`);
+  const filePath = path.join(
+    uploadsDir,
+    `${options?.withTimeMilis ? '' : Date.now() + '-'}${imageFile.name}`
+  );
   const fileBuffer = Buffer.from(await imageFile.arrayBuffer());
   await fs.writeFile(filePath, fileBuffer);
 

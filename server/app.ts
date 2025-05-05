@@ -4,6 +4,7 @@ import { logger } from 'hono/logger';
 
 import { authRoute } from './routes/auth.js';
 import { kelompokKomunitasRoute } from './routes/kelompokkomunitas.js';
+import { massUploadRoute } from './routes/massUpload.js';
 import { masterTreeRoute } from './routes/masterTree.js';
 import { surveyHistoryRoute } from './routes/surveyHistory.js';
 import { treeRoute } from './routes/tree.js';
@@ -22,7 +23,8 @@ const apiRoutes = app
   .route('/master-tree', masterTreeRoute)
   .route('/tree', treeRoute)
   .route('/survey-history', surveyHistoryRoute)
-  .route('/adopt-history', authRoute);
+  .route('/adopt-history', authRoute)
+  .route('/mass-upload', massUploadRoute);
 
 app.get('*', serveStatic({ root: './frontend/dist' }));
 app.get('*', serveStatic({ path: './frontend/dist/index.html' }));

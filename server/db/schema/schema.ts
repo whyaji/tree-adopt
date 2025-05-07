@@ -1,4 +1,4 @@
-import { bigint, float, int, mysqlTable, timestamp, varchar } from 'drizzle-orm/mysql-core';
+import { bigint, double, float, int, mysqlTable, timestamp, varchar } from 'drizzle-orm/mysql-core';
 
 export const userSchema = mysqlTable('users', {
   id: bigint('id', { mode: 'number', unsigned: true }).autoincrement().notNull().primaryKey(),
@@ -58,8 +58,8 @@ export const treeSchema = mysqlTable('tree', {
   elevation: float('elevation'),
   landType: varchar('land_type', { length: 255 }).notNull(),
   address: varchar('address', { length: 255 }).notNull(),
-  latitude: float('latitude').notNull(),
-  longitude: float('longitude').notNull(),
+  latitude: double('latitude').notNull(),
+  longitude: double('longitude').notNull(),
   sitterName: varchar('sitter_name', { length: 255 }),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),

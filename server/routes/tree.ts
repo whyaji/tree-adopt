@@ -135,7 +135,7 @@ export const treeRoute = new Hono()
     return await getPaginationData({
       c,
       table: treeSchema,
-      searchBy: 'code,kelompokKomunitasId',
+      searchBy: 'code,kelompokKomunitasId,localTreeName,latinTreeName,address',
       relations,
     });
   })

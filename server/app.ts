@@ -8,6 +8,7 @@ import { massUploadRoute } from './routes/massUpload.js';
 import { masterTreeRoute } from './routes/masterTree.js';
 import { surveyHistoryRoute } from './routes/surveyHistory.js';
 import { treeRoute } from './routes/tree.js';
+import { treeCodeRoute } from './routes/treeCode.js';
 import { usersRoute } from './routes/users.js';
 
 const app = new Hono();
@@ -21,6 +22,7 @@ const apiRoutes = app
   .route('/users', usersRoute)
   .route('/kelompok-komunitas', kelompokKomunitasRoute)
   .route('/master-tree', masterTreeRoute)
+  .route('/tree-code', treeCodeRoute)
   .route('/tree', treeRoute)
   .route('/survey-history', surveyHistoryRoute)
   .route('/adopt-history', authRoute)

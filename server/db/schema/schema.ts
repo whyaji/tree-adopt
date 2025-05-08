@@ -40,6 +40,18 @@ export const masterTreeSchema = mysqlTable('master_tree', {
   deletedAt: timestamp('deleted_at'),
 });
 
+export const treeCodeSchema = mysqlTable('tree_code', {
+  id: bigint('id', { mode: 'number', unsigned: true }).autoincrement().notNull().primaryKey(),
+  code: varchar('code', { length: 255 }).notNull(),
+  kelompokKomunitasId: bigint('kelompok_komunitas_id', { mode: 'number', unsigned: true })
+    .notNull()
+    .references(() => kelompokKomunitasSchema.id),
+  status: int('status').default(0), // 0 = untagged, 1 = tagged
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+  deletedAt: timestamp('deleted_at'),
+});
+
 export const treeSchema = mysqlTable('tree', {
   id: bigint('id', { mode: 'number', unsigned: true }).autoincrement().notNull().primaryKey(),
   code: varchar('code', { length: 255 }).notNull(),

@@ -1,12 +1,13 @@
-import { inArray } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { Hono } from 'hono';
 
 import { db } from '../db/database.js';
-import { surveyHistorySchema, treeSchema } from '../db/schema/schema.js';
+import { surveyHistorySchema, treeCodeSchema, treeSchema } from '../db/schema/schema.js';
 import { uploadFile } from '../lib/upload.js';
 import authMiddleware from '../middleware/jwt.js';
 import type { SurveyHistory } from './surveyHistory.js';
 import type { Tree } from './tree.js';
+import type { TreeCode } from './treeCode.js';
 
 export const massUploadRoute = new Hono()
   .use(authMiddleware)
@@ -14,7 +15,8 @@ export const massUploadRoute = new Hono()
   .post('/tree', async (c) => {
     const data: {
       trees: Tree[];
-      surveys: (Omit<SurveyHistory, 'treeId'> & { code: string })[];
+      surveys: (SurveyHistory & { code: string })[];
+      treeCodes: TreeCode[];
     } = await c.req.json();
     if (data.trees === undefined || data.surveys === undefined) {
       return c.json({ message: 'No data provided' }, 400);
@@ -23,6 +25,8 @@ export const massUploadRoute = new Hono()
 
     const surveys = data.surveys;
     const dir = '/uploads/survey-history/';
+
+    const treeCodes = data.treeCodes;
 
     const resultTrees: {
       id: number;
@@ -34,19 +38,20 @@ export const massUploadRoute = new Hono()
       status: number;
     }[] = [];
 
-    // separate list code in survey
-    const surveyCodeList = surveys.map((survey) => survey.code);
+    const resultTreeCodes: {
+      id: number;
+      status: number;
+    }[] = [];
 
     try {
       await db.transaction(async (tx) => {
         for (const tree of trees) {
           try {
-            const { id, ...rest } = tree;
-            const upload = await tx.insert(treeSchema).values(rest);
+            const upload = await tx.insert(treeSchema).values(tree);
             if (upload) {
-              resultTrees.push({ id, status: 1 });
+              resultTrees.push({ id: tree.id, status: 1 });
             } else {
-              resultTrees.push({ id, status: 0 });
+              resultTrees.push({ id: tree.id, status: 0 });
             }
           } catch (error) {
             console.error('Error inserting tree:', error);
@@ -55,19 +60,10 @@ export const massUploadRoute = new Hono()
         }
       });
       await db.transaction(async (tx) => {
-        const treesForSurveyFromCode = await db
-          .select({
-            id: treeSchema.id,
-            code: treeSchema.code,
-          })
-          .from(treeSchema)
-          .where(inArray(treeSchema.code, surveyCodeList));
-
         for (const survey of surveys) {
           try {
             const {
               id,
-              code,
               treeImage,
               leafImage,
               skinImage,
@@ -77,21 +73,26 @@ export const massUploadRoute = new Hono()
               otherImage,
               ...rest
             } = survey;
-            const tree = treesForSurveyFromCode.find((tree) => tree.code === code);
-            if (!tree) {
-              resultSurveys.push({ id: survey.id, status: 0 });
-              continue;
-            }
+
+            const listTreeImage = treeImage.map((image) => {
+              return dir + image;
+            });
+            const listLeafImage = leafImage ? leafImage.map((image) => dir + image) : null;
+            const listSkinImage = skinImage ? skinImage.map((image) => dir + image) : null;
+            const listFruitImage = fruitImage ? fruitImage.map((image) => dir + image) : null;
+            const listFlowerImage = flowerImage ? flowerImage.map((image) => dir + image) : null;
+            const listSapImage = sapImage ? sapImage.map((image) => dir + image) : null;
+            const listOtherImage = otherImage ? otherImage.map((image) => dir + image) : null;
+
             const upload = await tx.insert(surveyHistorySchema).values({
-              treeId: tree.id,
               ...rest,
-              treeImage: dir + treeImage,
-              leafImage: leafImage ? dir + leafImage : null,
-              skinImage: skinImage ? dir + skinImage : null,
-              fruitImage: fruitImage ? dir + fruitImage : null,
-              flowerImage: flowerImage ? dir + flowerImage : null,
-              sapImage: sapImage ? dir + sapImage : null,
-              otherImage: otherImage ? dir + otherImage : null,
+              treeImage: listTreeImage,
+              leafImage: listLeafImage,
+              skinImage: listSkinImage,
+              fruitImage: listFruitImage,
+              flowerImage: listFlowerImage,
+              sapImage: listSapImage,
+              otherImage: listOtherImage,
             });
             if (upload) {
               resultSurveys.push({ id, status: 1 });
@@ -103,11 +104,33 @@ export const massUploadRoute = new Hono()
             resultSurveys.push({ id: survey.id, status: 0 });
           }
         }
+
+        for (const treeCode of treeCodes) {
+          try {
+            const update = await tx
+              .update(treeCodeSchema)
+              .set(treeCode)
+              .where(eq(treeCodeSchema.id, treeCode.id));
+            if (update) {
+              resultTreeCodes.push({ id: treeCode.id, status: 1 });
+            } else {
+              resultTreeCodes.push({ id: treeCode.id, status: 0 });
+            }
+          } catch (error) {
+            console.error('Error updating tree code:', error);
+          }
+        }
       });
-      return c.json({ message: 'Trees created', resultTrees, resultSurveys }, 201);
+      return c.json(
+        { message: 'Mass upload success', resultTrees, resultSurveys, resultTreeCodes },
+        201
+      );
     } catch (error) {
-      console.error('Error creating trees:', error);
-      return c.json({ message: 'Error creating trees', resultTrees, resultSurveys }, 500);
+      console.error('Error mass upload:', error);
+      return c.json(
+        { message: 'Error mass upload', resultTrees, resultSurveys, resultTreeCodes },
+        500
+      );
     }
   })
 

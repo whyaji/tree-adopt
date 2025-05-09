@@ -1,4 +1,13 @@
-import { bigint, double, float, int, mysqlTable, timestamp, varchar } from 'drizzle-orm/mysql-core';
+import {
+  bigint,
+  double,
+  float,
+  int,
+  json,
+  mysqlTable,
+  timestamp,
+  varchar,
+} from 'drizzle-orm/mysql-core';
 
 export const userSchema = mysqlTable('users', {
   id: bigint('id', { mode: 'number', unsigned: true }).autoincrement().notNull().primaryKey(),
@@ -53,7 +62,7 @@ export const treeCodeSchema = mysqlTable('tree_code', {
 });
 
 export const treeSchema = mysqlTable('tree', {
-  id: bigint('id', { mode: 'number', unsigned: true }).autoincrement().notNull().primaryKey(),
+  id: bigint('id', { mode: 'number', unsigned: true }).notNull().primaryKey(),
   code: varchar('code', { length: 255 }).notNull(),
   masterTreeId: bigint('master_tree_id', { mode: 'number', unsigned: true }).references(
     () => masterTreeSchema.id
@@ -107,13 +116,13 @@ export const surveyHistorySchema = mysqlTable('survey_history', {
   diameter: float('diameter').notNull(),
   height: float('height').notNull(),
   serapanCo2: float('serapan_co2').notNull(),
-  treeImage: varchar('tree_image', { length: 255 }).notNull(),
-  leafImage: varchar('leaf_image', { length: 255 }),
-  skinImage: varchar('skin_image', { length: 255 }),
-  fruitImage: varchar('fruit_image', { length: 255 }),
-  flowerImage: varchar('flower_image', { length: 255 }),
-  sapImage: varchar('sap_image', { length: 255 }),
-  otherImage: varchar('other_image', { length: 255 }),
+  treeImage: json('tree_image').notNull(),
+  leafImage: json('leaf_image'),
+  skinImage: json('skin_image'),
+  fruitImage: json('fruit_image'),
+  flowerImage: json('flower_image'),
+  sapImage: json('sap_image'),
+  otherImage: json('other_image'),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
   deletedAt: timestamp('deleted_at'),

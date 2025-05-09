@@ -45,3 +45,16 @@ export async function cleanupUploadedImages(imageUploads: Record<string, string 
       })
   );
 }
+
+// clean upload images based on string[]
+export async function cleanupUploadedImagesByArray(imageUploads: string[]) {
+  await Promise.all(
+    imageUploads.map(async (path) => {
+      try {
+        await deleteImage(path);
+      } catch (deleteErr) {
+        console.error('Error deleting image:', deleteErr);
+      }
+    })
+  );
+}

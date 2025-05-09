@@ -1,1 +1,0 @@
-ALTER TABLE `survey_history` ADD `image` varchar(255);

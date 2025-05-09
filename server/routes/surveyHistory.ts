@@ -6,10 +6,9 @@ import { z } from 'zod';
 import { db } from '../db/database.js';
 import { surveyHistorySchema, treeSchema, userSchema } from '../db/schema/schema.js';
 import { getDataBy } from '../lib/dataBy.js';
-import { validateImage } from '../lib/image.js';
 import { getPaginationData } from '../lib/pagination.js';
 import type { RelationsType } from '../lib/relation.js';
-import { cleanupUploadedImages, deleteImage, uploadFile } from '../lib/upload.js';
+import { cleanupUploadedImagesByArray, uploadFile } from '../lib/upload.js';
 import authMiddleware from '../middleware/jwt.js';
 
 // === ZOD SCHEMAS ===
@@ -24,13 +23,13 @@ const surveyHistorySchemaZod = z.object({
   diameter: z.number(),
   height: z.number(),
   serapanCo2: z.number(),
-  treeImage: z.string(),
-  leafImage: z.string().optional(),
-  skinImage: z.string().optional(),
-  fruitImage: z.string().optional(),
-  flowerImage: z.string().optional(),
-  sapImage: z.string().optional(),
-  otherImage: z.string().optional(),
+  treeImage: z.array(z.string()).nonempty(),
+  leafImage: z.array(z.string()).optional(),
+  skinImage: z.array(z.string()).optional(),
+  fruitImage: z.array(z.string()).optional(),
+  flowerImage: z.array(z.string()).optional(),
+  sapImage: z.array(z.string()).optional(),
+  otherImage: z.array(z.string()).optional(),
 });
 
 const createSurveyHistorySchemaFormData = z.object({
@@ -56,13 +55,13 @@ const createSurveyHistoryByCodeSchemaFormData = z.object({
 });
 
 type ImagesType = {
-  treeImage: string;
-  leafImage?: string;
-  skinImage?: string;
-  fruitImage?: string;
-  flowerImage?: string;
-  sapImage?: string;
-  otherImage?: string;
+  treeImage: string[];
+  leafImage?: string[];
+  skinImage?: string[];
+  fruitImage?: string[];
+  flowerImage?: string[];
+  sapImage?: string[];
+  otherImage?: string[];
 };
 
 export type SurveyHistory = z.infer<typeof surveyHistorySchemaZod>;
@@ -97,13 +96,14 @@ export const surveyHistoryRoute = new Hono()
   .post('/', async (c) => {
     const formData = await c.req.parseBody();
 
-    // Validate form data
+    // Validate form data (except images)
     const validation = createSurveyHistorySchemaFormData.safeParse(formData);
     if (!validation.success) {
       return c.json({ errors: validation.error.errors }, 400);
     }
 
     const dir = 'uploads/survey-history';
+
     const imageFields = [
       'treeImage',
       'leafImage',
@@ -114,38 +114,44 @@ export const surveyHistoryRoute = new Hono()
       'otherImage',
     ];
 
-    // check required image
-    const requiredImages = ['treeImage'];
-
-    const missingImages = requiredImages.filter((field) => !formData[field]);
-    if (missingImages.length > 0) {
-      return c.json({ error: `Missing required images: ${missingImages.join(', ')}` }, 400);
-    }
-
     const imageUploads: ImagesType = {
-      treeImage: '',
+      treeImage: [],
+      leafImage: [],
+      skinImage: [],
+      fruitImage: [],
+      flowerImage: [],
+      sapImage: [],
+      otherImage: [],
     };
 
     try {
-      // Process all image fields
+      for (const field of imageFields) {
+        const files = formData[field];
+        const fileList = Array.isArray(files) ? files : files ? [files] : [];
 
-      // Upload all images in parallel
-      await Promise.all(
-        imageFields.map(async (field) => {
-          const file = formData[field] as File | undefined;
-          if (file && file.size > 0) {
+        // Special check for required treeImage
+        if (field === 'treeImage' && fileList.length === 0) {
+          return c.json({ error: `Missing required images: ${field}` }, 400);
+        }
+
+        const uploadedPaths: string[] = [];
+
+        for (const file of fileList) {
+          if (file instanceof File && file.size > 0) {
             try {
               const imagePath = await uploadFile(file, dir, { withTimeMilis: true });
-              imageUploads[field as keyof ImagesType] = `/${dir}/${path.basename(imagePath)}`;
+              uploadedPaths.push(`/${dir}/${path.basename(imagePath)}`);
             } catch (err) {
               console.error(`Error uploading ${field}:`, err);
               throw new Error(`Failed to upload ${field}`);
             }
           }
-        })
-      );
+        }
 
-      // Prepare data for database insertion
+        imageUploads[field as keyof ImagesType] = uploadedPaths;
+      }
+
+      // Prepare data for DB
       const data = {
         ...validation.data,
         ...imageUploads,
@@ -157,12 +163,19 @@ export const surveyHistoryRoute = new Hono()
         serapanCo2: parseFloat(validation.data.serapanCo2),
       };
 
-      // Insert into database
       await db.insert(surveyHistorySchema).values(data);
       return c.json({ message: 'Survey History created' }, 201);
     } catch (err) {
-      // Clean up any uploaded images if there was an error
-      await cleanupUploadedImages(imageUploads);
+      const imageUploadLists = [
+        ...imageUploads.treeImage,
+        ...(imageUploads.leafImage || []),
+        ...(imageUploads.skinImage || []),
+        ...(imageUploads.fruitImage || []),
+        ...(imageUploads.flowerImage || []),
+        ...(imageUploads.sapImage || []),
+        ...(imageUploads.otherImage || []),
+      ];
+      await cleanupUploadedImagesByArray(imageUploadLists);
       console.error('Error creating survey history:', err);
       return c.json({ error: 'Failed to create survey history' }, 500);
     }
@@ -171,7 +184,7 @@ export const surveyHistoryRoute = new Hono()
   .post('/survey-by-code', async (c) => {
     const formData = await c.req.parseBody();
 
-    // Validate form data
+    // Validate form data (except images)
     const validation = createSurveyHistoryByCodeSchemaFormData.safeParse(formData);
     if (!validation.success) {
       return c.json({ errors: validation.error.errors }, 400);
@@ -187,6 +200,7 @@ export const surveyHistoryRoute = new Hono()
     const treeId = tree[0].id;
 
     const dir = 'uploads/survey-history';
+
     const imageFields = [
       'treeImage',
       'leafImage',
@@ -197,41 +211,46 @@ export const surveyHistoryRoute = new Hono()
       'otherImage',
     ];
 
-    // check required image
-    const requiredImages = ['treeImage'];
-
-    const missingImages = requiredImages.filter((field) => !formData[field]);
-    if (missingImages.length > 0) {
-      return c.json({ error: `Missing required images: ${missingImages.join(', ')}` }, 400);
-    }
-
     const imageUploads: ImagesType = {
-      treeImage: '',
+      treeImage: [],
+      leafImage: [],
+      skinImage: [],
+      fruitImage: [],
+      flowerImage: [],
+      sapImage: [],
+      otherImage: [],
     };
-    try {
-      // Process all image fields
 
-      // Upload all images in parallel
-      await Promise.all(
-        imageFields.map(async (field) => {
-          const file = formData[field] as File | undefined;
-          if (file && file.size > 0) {
+    try {
+      for (const field of imageFields) {
+        const files = formData[field];
+        const fileList = Array.isArray(files) ? files : files ? [files] : [];
+
+        // Special check for required treeImage
+        if (field === 'treeImage' && fileList.length === 0) {
+          return c.json({ error: `Missing required images: ${field}` }, 400);
+        }
+
+        const uploadedPaths: string[] = [];
+
+        for (const file of fileList) {
+          if (file instanceof File && file.size > 0) {
             try {
               const imagePath = await uploadFile(file, dir, { withTimeMilis: true });
-              imageUploads[field as keyof ImagesType] = `/${dir}/${path.basename(imagePath)}`;
+              uploadedPaths.push(`/${dir}/${path.basename(imagePath)}`);
             } catch (err) {
               console.error(`Error uploading ${field}:`, err);
               throw new Error(`Failed to upload ${field}`);
             }
           }
-        })
-      );
+        }
 
-      // remove code in validation.data
+        imageUploads[field as keyof ImagesType] = uploadedPaths;
+      }
+
+      // Prepare data for DB
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { code, ...rest } = validation.data;
-
-      // Prepare data for database insertion
       const data = {
         ...rest,
         ...imageUploads,
@@ -243,12 +262,19 @@ export const surveyHistoryRoute = new Hono()
         serapanCo2: parseFloat(validation.data.serapanCo2),
       };
 
-      // Insert into database
       await db.insert(surveyHistorySchema).values(data);
       return c.json({ message: 'Survey History created' }, 201);
     } catch (err) {
-      // Clean up any uploaded images if there was an error
-      await cleanupUploadedImages(imageUploads);
+      const imageUploadLists = [
+        ...imageUploads.treeImage,
+        ...(imageUploads.leafImage || []),
+        ...(imageUploads.skinImage || []),
+        ...(imageUploads.fruitImage || []),
+        ...(imageUploads.flowerImage || []),
+        ...(imageUploads.sapImage || []),
+        ...(imageUploads.otherImage || []),
+      ];
+      await cleanupUploadedImagesByArray(imageUploadLists);
       console.error('Error creating survey history:', err);
       return c.json({ error: 'Failed to create survey history' }, 500);
     }
@@ -261,15 +287,11 @@ export const surveyHistoryRoute = new Hono()
   .put('/:id{[0-9]+}', async (c) => {
     const id = parseInt(c.req.param('id'));
     const formData = await c.req.parseBody();
-    const treeImage = formData.treeImage as File | undefined;
 
-    console.log('Form Data:', formData);
-
+    // Validate form data (except images)
     const validation = createSurveyHistorySchemaFormData.safeParse(formData);
-    const imageErrors = typeof treeImage !== 'string' ? validateImage(treeImage) : [];
-
-    if (!validation.success || imageErrors.length > 0) {
-      return c.json({ errors: [...(validation.error?.errors || []), ...imageErrors] }, 400);
+    if (!validation.success) {
+      return c.json({ errors: validation.error.errors }, 400);
     }
 
     const existing = await db
@@ -280,32 +302,83 @@ export const surveyHistoryRoute = new Hono()
 
     if (!existing[0]) return c.notFound();
 
-    let newImagePath = existing[0].treeImage;
+    const dir = 'uploads/survey-history';
 
-    if (treeImage instanceof File) {
-      const dir = 'uploads/survey-history';
-      try {
-        const uploadedPath = await uploadFile(treeImage, dir, { withTimeMilis: true });
-        newImagePath = `/${dir}/${path.basename(uploadedPath)}`;
-        if (existing[0].treeImage && existing[0].treeImage !== newImagePath)
-          deleteImage(existing[0].treeImage);
-      } catch {
-        return c.json({ error: 'Failed to upload image' }, 500);
-      }
-    }
+    const imageFields = [
+      'treeImage',
+      'leafImage',
+      'skinImage',
+      'fruitImage',
+      'flowerImage',
+      'sapImage',
+      'otherImage',
+    ];
 
-    const data = { ...validation.data, image: newImagePath };
-    const surveyHistory = {
-      ...data,
-      treeId: parseInt(data.treeId),
-      userId: parseInt(data.userId),
-      category: parseInt(data.category),
-      diameter: parseFloat(data.diameter),
-      height: parseFloat(data.height),
-      serapanCo2: parseFloat(data.serapanCo2),
+    const imageUploads: ImagesType = {
+      treeImage: [],
+      leafImage: [],
+      skinImage: [],
+      fruitImage: [],
+      flowerImage: [],
+      sapImage: [],
+      otherImage: [],
     };
-    await db.update(surveyHistorySchema).set(surveyHistory).where(eq(surveyHistorySchema.id, id));
-    return c.json({ message: 'Survey History updated' });
+
+    try {
+      for (const field of imageFields) {
+        const files = formData[field];
+        const fileList = Array.isArray(files) ? files : files ? [files] : [];
+
+        // Special check for required treeImage
+        if (field === 'treeImage' && fileList.length === 0) {
+          return c.json({ error: `Missing required images: ${field}` }, 400);
+        }
+
+        const uploadedPaths: string[] = [];
+
+        for (const file of fileList) {
+          if (file instanceof File && file.size > 0) {
+            try {
+              const imagePath = await uploadFile(file, dir, { withTimeMilis: true });
+              uploadedPaths.push(`/${dir}/${path.basename(imagePath)}`);
+            } catch (err) {
+              console.error(`Error uploading ${field}:`, err);
+              throw new Error(`Failed to upload ${field}`);
+            }
+          }
+        }
+
+        imageUploads[field as keyof ImagesType] = uploadedPaths;
+      }
+
+      // Prepare data for DB
+      const data = {
+        ...validation.data,
+        ...imageUploads,
+        treeId: parseInt(validation.data.treeId),
+        userId: parseInt(validation.data.userId),
+        category: parseInt(validation.data.category),
+        diameter: parseFloat(validation.data.diameter),
+        height: parseFloat(validation.data.height),
+        serapanCo2: parseFloat(validation.data.serapanCo2),
+      };
+
+      await db.update(surveyHistorySchema).set(data).where(eq(surveyHistorySchema.id, id));
+      return c.json({ message: 'Survey History updated' });
+    } catch (err) {
+      const imageUploadLists = [
+        ...imageUploads.treeImage,
+        ...(imageUploads.leafImage || []),
+        ...(imageUploads.skinImage || []),
+        ...(imageUploads.fruitImage || []),
+        ...(imageUploads.flowerImage || []),
+        ...(imageUploads.sapImage || []),
+        ...(imageUploads.otherImage || []),
+      ];
+      await cleanupUploadedImagesByArray(imageUploadLists);
+      console.error('Error updating survey history:', err);
+      return c.json({ error: 'Failed to update survey history' }, 500);
+    }
   })
 
   .delete('/:id{[0-9]+}', async (c) => {

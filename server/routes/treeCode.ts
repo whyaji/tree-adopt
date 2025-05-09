@@ -83,7 +83,7 @@ export const treeCodeRoute = new Hono()
       orderBy: desc(treeCodeSchema.createdAt),
     });
 
-    const lastCodeNumber = lastCode ? parseInt(lastCode.code.split('-')[2]) : 1;
+    const lastCodeNumber = lastCode ? parseInt(lastCode.code.split('-')[2]) : 0;
     const newCodes: {
       code: string;
       kelompokKomunitasId: number;

@@ -13,7 +13,7 @@ export const uploadFile = async (
 
   const filePath = path.join(
     uploadsDir,
-    `${options?.withTimeMilis ? '' : Date.now() + '-'}${imageFile.name}`
+    `${options?.withTimeMilis ? Date.now() + '-' : ''}${imageFile.name}`
   );
   const fileBuffer = Buffer.from(await imageFile.arrayBuffer());
   await fs.writeFile(filePath, fileBuffer);

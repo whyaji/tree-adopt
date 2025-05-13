@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "e2169809-d674-474f-8fdb-78200e50bc61",
+  "id": "1307021d-cd2b-40c1-8792-523fbea3ebe6",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "adopt_history": {
@@ -301,6 +301,13 @@
           "notNull": true,
           "autoincrement": false
         },
+        "kelompok_komunitas_id": {
+          "name": "kelompok_komunitas_id",
+          "type": "bigint unsigned",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
         "survey_date": {
           "name": "survey_date",
           "type": "varchar(255)",
@@ -416,7 +423,22 @@
           "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "kelompok_komunitas_id_idx_survey_history": {
+          "name": "kelompok_komunitas_id_idx_survey_history",
+          "columns": [
+            "kelompok_komunitas_id"
+          ],
+          "isUnique": false
+        },
+        "tree_id_idx_survey_history": {
+          "name": "tree_id_idx_survey_history",
+          "columns": [
+            "tree_id"
+          ],
+          "isUnique": false
+        }
+      },
       "foreignKeys": {
         "survey_history_tree_id_tree_id_fk": {
           "name": "survey_history_tree_id_tree_id_fk",
@@ -437,6 +459,19 @@
           "tableTo": "users",
           "columnsFrom": [
             "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "survey_history_kelompok_komunitas_id_kelompok_komunitas_id_fk": {
+          "name": "survey_history_kelompok_komunitas_id_kelompok_komunitas_id_fk",
+          "tableFrom": "survey_history",
+          "tableTo": "kelompok_komunitas",
+          "columnsFrom": [
+            "kelompok_komunitas_id"
           ],
           "columnsTo": [
             "id"
@@ -488,6 +523,20 @@
           "autoincrement": false,
           "default": 0
         },
+        "tagged_by": {
+          "name": "tagged_by",
+          "type": "bigint unsigned",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "tagged_at": {
+          "name": "tagged_at",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -512,7 +561,15 @@
           "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "kelompok_komunitas_id_idx_tree_code": {
+          "name": "kelompok_komunitas_id_idx_tree_code",
+          "columns": [
+            "kelompok_komunitas_id"
+          ],
+          "isUnique": false
+        }
+      },
       "foreignKeys": {
         "tree_code_kelompok_komunitas_id_kelompok_komunitas_id_fk": {
           "name": "tree_code_kelompok_komunitas_id_kelompok_komunitas_id_fk",
@@ -520,6 +577,19 @@
           "tableTo": "kelompok_komunitas",
           "columnsFrom": [
             "kelompok_komunitas_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "tree_code_tagged_by_users_id_fk": {
+          "name": "tree_code_tagged_by_users_id_fk",
+          "tableFrom": "tree_code",
+          "tableTo": "users",
+          "columnsFrom": [
+            "tagged_by"
           ],
           "columnsTo": [
             "id"
@@ -536,7 +606,14 @@
           ]
         }
       },
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "tree_code_code_unique": {
+          "name": "tree_code_code_unique",
+          "columns": [
+            "code"
+          ]
+        }
+      },
       "checkConstraint": {}
     },
     "tree": {
@@ -547,7 +624,7 @@
           "type": "bigint unsigned",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": true
         },
         "code": {
           "name": "code",
@@ -665,7 +742,15 @@
           "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "kelompok_komunitas_id_idx_tree": {
+          "name": "kelompok_komunitas_id_idx_tree",
+          "columns": [
+            "kelompok_komunitas_id"
+          ],
+          "isUnique": false
+        }
+      },
       "foreignKeys": {
         "tree_master_tree_id_master_tree_id_fk": {
           "name": "tree_master_tree_id_master_tree_id_fk",
@@ -715,7 +800,14 @@
           ]
         }
       },
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "tree_code_unique": {
+          "name": "tree_code_unique",
+          "columns": [
+            "code"
+          ]
+        }
+      },
       "checkConstraint": {}
     },
     "users": {
@@ -802,7 +894,15 @@
           "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "group_id_idx_users": {
+          "name": "group_id_idx_users",
+          "columns": [
+            "group_id"
+          ],
+          "isUnique": false
+        }
+      },
       "foreignKeys": {
         "users_group_id_kelompok_komunitas_id_fk": {
           "name": "users_group_id_kelompok_komunitas_id_fk",

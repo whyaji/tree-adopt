@@ -16,6 +16,8 @@ const treeCodeSchemaZod = z.object({
   code: z.string().min(1),
   kelompokKomunitasId: z.number().int().positive(),
   status: z.number().int().optional(),
+  taggedAt: z.string().optional(),
+  taggedBy: z.number().int().optional(),
 });
 
 const createTreeCodeSchema = treeCodeSchemaZod.omit({ id: true });
@@ -46,10 +48,14 @@ export const treeCodeRoute = new Hono()
 
   .post('/generate-next-code', async (c) => {
     // payload is body raw json { kelompokKomunitasId: 1, size: 10 }
+    const payload = c.get('jwtPayload');
+
     const { kelompokKomunitasId, size } = await c.req.json<{
       kelompokKomunitasId: number;
       size: number;
     }>();
+
+    const groupId = kelompokKomunitasId ?? payload.groupId;
 
     // Check if size is valid
     if (size < 1 || size > 100) {
@@ -58,7 +64,7 @@ export const treeCodeRoute = new Hono()
 
     // Check if kelompokKomunitasId is valid
     const kelompokKomunitas = await db.query.kelompokKomunitasSchema.findFirst({
-      where: eq(kelompokKomunitasSchema.id, kelompokKomunitasId),
+      where: eq(kelompokKomunitasSchema.id, groupId),
     });
 
     if (!kelompokKomunitas) {
@@ -67,8 +73,8 @@ export const treeCodeRoute = new Hono()
 
     const groupName = kelompokKomunitas.name.replace(/\s+/g, '-').toUpperCase();
 
-    // EXAMPLE CODE: [tree letter group name first center last name leter]-[kelompokKomunitasId]-[number]
-    // EXAMPLE CODE: HTK-1-1
+    // EXAMPLE CODE: [tree letter group name first center last name leter]-[kelompokKomunitasId]-[number]-[userId]
+    // EXAMPLE CODE: HTK-1-1-1
 
     // Generate code based on the last code
     const midIndex = Math.floor(groupName.length / 2);
@@ -79,7 +85,7 @@ export const treeCodeRoute = new Hono()
 
     // Get the last code for the kelompokKomunitasId
     const lastCode = await db.query.treeCodeSchema.findFirst({
-      where: eq(treeCodeSchema.kelompokKomunitasId, kelompokKomunitasId),
+      where: eq(treeCodeSchema.kelompokKomunitasId, groupId),
       orderBy: desc(treeCodeSchema.createdAt),
     });
 
@@ -90,10 +96,10 @@ export const treeCodeRoute = new Hono()
     }[] = [];
     for (let i = 1; i <= size; i++) {
       const newCodeNumber = lastCodeNumber + i;
-      const newCode = `${treeLetter}-${kelompokKomunitasId}-${newCodeNumber}`;
+      const newCode = `${treeLetter}-${groupId}-${newCodeNumber}-${payload.userId}`;
       newCodes.push({
         code: newCode,
-        kelompokKomunitasId: kelompokKomunitasId,
+        kelompokKomunitasId: groupId,
       });
     }
 

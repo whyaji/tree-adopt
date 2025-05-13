@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 import { Hono } from 'hono';
 
 import { db } from '../db/database.js';
@@ -15,8 +15,9 @@ export const massUploadRoute = new Hono()
   .post('/tree', async (c) => {
     const data: {
       trees: Tree[];
-      surveys: (SurveyHistory & { code: string })[];
+      surveys: (Omit<SurveyHistory, 'treeId'> & { code: string })[];
       treeCodes: TreeCode[];
+      treeCodesUpdate: TreeCode[];
     } = await c.req.json();
     if (data.trees === undefined || data.surveys === undefined) {
       return c.json({ message: 'No data provided' }, 400);
@@ -27,43 +28,67 @@ export const massUploadRoute = new Hono()
     const dir = '/uploads/survey-history/';
 
     const treeCodes = data.treeCodes;
+    const treeCodesUpdate = data.treeCodesUpdate;
 
     const resultTrees: {
       id: number;
       status: number;
+      message?: string;
     }[] = [];
 
     const resultSurveys: {
       id: number;
       status: number;
+      message?: string;
     }[] = [];
 
     const resultTreeCodes: {
       id: number;
       status: number;
+      message?: string;
     }[] = [];
+
+    const resultTreeCodesUpdate: {
+      id: number;
+      status: number;
+      message?: string;
+    }[] = [];
+
+    // separate list code in survey
+    const surveyCodeList = surveys.map((survey) => survey.code);
 
     try {
       await db.transaction(async (tx) => {
         for (const tree of trees) {
           try {
-            const upload = await tx.insert(treeSchema).values(tree);
+            const { id, ...rest } = tree;
+            const upload = await tx.insert(treeSchema).values(rest);
             if (upload) {
-              resultTrees.push({ id: tree.id, status: 1 });
+              resultTrees.push({ id: id, status: 1 });
             } else {
-              resultTrees.push({ id: tree.id, status: 0 });
+              resultTrees.push({ id: id, status: 0, message: 'Failed to insert tree' });
             }
           } catch (error) {
             console.error('Error inserting tree:', error);
-            resultTrees.push({ id: tree.id, status: 0 });
+            resultTrees.push({ id: tree.id, status: 0, message: String(error) });
           }
         }
       });
+
+      const treesForSurveyFromCode = await db
+        .select({
+          id: treeSchema.id,
+          code: treeSchema.code,
+        })
+        .from(treeSchema)
+        .where(inArray(treeSchema.code, surveyCodeList));
+
       await db.transaction(async (tx) => {
         for (const survey of surveys) {
           try {
             const {
               id,
+              code,
               treeImage,
               leafImage,
               skinImage,
@@ -73,6 +98,11 @@ export const massUploadRoute = new Hono()
               otherImage,
               ...rest
             } = survey;
+            const tree = treesForSurveyFromCode.find((tree) => tree.code === code);
+            if (!tree) {
+              resultSurveys.push({ id: survey.id, status: 0, message: 'Tree not found' });
+              continue;
+            }
 
             const listTreeImage = treeImage.map((image) => {
               return dir + image;
@@ -85,6 +115,7 @@ export const massUploadRoute = new Hono()
             const listOtherImage = otherImage ? otherImage.map((image) => dir + image) : null;
 
             const upload = await tx.insert(surveyHistorySchema).values({
+              treeId: tree.id,
               ...rest,
               treeImage: listTreeImage,
               leafImage: listLeafImage,
@@ -97,38 +128,72 @@ export const massUploadRoute = new Hono()
             if (upload) {
               resultSurveys.push({ id, status: 1 });
             } else {
-              resultSurveys.push({ id, status: 0 });
+              resultSurveys.push({ id, status: 0, message: 'Failed to insert survey' });
             }
           } catch (error) {
             console.error('Error inserting survey:', error);
-            resultSurveys.push({ id: survey.id, status: 0 });
+            resultSurveys.push({ id: survey.id, status: 0, message: String(error) });
           }
         }
+      });
 
+      await db.transaction(async (tx) => {
         for (const treeCode of treeCodes) {
+          try {
+            const { id, ...rest } = treeCode;
+            const upload = await tx.insert(treeCodeSchema).values(rest);
+            if (upload) {
+              resultTreeCodes.push({ id: id, status: 1 });
+            } else {
+              resultTreeCodes.push({ id: id, status: 0, message: 'Failed to insert tree code' });
+            }
+          } catch (error) {
+            console.error('Error inserting tree code:', error);
+            resultTreeCodes.push({ id: treeCode.id, status: 0, message: String(error) });
+          }
+        }
+      });
+
+      await db.transaction(async (tx) => {
+        for (const treeCode of treeCodesUpdate) {
           try {
             const update = await tx
               .update(treeCodeSchema)
               .set(treeCode)
               .where(eq(treeCodeSchema.id, treeCode.id));
             if (update) {
-              resultTreeCodes.push({ id: treeCode.id, status: 1 });
+              resultTreeCodesUpdate.push({ id: treeCode.id, status: 1 });
             } else {
-              resultTreeCodes.push({ id: treeCode.id, status: 0 });
+              resultTreeCodesUpdate.push({ id: treeCode.id, status: 0 });
             }
           } catch (error) {
             console.error('Error updating tree code:', error);
+            resultTreeCodesUpdate.push({ id: treeCode.id, status: 0, message: String(error) });
           }
         }
       });
+
       return c.json(
-        { message: 'Mass upload success', resultTrees, resultSurveys, resultTreeCodes },
+        {
+          message: 'Mass upload success',
+          resultTrees,
+          resultSurveys,
+          resultTreeCodes,
+          resultTreeCodesUpdate,
+        },
         201
       );
     } catch (error) {
       console.error('Error mass upload:', error);
       return c.json(
-        { message: 'Error mass upload', resultTrees, resultSurveys, resultTreeCodes },
+        {
+          message: 'Error mass upload',
+          error: String(error),
+          resultTrees,
+          resultSurveys,
+          resultTreeCodes,
+          resultTreeCodesUpdate,
+        },
         500
       );
     }

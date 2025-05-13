@@ -50,7 +50,10 @@ export const authRoute = new Hono()
       }
 
       // Generate JWT
-      const token = await sign({ userId: user[0].id, email: user[0].email }, JWT_SECRET);
+      const token = await sign(
+        { userId: user[0].id, email: user[0].email, groupId: user[0].groupId },
+        JWT_SECRET
+      );
 
       let userData = await db
         .select()

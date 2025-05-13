@@ -27,7 +27,7 @@ export const userSchema = mysqlTable(
     updatedAt: timestamp('updated_at').defaultNow(),
     deletedAt: timestamp('deleted_at'),
   },
-  (table) => [index('group_id_idx').on(table.groupId)]
+  (table) => [index('group_id_idx_users').on(table.groupId)]
 );
 
 export const kelompokKomunitasSchema = mysqlTable('kelompok_komunitas', {
@@ -58,23 +58,27 @@ export const treeCodeSchema = mysqlTable(
   'tree_code',
   {
     id: bigint('id', { mode: 'number', unsigned: true }).autoincrement().notNull().primaryKey(),
-    code: varchar('code', { length: 255 }).notNull(),
+    code: varchar('code', { length: 255 }).unique().notNull(),
     kelompokKomunitasId: bigint('kelompok_komunitas_id', { mode: 'number', unsigned: true })
       .notNull()
       .references(() => kelompokKomunitasSchema.id),
     status: int('status').default(0), // 0 = untagged, 1 = tagged
+    taggedBy: bigint('tagged_by', { mode: 'number', unsigned: true }).references(
+      () => userSchema.id
+    ),
+    taggedAt: varchar('tagged_at', { length: 255 }),
     createdAt: timestamp('created_at').defaultNow(),
     updatedAt: timestamp('updated_at').defaultNow(),
     deletedAt: timestamp('deleted_at'),
   },
-  (table) => [index('kelompok_komunitas_id_idx').on(table.kelompokKomunitasId)]
+  (table) => [index('kelompok_komunitas_id_idx_tree_code').on(table.kelompokKomunitasId)]
 );
 
 export const treeSchema = mysqlTable(
   'tree',
   {
-    id: bigint('id', { mode: 'number', unsigned: true }).notNull().primaryKey(),
-    code: varchar('code', { length: 255 }).notNull(),
+    id: bigint('id', { mode: 'number', unsigned: true }).autoincrement().notNull().primaryKey(),
+    code: varchar('code', { length: 255 }).unique().notNull(),
     masterTreeId: bigint('master_tree_id', { mode: 'number', unsigned: true }).references(
       () => masterTreeSchema.id
     ),
@@ -97,7 +101,7 @@ export const treeSchema = mysqlTable(
     updatedAt: timestamp('updated_at').defaultNow(),
     deletedAt: timestamp('deleted_at'),
   },
-  (table) => [index('kelompok_komunitas_id_idx').on(table.kelompokKomunitasId)]
+  (table) => [index('kelompok_komunitas_id_idx_tree').on(table.kelompokKomunitasId)]
 );
 
 export const adoptHistorySchema = mysqlTable('adopt_history', {
@@ -145,5 +149,8 @@ export const surveyHistorySchema = mysqlTable(
     updatedAt: timestamp('updated_at').defaultNow(),
     deletedAt: timestamp('deleted_at'),
   },
-  (table) => [index('kelompok_komunitas_id_idx').on(table.kelompokKomunitasId)]
+  (table) => [
+    index('kelompok_komunitas_id_idx_survey_history').on(table.kelompokKomunitasId),
+    index('tree_id_idx_survey_history').on(table.treeId),
+  ]
 );

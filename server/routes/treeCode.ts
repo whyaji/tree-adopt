@@ -4,7 +4,7 @@ import { Hono } from 'hono';
 import { z } from 'zod';
 
 import { db } from '../db/database.js';
-import { kelompokKomunitasSchema, treeCodeSchema } from '../db/schema/schema.js';
+import { kelompokKomunitasSchema, treeCodeSchema, userSchema } from '../db/schema/schema.js';
 import { getDataBy } from '../lib/dataBy.js';
 import { getPaginationData } from '../lib/pagination.js';
 import type { RelationsType } from '../lib/relation.js';
@@ -29,6 +29,12 @@ const relations: RelationsType = {
     type: 'one-to-one',
     table: kelompokKomunitasSchema,
     on: 'id',
+  },
+  taggedBy: {
+    type: 'one-to-one',
+    table: userSchema,
+    on: 'id',
+    alias: 'marker',
   },
 };
 

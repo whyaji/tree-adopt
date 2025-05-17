@@ -57,6 +57,8 @@ export const massUploadRoute = new Hono()
     // separate list code in survey
     const surveyCodeList = surveys.map((survey) => survey.code);
 
+    const treeCodeListUpdate = treeCodesUpdate.map((treeCode) => treeCode.code);
+
     try {
       await db.transaction(async (tx) => {
         for (const tree of trees) {
@@ -154,17 +156,40 @@ export const massUploadRoute = new Hono()
         }
       });
 
+      const treeCodesToUpdate = await db
+        .select({
+          id: treeCodeSchema.id,
+          code: treeCodeSchema.code,
+        })
+        .from(treeCodeSchema)
+        .where(inArray(treeCodeSchema.code, treeCodeListUpdate));
+
       await db.transaction(async (tx) => {
         for (const treeCode of treeCodesUpdate) {
           try {
+            const treeCodeToUpdate = treeCodesToUpdate.find(
+              (treeCodeToUpdate) => treeCodeToUpdate.code === treeCode.code
+            );
+            if (!treeCodeToUpdate) {
+              resultTreeCodesUpdate.push({
+                id: treeCode.id,
+                status: 0,
+                message: 'Tree code not found',
+              });
+              continue;
+            }
+            const { id, ...rest } = treeCode;
             const update = await tx
               .update(treeCodeSchema)
-              .set(treeCode)
-              .where(eq(treeCodeSchema.id, treeCode.id));
+              .set({
+                id: treeCodeToUpdate.id,
+                ...rest,
+              })
+              .where(eq(treeCodeSchema.id, treeCodeToUpdate.id));
             if (update) {
-              resultTreeCodesUpdate.push({ id: treeCode.id, status: 1 });
+              resultTreeCodesUpdate.push({ id, status: 1 });
             } else {
-              resultTreeCodesUpdate.push({ id: treeCode.id, status: 0 });
+              resultTreeCodesUpdate.push({ id, status: 0 });
             }
           } catch (error) {
             console.error('Error updating tree code:', error);

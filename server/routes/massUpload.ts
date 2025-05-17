@@ -61,7 +61,8 @@ export const massUploadRoute = new Hono()
 
     try {
       await db.transaction(async (tx) => {
-        for (const tree of trees) {
+        const sortedTrees = [...trees].sort((a, b) => a.id - b.id);
+        for (const tree of sortedTrees) {
           try {
             const { id, ...rest } = tree;
             const upload = await tx.insert(treeSchema).values(rest);
@@ -86,7 +87,8 @@ export const massUploadRoute = new Hono()
         .where(inArray(treeSchema.code, surveyCodeList));
 
       await db.transaction(async (tx) => {
-        for (const survey of surveys) {
+        const sortedSurveys = [...surveys].sort((a, b) => a.id - b.id);
+        for (const survey of sortedSurveys) {
           try {
             const {
               id,
@@ -140,7 +142,8 @@ export const massUploadRoute = new Hono()
       });
 
       await db.transaction(async (tx) => {
-        for (const treeCode of treeCodes) {
+        const sortedTreeCodes = [...treeCodes].sort((a, b) => a.id - b.id);
+        for (const treeCode of sortedTreeCodes) {
           try {
             const { id, ...rest } = treeCode;
             const upload = await tx.insert(treeCodeSchema).values(rest);

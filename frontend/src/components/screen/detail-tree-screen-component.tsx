@@ -16,7 +16,7 @@ export function DetailTreeScreenComponent({ tree }: { tree: TreeType | null }) {
   const listDetail = [
     { label: 'Nama Lokal', value: tree.masterTree?.localName ?? '-' },
     { label: 'Nama Latin', value: tree.masterTree?.latinName ?? '-' },
-    { label: 'Diameter', value: tree.survey?.diameter ? `${tree.survey?.diameter} cm` : '-' },
+    { label: 'Circumference', value: tree.survey?.circumference ? `${tree.survey?.circumference} cm` : '-' },
     { label: 'Tinggi', value: tree.survey?.height ? `${tree.survey?.height} m` : '-' },
     { label: 'Elevasi', value: `${tree.elevation} m` },
     { label: 'Surveyor', value: tree.survey?.user?.name ?? '-' },

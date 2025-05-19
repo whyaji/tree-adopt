@@ -38,7 +38,7 @@ export function SurveyHistoryTable({
             'ID',
             'Tanggal Survey',
             'Kategori Pohon',
-            'Diameter',
+            'Circumference',
             'Tinggi',
             'Serapan CO2',
             'Action',
@@ -64,7 +64,7 @@ export function SurveyHistoryTable({
                   <TableCell>{survey.id}</TableCell>
                   <TableCell>{dateTimeFormat(survey.surveyDate, { dateOnly: true })}</TableCell>
                   <TableCell>{TreeCategoryLabel[survey.category]}</TableCell>
-                  <TableCell>{survey.diameter} cm</TableCell>
+                  <TableCell>{survey.circumference} cm</TableCell>
                   <TableCell>{survey.height} cm</TableCell>
                   <TableCell>{survey.serapanCo2} kg</TableCell>
                   <TableCell>

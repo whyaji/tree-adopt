@@ -21,7 +21,7 @@ const surveyHistorySchemaZod = z.object({
   surveyDate: z.string().date(),
   surveyTime: z.string().time(),
   category: z.number().int(),
-  diameter: z.number(),
+  circumference: z.number(),
   height: z.number(),
   serapanCo2: z.number(),
   treeImage: z.array(z.string()).nonempty(),
@@ -40,7 +40,7 @@ const createSurveyHistorySchemaFormData = z.object({
   surveyDate: z.string().date(),
   surveyTime: z.string().regex(/^(0[0-9]|1[0-9]|2[0-3]):([0-5][0-9])$/),
   category: z.string().min(1),
-  diameter: z.string().min(1),
+  circumference: z.string().min(1),
   height: z.string().min(1),
   serapanCo2: z.string().min(1),
 });
@@ -52,7 +52,7 @@ const createSurveyHistoryByCodeSchemaFormData = z.object({
   surveyDate: z.string().date(),
   surveyTime: z.string().regex(/^(0[0-9]|1[0-9]|2[0-3]):([0-5][0-9])$/),
   category: z.string().min(1),
-  diameter: z.string().min(1),
+  circumference: z.string().min(1),
   height: z.string().min(1),
   serapanCo2: z.string().min(1),
 });
@@ -162,7 +162,7 @@ export const surveyHistoryRoute = new Hono()
         userId: parseInt(validation.data.userId),
         kelompokKomunitasId: parseInt(validation.data.kelompokKomunitasId),
         category: parseInt(validation.data.category),
-        diameter: parseFloat(validation.data.diameter),
+        circumference: parseFloat(validation.data.circumference),
         height: parseFloat(validation.data.height),
         serapanCo2: parseFloat(validation.data.serapanCo2),
       };
@@ -262,7 +262,7 @@ export const surveyHistoryRoute = new Hono()
         userId: parseInt(validation.data.userId),
         kelompokKomunitasId: parseInt(validation.data.kelompokKomunitasId),
         category: parseInt(validation.data.category),
-        diameter: parseFloat(validation.data.diameter),
+        circumference: parseFloat(validation.data.circumference),
         height: parseFloat(validation.data.height),
         serapanCo2: parseFloat(validation.data.serapanCo2),
       };
@@ -364,7 +364,7 @@ export const surveyHistoryRoute = new Hono()
         userId: parseInt(validation.data.userId),
         kelompokKomunitasId: parseInt(validation.data.kelompokKomunitasId),
         category: parseInt(validation.data.category),
-        diameter: parseFloat(validation.data.diameter),
+        circumference: parseFloat(validation.data.circumference),
         height: parseFloat(validation.data.height),
         serapanCo2: parseFloat(validation.data.serapanCo2),
       };

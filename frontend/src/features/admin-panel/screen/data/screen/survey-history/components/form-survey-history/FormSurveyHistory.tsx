@@ -32,7 +32,7 @@ export const FormSurveyHistory: FC<{
       userId: user ? String(user.id) : '',
       surveyDate: survey ? survey.surveyDate : toDbDate(moment().toString()),
       category: survey ? String(survey.category) : '',
-      diameter: survey ? String(survey.diameter) : '',
+      circumference: survey ? String(survey.circumference) : '',
       height: survey ? String(survey.height) : '',
       serapanCo2: survey ? String(survey.serapanCo2) : '',
     },
@@ -70,7 +70,7 @@ export const FormSurveyHistory: FC<{
   const formItem: FieldItemType<keyof (typeof form)['state']['values']>[] = [
     { name: 'surveyDate', label: 'Survey Date', type: 'date' },
     { name: 'category', label: 'Category', type: 'dropdown', data: ListTreeCategory },
-    { name: 'diameter', label: 'Diameter (cm)', type: 'number' },
+    { name: 'circumference', label: 'Circumference (cm)', type: 'number' },
     { name: 'height', label: 'Height (m)', type: 'number' },
     { name: 'serapanCo2', label: 'Serapan CO2 (kg)', type: 'number' },
   ];

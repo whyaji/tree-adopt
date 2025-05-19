@@ -1,0 +1,1 @@
+ALTER TABLE `survey_history` RENAME COLUMN `diameter` TO `circumference`;

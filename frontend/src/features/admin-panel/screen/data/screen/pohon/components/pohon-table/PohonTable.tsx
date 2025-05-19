@@ -67,7 +67,7 @@ export function PohonTable({ data, isPending }: { data?: TreeType[]; isPending: 
                         <strong>Kategori:</strong> {TreeCategoryLabel[tree.survey.category]}
                       </div>
                       <div>
-                        <strong>Diameter:</strong> {tree.survey.diameter} cm
+                        <strong>Circumference:</strong> {tree.survey.circumference} cm
                       </div>
                       <div>
                         <strong>Serapan Karbon (CO2):</strong> {tree.survey.serapanCo2} kg

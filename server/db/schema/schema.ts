@@ -135,7 +135,7 @@ export const surveyHistorySchema = mysqlTable(
     surveyDate: varchar('survey_date', { length: 255 }).notNull(),
     surveyTime: varchar('survey_time', { length: 255 }).notNull(),
     category: int('category').notNull(), // 1 = pohon dewasa, 2 = pohon remaja, 3 = bibit
-    diameter: float('diameter').notNull(),
+    circumference: float('circumference').notNull(),
     height: float('height').notNull(),
     serapanCo2: float('serapan_co2').notNull(),
     treeImage: json('tree_image').notNull(),

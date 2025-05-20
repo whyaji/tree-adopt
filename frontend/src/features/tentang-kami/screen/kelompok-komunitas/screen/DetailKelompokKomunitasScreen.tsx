@@ -2,18 +2,17 @@ import { LatLngTuple } from 'leaflet';
 import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
 
 import { Route } from '@/routes/_authenticated/tentang-kami/kelompok-komunitas/$kelompokKomunitasName';
+import { KelompokKomunitasType } from '@/types/kelompokKomunitas.type';
 
 export function DetailKelompokKomunitasScreen() {
-  const { kelompokKomunitas } = Route.useLoaderData();
+  const { kelompokKomunitas }: { kelompokKomunitas?: KelompokKomunitasType } =
+    Route.useLoaderData();
 
   if (!kelompokKomunitas) {
     return <div>Kelompok Komunitas tidak ditemukan.</div>;
   }
 
-  const position: LatLngTuple = [
-    parseFloat(kelompokKomunitas.latitude),
-    parseFloat(kelompokKomunitas.longitude),
-  ];
+  const position: LatLngTuple = [kelompokKomunitas.latitude, kelompokKomunitas.longitude];
 
   const kupsList = kelompokKomunitas.kups?.split(',') ?? [];
   const programUnggulanList = kelompokKomunitas.programUnggulan?.split(',') ?? [];
@@ -56,6 +55,10 @@ export function DetailKelompokKomunitasScreen() {
                   ))}
                 </div>
               </div>
+
+              <div className="font-semibold">Alamat</div>
+              <div>:</div>
+              <div>{kelompokKomunitas.address}</div>
             </div>
           </div>
         </div>

@@ -23,25 +23,19 @@ const treeSchemaZod = z.object({
   code: z.string().min(1),
   masterTreeId: z.number().int().positive().optional(),
   localTreeName: z.string().min(1),
-  latinTreeName: z.string().optional(),
   kelompokKomunitasId: z.number().int().positive(),
   surveyorId: z.number().int().positive(),
   status: z.number().int().default(1), // 0 = inactive, 1 = active
-  elevation: z.number().optional(),
-  address: z.string().min(1),
+  elevation: z.number(),
+  landType: z.number().int(),
   latitude: z.number(),
   longitude: z.number(),
-  landType: z.string(),
-  sitterName: z.string().optional(),
 });
 
 const createTreeSchema = treeSchemaZod.omit({
   id: true,
   masterTreeId: true,
   status: true,
-  latinTreeName: true,
-  elevation: true,
-  sitterName: true,
 });
 
 export type Tree = z.infer<typeof treeSchemaZod>;

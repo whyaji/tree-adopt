@@ -37,8 +37,9 @@ export const kelompokKomunitasSchema = mysqlTable('kelompok_komunitas', {
   noSk: varchar('no_sk', { length: 255 }).notNull(),
   kups: varchar('kups', { length: 255 }).notNull(),
   programUnggulan: varchar('program_unggulan', { length: 255 }).notNull(),
-  latitude: varchar('latitude', { length: 255 }).notNull(),
-  longitude: varchar('longitude', { length: 255 }).notNull(),
+  address: varchar('address', { length: 255 }).notNull(),
+  latitude: double('latitude').notNull(),
+  longitude: double('longitude').notNull(),
   image: varchar('image', { length: 255 }),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
@@ -83,7 +84,6 @@ export const treeSchema = mysqlTable(
       () => masterTreeSchema.id
     ),
     localTreeName: varchar('local_tree_name', { length: 255 }).notNull(),
-    latinTreeName: varchar('latin_tree_name', { length: 255 }),
     kelompokKomunitasId: bigint('kelompok_komunitas_id', { mode: 'number', unsigned: true })
       .notNull()
       .references(() => kelompokKomunitasSchema.id),
@@ -91,12 +91,10 @@ export const treeSchema = mysqlTable(
       .notNull()
       .references(() => userSchema.id),
     status: int('status').default(1), // 0 = inactive, 1 = active
-    elevation: float('elevation'),
-    landType: varchar('land_type', { length: 255 }).notNull(),
-    address: varchar('address', { length: 255 }).notNull(),
+    elevation: float('elevation').notNull(),
+    landType: int('land_type').notNull(), // 1 = gambut, 2 = hutan, 3 = pekarangan, 4 = tegalan, 5 = jalan,
     latitude: double('latitude').notNull(),
     longitude: double('longitude').notNull(),
-    sitterName: varchar('sitter_name', { length: 255 }),
     createdAt: timestamp('created_at').defaultNow(),
     updatedAt: timestamp('updated_at').defaultNow(),
     deletedAt: timestamp('deleted_at'),

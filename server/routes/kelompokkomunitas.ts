@@ -1,4 +1,4 @@
-import { count, eq } from 'drizzle-orm';
+import { count, eq, type InferSelectModel } from 'drizzle-orm';
 import { Hono } from 'hono';
 import path from 'path';
 import { z } from 'zod';
@@ -20,13 +20,14 @@ const kelompokKomunitasSchemaZod = z.object({
   noSk: z.string().min(1),
   kups: z.string().min(1),
   programUnggulan: z.string().min(1),
+  address: z.string().min(1),
   latitude: z.string().min(1),
   longitude: z.string().min(1),
   image: z.string().min(1),
 });
 
 const createPostSchema = kelompokKomunitasSchemaZod.omit({ id: true, image: true });
-export type KelompokKomunitas = z.infer<typeof kelompokKomunitasSchemaZod>;
+export type KelompokKomunitas = InferSelectModel<typeof kelompokKomunitasSchema>;
 
 // === RELATIONS ===
 const relations: RelationsType = {
@@ -76,6 +77,8 @@ export const kelompokKomunitasRoute = new Hono()
       const data = {
         ...validation.data,
         image: `/${dir}/${path.basename(imagePath)}`,
+        latitude: parseFloat(validation.data.latitude),
+        longitude: parseFloat(validation.data.longitude),
       };
       await db.insert(kelompokKomunitasSchema).values(data);
       return c.json({ message: 'Kelompok Komunitas created' }, 201);
@@ -118,7 +121,12 @@ export const kelompokKomunitasRoute = new Hono()
       }
     }
 
-    const data = { ...validation.data, image: newImagePath };
+    const data = {
+      ...validation.data,
+      image: newImagePath,
+      latitude: parseFloat(validation.data.latitude),
+      longitude: parseFloat(validation.data.longitude),
+    };
     await db.update(kelompokKomunitasSchema).set(data).where(eq(kelompokKomunitasSchema.id, id));
     return c.json({ message: 'Kelompok Komunitas updated' });
   })

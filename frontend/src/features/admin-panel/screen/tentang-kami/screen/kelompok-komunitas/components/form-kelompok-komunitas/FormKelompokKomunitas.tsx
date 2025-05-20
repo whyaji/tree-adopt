@@ -36,7 +36,7 @@ export const FormKelompokKomunitas: FC<{
   const [markerPosition, setMarkerPosition] = useState<[number, number] | null>(null);
   const [mapCenter, setMapCenter] = useState<[number, number]>(
     kelompokKomunitas
-      ? [parseFloat(kelompokKomunitas.latitude), parseFloat(kelompokKomunitas.longitude)]
+      ? [kelompokKomunitas.latitude, kelompokKomunitas.longitude]
       : MAPS_CENTER.DEFAULT
   );
 
@@ -50,8 +50,9 @@ export const FormKelompokKomunitas: FC<{
       noSk: kelompokKomunitas?.noSk ?? '',
       kups: kelompokKomunitas?.kups ?? '',
       programUnggulan: kelompokKomunitas?.programUnggulan ?? '',
-      latitude: kelompokKomunitas?.latitude ?? '',
-      longitude: kelompokKomunitas?.longitude ?? '',
+      latitude: kelompokKomunitas?.latitude ? String(kelompokKomunitas?.latitude) : '',
+      longitude: kelompokKomunitas?.longitude ? String(kelompokKomunitas?.longitude) : '',
+      address: kelompokKomunitas?.address ?? '',
     },
     onSubmit: async ({ value }) => {
       try {
@@ -113,10 +114,11 @@ export const FormKelompokKomunitas: FC<{
     type: string;
   }[] = [
     { name: 'name', label: 'Name', type: 'text' },
-    { name: 'description', label: 'Description', type: 'text' },
+    { name: 'description', label: 'Description', type: 'area' },
     { name: 'noSk', label: 'No SK', type: 'text' },
-    { name: 'kups', label: 'KUPS', type: 'text' },
-    { name: 'programUnggulan', label: 'Program Unggulan', type: 'text' },
+    { name: 'kups', label: 'KUPS', type: 'area' },
+    { name: 'programUnggulan', label: 'Program Unggulan', type: 'area' },
+    { name: 'address', label: 'Address', type: 'area' },
   ];
 
   return (
@@ -133,9 +135,7 @@ export const FormKelompokKomunitas: FC<{
           {(field) => (
             <>
               <Label htmlFor={field.name}>{item.label}</Label>
-              {item.name === 'description' ||
-              item.name === 'programUnggulan' ||
-              item.name === 'kups' ? (
+              {item.type === 'area' ? (
                 <Textarea
                   id={field.name}
                   name={field.name}
@@ -231,7 +231,7 @@ export const FormKelompokKomunitas: FC<{
         {(file || imageUrl) && (
           <div className="mt-1">
             <img
-              src={file ? URL.createObjectURL(file) : imageUrl}
+              src={file ? URL.createObjectURL(file) : (imageUrl ?? undefined)}
               alt="Preview"
               className="h-48 object-cover rounded-md"
             />

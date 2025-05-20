@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "1307021d-cd2b-40c1-8792-523fbea3ebe6",
+  "id": "9f1c8b74-8995-45a2-a30d-7799e15d4939",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "adopt_history": {
@@ -151,16 +151,23 @@
           "notNull": true,
           "autoincrement": false
         },
+        "address": {
+          "name": "address",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
         "latitude": {
           "name": "latitude",
-          "type": "varchar(255)",
+          "type": "double",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "longitude": {
           "name": "longitude",
-          "type": "varchar(255)",
+          "type": "double",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -329,8 +336,8 @@
           "notNull": true,
           "autoincrement": false
         },
-        "diameter": {
-          "name": "diameter",
+        "circumference": {
+          "name": "circumference",
           "type": "float",
           "primaryKey": false,
           "notNull": true,
@@ -647,13 +654,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "latin_tree_name": {
-          "name": "latin_tree_name",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
         "kelompok_komunitas_id": {
           "name": "kelompok_komunitas_id",
           "type": "bigint unsigned",
@@ -680,19 +680,12 @@
           "name": "elevation",
           "type": "float",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "land_type": {
           "name": "land_type",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "address": {
-          "name": "address",
-          "type": "varchar(255)",
+          "type": "int",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -709,13 +702,6 @@
           "type": "double",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
-        },
-        "sitter_name": {
-          "name": "sitter_name",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false,
           "autoincrement": false
         },
         "created_at": {

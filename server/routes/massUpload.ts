@@ -2,7 +2,12 @@ import { eq, inArray } from 'drizzle-orm';
 import { Hono } from 'hono';
 
 import { db } from '../db/database.js';
-import { surveyHistorySchema, treeCodeSchema, treeSchema } from '../db/schema/schema.js';
+import {
+  masterTreeSchema,
+  surveyHistorySchema,
+  treeCodeSchema,
+  treeSchema,
+} from '../db/schema/schema.js';
 import { uploadFile } from '../lib/upload.js';
 import authMiddleware from '../middleware/jwt.js';
 import type { SurveyHistory } from './surveyHistory.js';
@@ -59,13 +64,28 @@ export const massUploadRoute = new Hono()
 
     const treeCodeListUpdate = treeCodesUpdate.map((treeCode) => treeCode.code);
 
+    const treeLocalNameList = trees.map((tree) => tree.localTreeName);
+
     try {
+      const masterTreesSelected = await db
+        .select({
+          id: masterTreeSchema.id,
+          localName: masterTreeSchema.localName,
+        })
+        .from(masterTreeSchema)
+        .where(inArray(masterTreeSchema.localName, treeLocalNameList));
       await db.transaction(async (tx) => {
         const sortedTrees = [...trees].sort((a, b) => a.id - b.id);
         for (const tree of sortedTrees) {
           try {
+            const masterTree = masterTreesSelected.find(
+              (masterTree) => masterTree.localName === tree.localTreeName
+            );
+
             const { id, ...rest } = tree;
-            const upload = await tx.insert(treeSchema).values(rest);
+            const upload = await tx
+              .insert(treeSchema)
+              .values({ ...rest, masterTreeId: masterTree?.id ?? null });
             if (upload) {
               resultTrees.push({ id: id, status: 1 });
             } else {

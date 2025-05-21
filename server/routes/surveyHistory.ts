@@ -128,30 +128,35 @@ export const surveyHistoryRoute = new Hono()
     };
 
     try {
-      for (const field of imageFields) {
-        const files = formData[field];
-        const fileList = Array.isArray(files) ? files : files ? [files] : [];
-
-        // Special check for required treeImage
-        if (field === 'treeImage' && fileList.length === 0) {
-          return c.json({ error: `Missing required images: ${field}` }, 400);
-        }
-
+      for (const type of imageFields) {
         const uploadedPaths: string[] = [];
-
-        for (const file of fileList) {
-          if (file instanceof File && file.size > 0) {
+        // Collect all keys like 'treeImage[0]', 'treeImage[1]', etc.
+        let idx = 0;
+        while (true) {
+          const key = `${type}[${idx}]`;
+          if (!(key in formData)) break;
+          const value = formData[key];
+          if (value instanceof File && value.size > 0) {
             try {
-              const imagePath = await uploadFile(file, dir, { withTimeMilis: true });
+              const imagePath = await uploadFile(value, dir, { withTimeMilis: true });
               uploadedPaths.push(`/${dir}/${path.basename(imagePath)}`);
             } catch (err) {
-              console.error(`Error uploading ${field}:`, err);
-              throw new Error(`Failed to upload ${field}`);
+              console.error(`Error uploading ${type}:`, err);
+              throw new Error(`Failed to upload ${type}`);
             }
+          } else if (typeof value === 'string' && value.trim() !== '') {
+            // Existing image URL, just push as is
+            uploadedPaths.push(value);
           }
+          idx++;
         }
 
-        imageUploads[field as keyof ImagesType] = uploadedPaths;
+        // Special check for required treeImage
+        if (type === 'treeImage' && uploadedPaths.length === 0) {
+          return c.json({ error: `Missing required images: ${type}` }, 400);
+        }
+
+        imageUploads[type as keyof ImagesType] = uploadedPaths;
       }
 
       // Prepare data for DB
@@ -226,30 +231,35 @@ export const surveyHistoryRoute = new Hono()
     };
 
     try {
-      for (const field of imageFields) {
-        const files = formData[field];
-        const fileList = Array.isArray(files) ? files : files ? [files] : [];
-
-        // Special check for required treeImage
-        if (field === 'treeImage' && fileList.length === 0) {
-          return c.json({ error: `Missing required images: ${field}` }, 400);
-        }
-
+      for (const type of imageFields) {
         const uploadedPaths: string[] = [];
-
-        for (const file of fileList) {
-          if (file instanceof File && file.size > 0) {
+        // Collect all keys like 'treeImage[0]', 'treeImage[1]', etc.
+        let idx = 0;
+        while (true) {
+          const key = `${type}[${idx}]`;
+          if (!(key in formData)) break;
+          const value = formData[key];
+          if (value instanceof File && value.size > 0) {
             try {
-              const imagePath = await uploadFile(file, dir, { withTimeMilis: true });
+              const imagePath = await uploadFile(value, dir, { withTimeMilis: true });
               uploadedPaths.push(`/${dir}/${path.basename(imagePath)}`);
             } catch (err) {
-              console.error(`Error uploading ${field}:`, err);
-              throw new Error(`Failed to upload ${field}`);
+              console.error(`Error uploading ${type}:`, err);
+              throw new Error(`Failed to upload ${type}`);
             }
+          } else if (typeof value === 'string' && value.trim() !== '') {
+            // Existing image URL, just push as is
+            uploadedPaths.push(value);
           }
+          idx++;
         }
 
-        imageUploads[field as keyof ImagesType] = uploadedPaths;
+        // Special check for required treeImage
+        if (type === 'treeImage' && uploadedPaths.length === 0) {
+          return c.json({ error: `Missing required images: ${type}` }, 400);
+        }
+
+        imageUploads[type as keyof ImagesType] = uploadedPaths;
       }
 
       // Prepare data for DB

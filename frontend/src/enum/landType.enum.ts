@@ -1,17 +1,9 @@
 export enum LAND_TYPE {
-  MINERAL = 1,
-  ORGANIK = 2,
-  LAHAN_BASAH = 3,
+  PEATLAND = 1,
 }
 
 export const LandTypeLabel: Record<number, string> = {
-  [LAND_TYPE.MINERAL]: 'Mineral',
-  [LAND_TYPE.ORGANIK]: 'Organik',
-  [LAND_TYPE.LAHAN_BASAH]: 'Lahan Basah',
+  [LAND_TYPE.PEATLAND]: 'Lahan Gambut',
 };
 
-export const ListLandType = [
-  { label: 'Mineral', value: String(LAND_TYPE.MINERAL) },
-  { label: 'Organik', value: String(LAND_TYPE.ORGANIK) },
-  { label: 'Lahan Basah', value: String(LAND_TYPE.LAHAN_BASAH) },
-];
+export const ListLandType = [{ label: 'Lahan Gambut', value: String(LAND_TYPE.PEATLAND) }];

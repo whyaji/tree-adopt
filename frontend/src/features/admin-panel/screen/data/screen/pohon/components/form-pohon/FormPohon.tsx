@@ -21,11 +21,11 @@ export const FormPohon: FC<{
     defaultValues: {
       code: tree?.code ?? '',
       masterTreeId: tree?.masterTreeId ? String(tree.masterTreeId) : '',
+      localTreeName: tree?.masterTree?.localName ?? '',
       kelompokKomunitasId: tree?.kelompokKomunitasId ? String(tree.kelompokKomunitasId) : '',
       surveyorId: tree?.surveyorId ? String(tree.surveyorId) : '',
       status: tree?.status ? String(tree.status) : '',
       elevation: tree?.elevation ? String(tree.elevation) : '',
-      address: tree?.address ?? '',
       latitude: tree?.latitude ? String(tree.latitude) : '',
       longitude: tree?.longitude ? String(tree.longitude) : '',
       landType: tree?.landType ? String(tree.landType) : '',
@@ -34,11 +34,11 @@ export const FormPohon: FC<{
       const dataValue = {
         code: value.code,
         masterTreeId: Number(value.masterTreeId),
+        localTreeName: value.localTreeName,
         kelompokKomunitasId: Number(value.kelompokKomunitasId),
         surveyorId: Number(value.surveyorId),
         status: Number(value.status),
         elevation: Number(value.elevation),
-        address: value.address,
         latitude: Number(value.latitude),
         longitude: Number(value.longitude),
         landType: Number(value.landType),
@@ -71,6 +71,7 @@ export const FormPohon: FC<{
   const formItem: FieldItemType<keyof (typeof form)['state']['values']>[] = [
     { name: 'code', label: 'Code', type: 'text' },
     { name: 'masterTreeId', label: 'Tree', type: 'dropdown-master-tree' },
+    { name: 'localTreeName', label: 'Local Tree Name', type: 'text' },
     { name: 'kelompokKomunitasId', label: 'Kelompok Komunitas', type: 'dropdown-comunity-group' },
     { name: 'surveyorId', label: 'Surveyor', type: 'dropdown-surveyor' },
     {
@@ -83,7 +84,6 @@ export const FormPohon: FC<{
       ],
     },
     { name: 'elevation', label: 'Elevation', type: 'number' },
-    { name: 'address', label: 'Address', type: 'area' },
     { name: 'landType', label: 'Land Type', type: 'dropdown', data: ListLandType },
   ];
 
@@ -98,11 +98,7 @@ export const FormPohon: FC<{
       <h2 className="text-2xl font-bold">Add Tree</h2>
       {formItem.map((item) => (
         <form.Field key={item.name} name={item.name}>
-          {(field) => (
-            <>
-              <FieldForm item={item} field={field}></FieldForm>
-            </>
-          )}
+          {(field) => <FieldForm item={item} field={field}></FieldForm>}
         </form.Field>
       ))}
 

@@ -43,14 +43,23 @@ export function Dropdown({
   setValue: (value: string) => void;
   search?: string;
   setSearch?: (search: string) => void;
-  onEndReached?: () => void;
+  onEndReached?: () => Promise<void> | void;
   refreshing?: boolean;
   onRefresh?: () => void;
   totalData?: number;
 }) {
   const [open, setOpen] = React.useState(false);
+  const [loadingMore, setLoadingMore] = React.useState(false);
   const triggerRef = React.useRef<HTMLButtonElement>(null);
   const selectedItem = data.find((itemValue) => itemValue.value === value);
+
+  const handleEndReached = async () => {
+    if (!loadingMore && !refreshing && typeof totalData === 'number' && data.length < totalData) {
+      setLoadingMore(true);
+      await onEndReached?.();
+      setLoadingMore(false);
+    }
+  };
 
   return (
     <div className="w-full">
@@ -66,7 +75,7 @@ export function Dropdown({
               <span className="truncate font-normal">
                 {selectedItem?.label}{' '}
                 {selectedItem?.secondaryLabel && (
-                  <span className="italic">- {selectedItem?.secondaryLabel}</span>
+                  <span className="italic">- {selectedItem.secondaryLabel}</span>
                 )}
               </span>
             ) : (
@@ -106,13 +115,14 @@ export function Dropdown({
               )}
             </div>
           )}
+
           <div
             className="max-h-60 overflow-y-auto"
             onScroll={(e) => {
               const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
-              const isAtBottom = scrollHeight - scrollTop === clientHeight;
+              const isAtBottom = scrollTop + clientHeight >= scrollHeight - 5;
               if (isAtBottom) {
-                onEndReached?.();
+                handleEndReached();
               }
             }}>
             {data.length === 0 ? (
@@ -146,14 +156,15 @@ export function Dropdown({
                 </div>
               ))
             )}
+
             <div className="flex items-center justify-center py-2 text-sm text-muted-foreground gap-2">
-              {refreshing && (
+              {(refreshing || loadingMore) && (
                 <>
                   <ClipLoader size={24} aria-label="Loading Spinner" data-testid="loader" />
                   <Label className="text-xs">Loading...</Label>
                 </>
               )}
-              {!refreshing && totalData !== undefined && (
+              {!refreshing && !loadingMore && typeof totalData === 'number' && (
                 <Label className="text-xs">{`Showing ${data.length} from ${totalData}`}</Label>
               )}
             </div>

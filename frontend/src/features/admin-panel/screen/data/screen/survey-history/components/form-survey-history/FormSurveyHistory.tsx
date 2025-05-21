@@ -15,6 +15,26 @@ import { toDbDate } from '@/lib/utils/dateTimeFormat';
 import { SurveyHistoryType } from '@/types/surveyHistory.type';
 import { TreeType } from '@/types/tree.type';
 
+type ImagesType = {
+  treeImage: (File | string)[];
+  leafImage?: (File | string)[];
+  skinImage?: (File | string)[];
+  fruitImage?: (File | string)[];
+  flowerImage?: (File | string)[];
+  sapImage?: (File | string)[];
+  otherImage?: (File | string)[];
+};
+
+const imageTypes: (keyof ImagesType)[] = [
+  'treeImage',
+  'leafImage',
+  'skinImage',
+  'fruitImage',
+  'flowerImage',
+  'sapImage',
+  'otherImage',
+];
+
 export const FormSurveyHistory: FC<{
   title?: string;
   survey?: SurveyHistoryType | null;
@@ -23,8 +43,24 @@ export const FormSurveyHistory: FC<{
   const navigate = useNavigate();
   const user = Cookies.get('user') ? JSON.parse(Cookies.get('user') as string) : null;
 
-  const [file, setFile] = useState<File | null>(null);
-  const imageUrl = survey?.image;
+  // Initialize images state for each type, max 5 images each
+  const [images, setImages] = useState<ImagesType>(() => {
+    const initial: ImagesType = {
+      treeImage: [],
+      leafImage: [],
+      skinImage: [],
+      fruitImage: [],
+      flowerImage: [],
+      sapImage: [],
+      otherImage: [],
+    };
+
+    imageTypes.forEach((type) => {
+      initial[type] = survey?.[type] ?? [];
+    });
+
+    return initial;
+  });
 
   const form = useForm({
     defaultValues: {
@@ -41,11 +77,18 @@ export const FormSurveyHistory: FC<{
       Object.entries(value).forEach(([key, value]) => {
         formData.append(key, String(value));
       });
-      if (file) {
-        formData.append('image', file);
-      } else if (survey?.image) {
-        formData.append('image', survey.image);
-      }
+
+      // Append images for each type, max 5 per type
+      imageTypes.forEach((type) => {
+        images[type]?.slice(0, 5).forEach((img, idx) => {
+          if (img instanceof File) {
+            formData.append(`${type}[${idx}]`, img);
+          } else if (typeof img === 'string') {
+            // If it's a string (existing image URL), send as is or handle as needed
+            formData.append(`${type}[${idx}]`, img);
+          }
+        });
+      });
 
       try {
         if (survey) {
@@ -58,11 +101,7 @@ export const FormSurveyHistory: FC<{
         form.reset();
         navigate({ to: `/admin/data/pohon/${tree?.id}/survey-history` });
       } catch {
-        if (survey) {
-          toast.error('Failed to Survey history');
-        } else {
-          toast.error('Failed to Survey history');
-        }
+        toast.error('Failed to Survey history');
       }
     },
   });
@@ -75,6 +114,14 @@ export const FormSurveyHistory: FC<{
     { name: 'serapanCo2', label: 'Serapan CO2 (kg)', type: 'number' },
   ];
 
+  // Handler for image changes
+  const handleImageChange = (type: keyof ImagesType, files: File[]) => {
+    setImages((prev) => ({
+      ...prev,
+      [type]: files.slice(0, 5),
+    }));
+  };
+
   return (
     <form
       className="flex flex-col gap-2 max-w-6xl m-auto"
@@ -86,15 +133,21 @@ export const FormSurveyHistory: FC<{
       {title && <h2 className="text-2xl font-bold">{title}</h2>}
       {formItem.map((item) => (
         <form.Field key={item.name} name={item.name}>
-          {(field) => (
-            <>
-              <FieldForm item={item} field={field}></FieldForm>
-            </>
-          )}
+          {(field) => <FieldForm item={item} field={field}></FieldForm>}
         </form.Field>
       ))}
 
-      <ImageForm file={file} setFile={setFile} imageUrl={imageUrl} />
+      {/* Render ImageForm for each image type */}
+      {imageTypes.map((type) => (
+        <div key={type} className="mb-2">
+          <ImageForm
+            label={type}
+            files={images[type] as (File | string)[]}
+            setFiles={(files: File[]) => handleImageChange(type, files)}
+            maxFiles={5}
+          />
+        </div>
+      ))}
 
       <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
         {([canSubmit, isSubmitting]) => (

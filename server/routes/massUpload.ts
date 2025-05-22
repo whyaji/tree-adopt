@@ -1,6 +1,7 @@
 import { eq, inArray } from 'drizzle-orm';
 import { Hono } from 'hono';
 
+import { STATUS_RECORD } from '../constants/STATUS_RECORD.js';
 import { db } from '../db/database.js';
 import {
   masterTreeSchema,
@@ -87,13 +88,17 @@ export const massUploadRoute = new Hono()
               .insert(treeSchema)
               .values({ ...rest, masterTreeId: masterTree?.id ?? null });
             if (upload) {
-              resultTrees.push({ id: id, status: 1 });
+              resultTrees.push({ id: id, status: STATUS_RECORD.UPLOADED });
             } else {
-              resultTrees.push({ id: id, status: 2, message: 'Failed to insert tree' });
+              resultTrees.push({
+                id: id,
+                status: STATUS_RECORD.FAILED,
+                message: 'Failed to insert tree',
+              });
             }
           } catch (error) {
             console.error('Error inserting tree:', error);
-            resultTrees.push({ id: tree.id, status: 2, message: String(error) });
+            resultTrees.push({ id: tree.id, status: STATUS_RECORD.FAILED, message: String(error) });
           }
         }
       });
@@ -122,9 +127,24 @@ export const massUploadRoute = new Hono()
               otherImage,
               ...rest
             } = survey;
+
+            const treeInNewTree = resultTrees.find((tree) => tree.id === id);
+            if (treeInNewTree?.status === STATUS_RECORD.FAILED) {
+              resultSurveys.push({
+                id: survey.id,
+                status: STATUS_RECORD.FAILED,
+                message: 'Your Tree Failed to Upload',
+              });
+              continue;
+            }
+
             const tree = treesForSurveyFromCode.find((tree) => tree.code === code);
             if (!tree) {
-              resultSurveys.push({ id: survey.id, status: 2, message: 'Tree not found' });
+              resultSurveys.push({
+                id: survey.id,
+                status: STATUS_RECORD.FAILED,
+                message: 'Tree not found',
+              });
               continue;
             }
 
@@ -150,13 +170,21 @@ export const massUploadRoute = new Hono()
               otherImage: listOtherImage,
             });
             if (upload) {
-              resultSurveys.push({ id, status: 1 });
+              resultSurveys.push({ id, status: STATUS_RECORD.UPLOADED });
             } else {
-              resultSurveys.push({ id, status: 2, message: 'Failed to insert survey' });
+              resultSurveys.push({
+                id,
+                status: STATUS_RECORD.FAILED,
+                message: 'Failed to insert survey',
+              });
             }
           } catch (error) {
             console.error('Error inserting survey:', error);
-            resultSurveys.push({ id: survey.id, status: 2, message: String(error) });
+            resultSurveys.push({
+              id: survey.id,
+              status: STATUS_RECORD.FAILED,
+              message: String(error),
+            });
           }
         }
       });
@@ -168,13 +196,21 @@ export const massUploadRoute = new Hono()
             const { id, ...rest } = treeCode;
             const upload = await tx.insert(treeCodeSchema).values(rest);
             if (upload) {
-              resultTreeCodes.push({ id: id, status: 1 });
+              resultTreeCodes.push({ id: id, status: STATUS_RECORD.UPLOADED });
             } else {
-              resultTreeCodes.push({ id: id, status: 2, message: 'Failed to insert tree code' });
+              resultTreeCodes.push({
+                id: id,
+                status: STATUS_RECORD.FAILED,
+                message: 'Failed to insert tree code',
+              });
             }
           } catch (error) {
             console.error('Error inserting tree code:', error);
-            resultTreeCodes.push({ id: treeCode.id, status: 2, message: String(error) });
+            resultTreeCodes.push({
+              id: treeCode.id,
+              status: STATUS_RECORD.FAILED,
+              message: String(error),
+            });
           }
         }
       });
@@ -196,7 +232,7 @@ export const massUploadRoute = new Hono()
             if (!treeCodeToUpdate) {
               resultTreeCodesUpdate.push({
                 id: treeCode.id,
-                status: 2,
+                status: STATUS_RECORD.FAILED,
                 message: 'Tree code not found',
               });
               continue;
@@ -210,13 +246,17 @@ export const massUploadRoute = new Hono()
               })
               .where(eq(treeCodeSchema.id, treeCodeToUpdate.id));
             if (update) {
-              resultTreeCodesUpdate.push({ id, status: 1 });
+              resultTreeCodesUpdate.push({ id, status: STATUS_RECORD.UPLOADED });
             } else {
-              resultTreeCodesUpdate.push({ id, status: 2 });
+              resultTreeCodesUpdate.push({ id, status: STATUS_RECORD.FAILED });
             }
           } catch (error) {
             console.error('Error updating tree code:', error);
-            resultTreeCodesUpdate.push({ id: treeCode.id, status: 2, message: String(error) });
+            resultTreeCodesUpdate.push({
+              id: treeCode.id,
+              status: STATUS_RECORD.FAILED,
+              message: String(error),
+            });
           }
         }
       });
@@ -264,10 +304,18 @@ export const massUploadRoute = new Hono()
 
       try {
         await uploadFile(file, dir);
-        responses.push({ fileIndex: i, status: 1, message: 'File uploaded successfully' });
+        responses.push({
+          fileIndex: i,
+          status: STATUS_RECORD.UPLOADED,
+          message: 'File uploaded successfully',
+        });
       } catch (err) {
         console.error(`Error uploading file at index ${i}:`, err);
-        responses.push({ fileIndex: i, status: 2, message: 'Error uploading file' });
+        responses.push({
+          fileIndex: i,
+          status: STATUS_RECORD.FAILED,
+          message: 'Error uploading file',
+        });
       }
     }
 

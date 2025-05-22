@@ -42,6 +42,8 @@ export const massUploadRoute = new Hono()
       message?: string;
     }[] = [];
 
+    const failedTreeUploadsCode: string[] = [];
+
     const resultSurveys: {
       id: number;
       status: number;
@@ -95,10 +97,12 @@ export const massUploadRoute = new Hono()
                 status: STATUS_RECORD.FAILED,
                 message: 'Failed to insert tree',
               });
+              failedTreeUploadsCode.push(tree.code);
             }
           } catch (error) {
             console.error('Error inserting tree:', error);
             resultTrees.push({ id: tree.id, status: STATUS_RECORD.FAILED, message: String(error) });
+            failedTreeUploadsCode.push(tree.code);
           }
         }
       });
@@ -128,8 +132,8 @@ export const massUploadRoute = new Hono()
               ...rest
             } = survey;
 
-            const treeInNewTree = resultTrees.find((tree) => tree.id === id);
-            if (treeInNewTree?.status === STATUS_RECORD.FAILED) {
+            const treeFailedInNewTree = failedTreeUploadsCode.find((treeCode) => treeCode === code);
+            if (treeFailedInNewTree) {
               resultSurveys.push({
                 id: survey.id,
                 status: STATUS_RECORD.FAILED,

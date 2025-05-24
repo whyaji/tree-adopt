@@ -27,7 +27,7 @@ const treeSchemaZod = z.object({
   surveyorId: z.number().int().positive(),
   status: z.number().int().default(1), // 0 = inactive, 1 = active
   elevation: z.number(),
-  landType: z.number().int(),
+  landCover: z.number().int(),
   latitude: z.number(),
   longitude: z.number(),
 });

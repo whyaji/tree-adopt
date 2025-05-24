@@ -7,7 +7,7 @@ import { ConfirmationDialog } from '@/components/confimation-dialog';
 import { FieldForm, FieldItemType } from '@/components/field-form';
 import { MapsForm } from '@/components/maps-form';
 import { Button } from '@/components/ui/button';
-import { ListLandType } from '@/enum/landType.enum';
+import { ListLandCover } from '@/enum/landCover.enum';
 import { useMapsState } from '@/hooks/use-maps-state';
 import { createTree, updateTree } from '@/lib/api/treeApi';
 import { TreeType } from '@/types/tree.type';
@@ -28,7 +28,7 @@ export const FormPohon: FC<{
       elevation: tree?.elevation ? String(tree.elevation) : '',
       latitude: tree?.latitude ? String(tree.latitude) : '',
       longitude: tree?.longitude ? String(tree.longitude) : '',
-      landType: tree?.landType ? String(tree.landType) : '',
+      landCover: tree?.landCover ? String(tree.landCover) : '',
     },
     onSubmit: async ({ value }) => {
       const dataValue = {
@@ -41,7 +41,7 @@ export const FormPohon: FC<{
         elevation: Number(value.elevation),
         latitude: Number(value.latitude),
         longitude: Number(value.longitude),
-        landType: Number(value.landType),
+        landCover: Number(value.landCover),
       };
       try {
         if (tree) {
@@ -84,7 +84,7 @@ export const FormPohon: FC<{
       ],
     },
     { name: 'elevation', label: 'Elevation', type: 'number' },
-    { name: 'landType', label: 'Land Type', type: 'dropdown', data: ListLandType },
+    { name: 'landCover', label: 'Land Cover', type: 'dropdown', data: ListLandCover },
   ];
 
   return (

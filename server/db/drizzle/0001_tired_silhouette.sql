@@ -1,0 +1,1 @@
+ALTER TABLE `tree` RENAME COLUMN `land_type` TO `land_cover`;

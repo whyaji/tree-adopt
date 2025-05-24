@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { LandTypeLabel } from '@/enum/landType.enum';
+import { LandCoverLabel } from '@/enum/landCover.enum';
 import { TreeCategoryLabel } from '@/enum/treeCategory.enum';
 import { deleteTree } from '@/lib/api/treeApi';
 import { TreeType } from '@/types/tree.type';
@@ -75,7 +75,7 @@ export function PohonTable({ data, isPending }: { data?: TreeType[]; isPending: 
                     </div>
                   )}
                   <div>
-                    <strong>Jenis Tanah:</strong> {LandTypeLabel[tree.landType]}
+                    <strong>Jenis Tanah:</strong> {LandCoverLabel[tree.landCover]}
                   </div>
                 </TableCell>
                 <TableCell>{tree.adopter?.user?.name ?? '-'}</TableCell>

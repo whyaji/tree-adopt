@@ -92,7 +92,7 @@ export const treeSchema = mysqlTable(
       .references(() => userSchema.id),
     status: int('status').default(1), // 0 = inactive, 1 = active
     elevation: float('elevation').notNull(),
-    landType: int('land_type').notNull(), // 1 = gambut, 2 = hutan, 3 = pekarangan, 4 = tegalan, 5 = jalan,
+    landCover: int('land_cover').notNull(), // 1 = gambut, 2 = hutan, 3 = pekarangan, 4 = tegalan, 5 = jalan,
     latitude: double('latitude').notNull(),
     longitude: double('longitude').notNull(),
     createdAt: timestamp('created_at').defaultNow(),

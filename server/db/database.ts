@@ -31,12 +31,24 @@ class DBLogger implements drizzleLogger {
   }
 }
 
-const connection = await mysql.createConnection({
+const pool = mysql.createPool({
   host: env.DB_HOST,
   user: env.DB_USER,
   password: env.DB_PASSWORD,
   database: env.DB_NAME,
+  waitForConnections: true,
+  connectionLimit: 45,
+  queueLimit: 0,
 });
 
-const db = drizzle(connection, { schema: schema, mode: 'default', logger: new DBLogger() });
-export { connection, db, DB_ERRORS };
+pool.on('connection', () => {
+  logger.info('New MySQL connection created');
+});
+
+const db = drizzle(pool, {
+  schema: schema,
+  mode: 'default',
+  logger: new DBLogger(),
+});
+
+export { pool as connection, db, DB_ERRORS };

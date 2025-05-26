@@ -84,6 +84,7 @@ export function DetailTreeScreenComponent({ tree }: { tree: TreeType | null }) {
     },
     { label: 'Tinggi', value: lastSurvey?.height ? `${lastSurvey?.height} m` : '-' },
     { label: 'Elevasi', value: `${tree.elevation} m` },
+    { label: 'Serapan CO2', value: lastSurvey?.serapanCo2 ? `${lastSurvey?.serapanCo2} kg` : '-' },
     { label: 'Surveyor', value: lastSurvey?.user?.name ?? '-' },
     {
       label: 'Tanggal Survey',
@@ -164,14 +165,16 @@ export function DetailTreeScreenComponent({ tree }: { tree: TreeType | null }) {
               />
             </div>
           </div>
-          <ImageGallery
-            items={listFilteredImage}
-            showThumbnails
-            showBullets
-            showNav
-            thumbnailPosition="left"
-            showPlayButton={false}
-          />
+          {listFilteredImage.length > 0 && (
+            <ImageGallery
+              items={listFilteredImage}
+              showThumbnails
+              showBullets
+              showNav
+              thumbnailPosition="left"
+              showPlayButton={false}
+            />
+          )}
         </div>
       </div>
 

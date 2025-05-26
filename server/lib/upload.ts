@@ -4,14 +4,13 @@ export const uploadFile = async (
   options?: {
     withTimeMilis?: boolean;
     withoutDir?: boolean;
-    withThumbnail?: boolean; // thumbnail with 150x150px
+    withThumbnail?: boolean; // thumbnail with max height 150px, dynamic width
   }
 ) => {
   const fs = await import('fs/promises');
   const path = await import('path');
   const uploadsDir = path.resolve(`server/public/${dir ?? ''}`);
   await fs.mkdir(uploadsDir, { recursive: true });
-
   const filePath = path.join(
     uploadsDir,
     `${options?.withTimeMilis ? Date.now() + '-' : ''}${imageFile.name}`
@@ -25,9 +24,11 @@ export const uploadFile = async (
     // Ensure the thumbnail directory exists
     await fs.mkdir(thumbnailDir, { recursive: true });
     const thumbnailPath = path.join(thumbnailDir, `${imageFile.name}`);
+
     await sharp
       .default(filePath)
-      .resize(125, 150, {
+      .resize({
+        height: 150,
         fit: 'inside',
         withoutEnlargement: true,
       })

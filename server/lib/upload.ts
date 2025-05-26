@@ -8,7 +8,7 @@ export const uploadFile = async (
 ) => {
   const fs = await import('fs/promises');
   const path = await import('path');
-  const uploadsDir = path.resolve(`frontend/public/${dir ?? ''}`);
+  const uploadsDir = path.resolve(`server/public/${dir ?? ''}`);
   await fs.mkdir(uploadsDir, { recursive: true });
 
   const filePath = path.join(
@@ -24,7 +24,7 @@ export const uploadFile = async (
 export const deleteImage = async (dir: string) => {
   const fs = await import('fs/promises');
   try {
-    await fs.unlink(`frontend/public/${dir}`);
+    await fs.unlink(`server/public/${dir}`);
     console.log(`Deleted file: ${dir}`);
   } catch (error) {
     console.error(`Error deleting file: ${dir}`, error);

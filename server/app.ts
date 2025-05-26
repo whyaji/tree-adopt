@@ -29,7 +29,7 @@ const apiRoutes = app
   .route('/mass-upload', massUploadRoute);
 
 // Serve files from uploads directory
-app.get('/uploads/*', serveStatic({ root: './frontend/public' }));
+app.get('/uploads/*', serveStatic({ root: './server/public' }));
 
 // Serve static files from the built frontend
 app.get('*', serveStatic({ root: './frontend/dist' }));

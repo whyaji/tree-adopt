@@ -10,6 +10,8 @@ import { PohonTable } from '../components/pohon-table/PohonTable';
 export function PohonListScreen() {
   const { setPage, setLimit, tempSearch, setTempSearch, paginationParams } = usePaginationFilter({
     withData: 'masterTreeId,kelompokKomunitasId,adopter,adopter.userId,survey,survey.userId',
+    sortBy: 'id',
+    order: 'desc',
   });
 
   const { isPending, error, data } = useQuery({

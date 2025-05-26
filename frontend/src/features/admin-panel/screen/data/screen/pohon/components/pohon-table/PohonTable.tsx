@@ -52,11 +52,14 @@ export function PohonTable({ data, isPending }: { data?: TreeType[]; isPending: 
                 <TableCell>{tree.id}</TableCell>
                 <TableCell>{tree.code}</TableCell>
                 <TableCell>
+                  {tree.masterTree?.latinName && (
+                    <div>
+                      <strong>Latin:</strong> {tree.masterTree?.latinName}
+                    </div>
+                  )}
                   <div>
-                    <strong>Latin:</strong> {tree.masterTree?.latinName}
-                  </div>
-                  <div>
-                    <strong>Lokal:</strong> {tree.masterTree?.localName}
+                    <strong>Lokal:</strong>{' '}
+                    {tree.masterTree?.localName ?? tree.localTreeName ?? '-'}
                   </div>
                 </TableCell>
                 <TableCell>{tree.kelompokKomunitas?.name}</TableCell>

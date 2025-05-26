@@ -28,8 +28,9 @@ const apiRoutes = app
   .route('/adopt-history', authRoute)
   .route('/mass-upload', massUploadRoute);
 
-// Serve files from uploads directory
+// Serve files from public directory
 app.get('/uploads/*', serveStatic({ root: './server/public' }));
+app.get('/thumbnails/uploads/*', serveStatic({ root: './server/public' }));
 
 // Serve static files from the built frontend
 app.get('*', serveStatic({ root: './frontend/dist' }));

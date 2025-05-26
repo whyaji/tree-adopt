@@ -1,5 +1,5 @@
 export const uploadFile = async (
-  imageFile: File,
+  file: File,
   dir?: string,
   options?: {
     withTimeMilis?: boolean;
@@ -11,11 +11,9 @@ export const uploadFile = async (
   const path = await import('path');
   const uploadsDir = path.resolve(`server/public/${dir ?? ''}`);
   await fs.mkdir(uploadsDir, { recursive: true });
-  const filePath = path.join(
-    uploadsDir,
-    `${options?.withTimeMilis ? Date.now() + '-' : ''}${imageFile.name}`
-  );
-  const fileBuffer = Buffer.from(await imageFile.arrayBuffer());
+  const fileName = `${options?.withTimeMilis ? Date.now() + '-' : ''}${file.name}`;
+  const filePath = path.join(uploadsDir, fileName);
+  const fileBuffer = Buffer.from(await file.arrayBuffer());
   await fs.writeFile(filePath, fileBuffer);
 
   if (options?.withThumbnail) {
@@ -23,7 +21,7 @@ export const uploadFile = async (
     const thumbnailDir = path.resolve(`server/public/thumbnails/${dir ?? ''}`);
     // Ensure the thumbnail directory exists
     await fs.mkdir(thumbnailDir, { recursive: true });
-    const thumbnailPath = path.join(thumbnailDir, `${imageFile.name}`);
+    const thumbnailPath = path.join(thumbnailDir, fileName);
 
     await sharp
       .default(filePath)

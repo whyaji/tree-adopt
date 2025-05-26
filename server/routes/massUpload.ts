@@ -307,7 +307,9 @@ export const massUploadRoute = new Hono()
       const file = formData[`file[${i}]`] as File;
 
       try {
-        await uploadFile(file, dir);
+        await uploadFile(file, dir, {
+          withThumbnail: true,
+        });
         responses.push({
           fileIndex: i,
           status: STATUS_RECORD.UPLOADED,

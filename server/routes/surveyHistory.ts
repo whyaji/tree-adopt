@@ -138,7 +138,10 @@ export const surveyHistoryRoute = new Hono()
           const value = formData[key];
           if (value instanceof File && value.size > 0) {
             try {
-              const imagePath = await uploadFile(value, dir, { withTimeMilis: true });
+              const imagePath = await uploadFile(value, dir, {
+                withTimeMilis: true,
+                withThumbnail: true,
+              });
               uploadedPaths.push(`/${dir}/${path.basename(imagePath)}`);
             } catch (err) {
               console.error(`Error uploading ${type}:`, err);
@@ -241,7 +244,10 @@ export const surveyHistoryRoute = new Hono()
           const value = formData[key];
           if (value instanceof File && value.size > 0) {
             try {
-              const imagePath = await uploadFile(value, dir, { withTimeMilis: true });
+              const imagePath = await uploadFile(value, dir, {
+                withTimeMilis: true,
+                withThumbnail: true,
+              });
               uploadedPaths.push(`/${dir}/${path.basename(imagePath)}`);
             } catch (err) {
               console.error(`Error uploading ${type}:`, err);

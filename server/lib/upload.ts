@@ -4,6 +4,7 @@ export const uploadFile = async (
   options?: {
     withTimeMilis?: boolean;
     withoutDir?: boolean;
+    withThumbnail?: boolean; // thumbnail with 150x150px
   }
 ) => {
   const fs = await import('fs/promises');
@@ -18,6 +19,22 @@ export const uploadFile = async (
   const fileBuffer = Buffer.from(await imageFile.arrayBuffer());
   await fs.writeFile(filePath, fileBuffer);
 
+  if (options?.withThumbnail) {
+    const sharp = await import('sharp');
+    const thumbnailDir = path.resolve(`server/public/thumbnails/${dir ?? ''}`);
+    // Ensure the thumbnail directory exists
+    await fs.mkdir(thumbnailDir, { recursive: true });
+    const thumbnailPath = path.join(thumbnailDir, `${imageFile.name}`);
+    await sharp
+      .default(filePath)
+      .resize(125, 150, {
+        fit: 'inside',
+        withoutEnlargement: true,
+      })
+      .toFile(thumbnailPath);
+    console.log(`Thumbnail created at: ${thumbnailPath}`);
+  }
+
   return filePath;
 };
 
@@ -25,6 +42,16 @@ export const deleteImage = async (dir: string) => {
   const fs = await import('fs/promises');
   try {
     await fs.unlink(`server/public/${dir}`);
+    // check if the thumbnail exists and delete it
+    const thumbnailPath = `server/public/thumbnails/${dir}`;
+    const thumbnailExists = await fs
+      .access(thumbnailPath)
+      .then(() => true)
+      .catch(() => false);
+    if (thumbnailExists) {
+      await fs.unlink(thumbnailPath);
+      console.log(`Deleted thumbnail: ${thumbnailPath}`);
+    }
     console.log(`Deleted file: ${dir}`);
   } catch (error) {
     console.error(`Error deleting file: ${dir}`, error);

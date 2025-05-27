@@ -30,6 +30,65 @@ export const userSchema = mysqlTable(
   (table) => [index('group_id_idx_users').on(table.groupId)]
 );
 
+export const rolesSchema = mysqlTable('roles', {
+  id: bigint('id', { mode: 'number', unsigned: true }).autoincrement().notNull().primaryKey(),
+  name: varchar('name', { length: 255 }).notNull().unique(),
+  description: varchar('description', { length: 255 }),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+  deletedAt: timestamp('deleted_at'),
+});
+
+export const permissionsSchema = mysqlTable('permissions', {
+  id: bigint('id', { mode: 'number', unsigned: true }).autoincrement().notNull().primaryKey(),
+  groupName: varchar('group_name', { length: 255 }).notNull(),
+  name: varchar('name', { length: 255 }).notNull().unique(),
+  description: varchar('description', { length: 255 }),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+  deletedAt: timestamp('deleted_at'),
+});
+
+export const userHasRolesSchema = mysqlTable(
+  'user_has_roles',
+  {
+    id: bigint('id', { mode: 'number', unsigned: true }).autoincrement().notNull().primaryKey(),
+    userId: bigint('user_id', { mode: 'number', unsigned: true })
+      .notNull()
+      .references(() => userSchema.id),
+    roleId: bigint('role_id', { mode: 'number', unsigned: true })
+      .notNull()
+      .references(() => rolesSchema.id),
+    createdAt: timestamp('created_at').defaultNow(),
+    updatedAt: timestamp('updated_at').defaultNow(),
+    deletedAt: timestamp('deleted_at'),
+  },
+  (table) => [
+    index('user_id_idx_user_has_roles').on(table.userId),
+    index('role_id_idx_user_has_roles').on(table.roleId),
+  ]
+);
+
+export const roleHasPermissionsSchema = mysqlTable(
+  'role_has_permissions',
+  {
+    id: bigint('id', { mode: 'number', unsigned: true }).autoincrement().notNull().primaryKey(),
+    roleId: bigint('role_id', { mode: 'number', unsigned: true })
+      .notNull()
+      .references(() => rolesSchema.id),
+    permissionId: bigint('permission_id', { mode: 'number', unsigned: true })
+      .notNull()
+      .references(() => permissionsSchema.id),
+    createdAt: timestamp('created_at').defaultNow(),
+    updatedAt: timestamp('updated_at').defaultNow(),
+    deletedAt: timestamp('deleted_at'),
+  },
+  (table) => [
+    index('role_id_idx_role_has_permissions').on(table.roleId),
+    index('permission_id_idx_role_has_permissions').on(table.permissionId),
+  ]
+);
+
 export const kelompokKomunitasSchema = mysqlTable('kelompok_komunitas', {
   id: bigint('id', { mode: 'number', unsigned: true }).autoincrement().notNull().primaryKey(),
   name: varchar('name', { length: 255 }).notNull().unique(),

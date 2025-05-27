@@ -9,6 +9,7 @@ import {
   LucideIcon,
   Map,
   MoreHorizontal,
+  SettingsIcon,
   Users,
 } from 'lucide-react';
 
@@ -99,6 +100,11 @@ const navMainAdmin: {
     title: 'Dashboard',
     icon: HomeIcon,
     url: '/admin',
+  },
+  {
+    title: 'Konfigurasi',
+    icon: SettingsIcon,
+    items: [{ title: 'User', url: '/admin/config/user' }],
   },
   {
     title: 'Master',

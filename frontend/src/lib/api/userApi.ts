@@ -62,3 +62,12 @@ export async function deleteUser(id: string) {
   if (!res.ok) throw new Error(res.statusText);
   return res.json();
 }
+
+export async function saveUserRoles(userId: number, roleIds: number[]) {
+  const res = await userApi[':id{[0-9]+}']['save-roles'].$post({
+    json: { roleIds },
+    param: { id: userId.toString() },
+  });
+  if (!res.ok) throw new Error(res.statusText);
+  return res.json();
+}

@@ -15,6 +15,13 @@
       "when": 1748062585559,
       "tag": "0001_tired_silhouette",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1748340525863,
+      "tag": "0002_robust_lethal_legion",
+      "breakpoints": true
     }
   ]
 }

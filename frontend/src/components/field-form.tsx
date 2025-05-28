@@ -8,6 +8,7 @@ import {
   DropdownMasterTreeList,
   DropdownUserList,
 } from './dropdown';
+import InputSuggestion from './input-suggestion';
 import { FieldInfo } from './ui/field-info';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
@@ -21,12 +22,14 @@ export type FieldItemType<T> = {
     label: string;
     value: string;
   }[];
+  suggestions?: string[];
   paginationParams?: PaginationParamsOptional;
   disabled?: boolean;
 };
 
 export type FieldType =
   | 'text'
+  | 'text-suggestions'
   | 'number'
   | 'email'
   | 'password'
@@ -65,6 +68,19 @@ export function FieldForm<T>({
                 value={field.state.value}
                 onBlur={field.handleBlur}
                 onChange={(e) => field.handleChange(e.target.value)}
+              />
+            );
+
+          case 'text-suggestions':
+            return (
+              <InputSuggestion
+                disabled={item.disabled}
+                id={field.name}
+                name={field.name}
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={(e) => field.handleChange(e.target.value)}
+                suggestions={item.suggestions}
               />
             );
 

@@ -13,6 +13,7 @@ export function TableData({
   setLimit,
   addUrl,
   table,
+  elementsHeader,
 }: {
   title: string;
   tempSearch: string;
@@ -24,6 +25,7 @@ export function TableData({
   setLimit: (limit: number) => void;
   addUrl?: string;
   table: React.ReactNode;
+  elementsHeader?: React.ReactNode[];
 }) {
   return (
     <Card className="p-4 m-auto mt-6 max-w-7xl">
@@ -32,6 +34,7 @@ export function TableData({
         tempSearch={tempSearch}
         setTempSearch={setTempSearch}
         addUrl={addUrl}
+        elementsHeader={elementsHeader}
       />
       {table}
       <TablePaginationControls

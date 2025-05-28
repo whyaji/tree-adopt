@@ -33,6 +33,7 @@ import { Route as AuthenticatedadminAdminTentangKamiKelompokKomunitasIndexImport
 import { Route as AuthenticatedadminAdminMasterPohonIndexImport } from './routes/_authenticated_admin/admin/master/pohon/index'
 import { Route as AuthenticatedadminAdminDataPohonIndexImport } from './routes/_authenticated_admin/admin/data/pohon/index'
 import { Route as AuthenticatedadminAdminConfigUserIndexImport } from './routes/_authenticated_admin/admin/config/user/index'
+import { Route as AuthenticatedadminAdminConfigRolePermissionIndexImport } from './routes/_authenticated_admin/admin/config/role-permission/index'
 import { Route as AuthenticatedadminAdminTentangKamiKelompokKomunitasAddKomunitasImport } from './routes/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/add-komunitas'
 import { Route as AuthenticatedadminAdminMasterPohonAddMasterTreeImport } from './routes/_authenticated_admin/admin/master/pohon/add-master-tree'
 import { Route as AuthenticatedadminAdminDataPohonAddIndexImport } from './routes/_authenticated_admin/admin/data/pohon/add/index'
@@ -189,6 +190,13 @@ const AuthenticatedadminAdminConfigUserIndexRoute =
   AuthenticatedadminAdminConfigUserIndexImport.update({
     id: '/admin/config/user/',
     path: '/admin/config/user/',
+    getParentRoute: () => AuthenticatedadminRoute,
+  } as any)
+
+const AuthenticatedadminAdminConfigRolePermissionIndexRoute =
+  AuthenticatedadminAdminConfigRolePermissionIndexImport.update({
+    id: '/admin/config/role-permission/',
+    path: '/admin/config/role-permission/',
     getParentRoute: () => AuthenticatedadminRoute,
   } as any)
 
@@ -424,6 +432,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasAddKomunitasImport
       parentRoute: typeof AuthenticatedadminImport
     }
+    '/_authenticated_admin/admin/config/role-permission/': {
+      id: '/_authenticated_admin/admin/config/role-permission/'
+      path: '/admin/config/role-permission'
+      fullPath: '/admin/config/role-permission'
+      preLoaderRoute: typeof AuthenticatedadminAdminConfigRolePermissionIndexImport
+      parentRoute: typeof AuthenticatedadminImport
+    }
     '/_authenticated_admin/admin/config/user/': {
       id: '/_authenticated_admin/admin/config/user/'
       path: '/admin/config/user'
@@ -566,6 +581,7 @@ interface AuthenticatedadminRouteChildren {
   AuthenticatedadminAdminIndexRoute: typeof AuthenticatedadminAdminIndexRoute
   AuthenticatedadminAdminMasterPohonAddMasterTreeRoute: typeof AuthenticatedadminAdminMasterPohonAddMasterTreeRoute
   AuthenticatedadminAdminTentangKamiKelompokKomunitasAddKomunitasRoute: typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasAddKomunitasRoute
+  AuthenticatedadminAdminConfigRolePermissionIndexRoute: typeof AuthenticatedadminAdminConfigRolePermissionIndexRoute
   AuthenticatedadminAdminConfigUserIndexRoute: typeof AuthenticatedadminAdminConfigUserIndexRoute
   AuthenticatedadminAdminDataPohonIndexRoute: typeof AuthenticatedadminAdminDataPohonIndexRoute
   AuthenticatedadminAdminMasterPohonIndexRoute: typeof AuthenticatedadminAdminMasterPohonIndexRoute
@@ -589,6 +605,8 @@ const AuthenticatedadminRouteChildren: AuthenticatedadminRouteChildren = {
     AuthenticatedadminAdminMasterPohonAddMasterTreeRoute,
   AuthenticatedadminAdminTentangKamiKelompokKomunitasAddKomunitasRoute:
     AuthenticatedadminAdminTentangKamiKelompokKomunitasAddKomunitasRoute,
+  AuthenticatedadminAdminConfigRolePermissionIndexRoute:
+    AuthenticatedadminAdminConfigRolePermissionIndexRoute,
   AuthenticatedadminAdminConfigUserIndexRoute:
     AuthenticatedadminAdminConfigUserIndexRoute,
   AuthenticatedadminAdminDataPohonIndexRoute:
@@ -642,6 +660,7 @@ export interface FileRoutesByFullPath {
   '/tentang-kami/kelompok-komunitas': typeof AuthenticatedTentangKamiKelompokKomunitasIndexRoute
   '/admin/master/pohon/add-master-tree': typeof AuthenticatedadminAdminMasterPohonAddMasterTreeRoute
   '/admin/tentang-kami/kelompok-komunitas/add-komunitas': typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasAddKomunitasRoute
+  '/admin/config/role-permission': typeof AuthenticatedadminAdminConfigRolePermissionIndexRoute
   '/admin/config/user': typeof AuthenticatedadminAdminConfigUserIndexRoute
   '/admin/data/pohon': typeof AuthenticatedadminAdminDataPohonIndexRoute
   '/admin/master/pohon': typeof AuthenticatedadminAdminMasterPohonIndexRoute
@@ -678,6 +697,7 @@ export interface FileRoutesByTo {
   '/tentang-kami/kelompok-komunitas': typeof AuthenticatedTentangKamiKelompokKomunitasIndexRoute
   '/admin/master/pohon/add-master-tree': typeof AuthenticatedadminAdminMasterPohonAddMasterTreeRoute
   '/admin/tentang-kami/kelompok-komunitas/add-komunitas': typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasAddKomunitasRoute
+  '/admin/config/role-permission': typeof AuthenticatedadminAdminConfigRolePermissionIndexRoute
   '/admin/config/user': typeof AuthenticatedadminAdminConfigUserIndexRoute
   '/admin/data/pohon': typeof AuthenticatedadminAdminDataPohonIndexRoute
   '/admin/master/pohon': typeof AuthenticatedadminAdminMasterPohonIndexRoute
@@ -716,6 +736,7 @@ export interface FileRoutesById {
   '/_authenticated/tentang-kami/kelompok-komunitas/': typeof AuthenticatedTentangKamiKelompokKomunitasIndexRoute
   '/_authenticated_admin/admin/master/pohon/add-master-tree': typeof AuthenticatedadminAdminMasterPohonAddMasterTreeRoute
   '/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/add-komunitas': typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasAddKomunitasRoute
+  '/_authenticated_admin/admin/config/role-permission/': typeof AuthenticatedadminAdminConfigRolePermissionIndexRoute
   '/_authenticated_admin/admin/config/user/': typeof AuthenticatedadminAdminConfigUserIndexRoute
   '/_authenticated_admin/admin/data/pohon/': typeof AuthenticatedadminAdminDataPohonIndexRoute
   '/_authenticated_admin/admin/master/pohon/': typeof AuthenticatedadminAdminMasterPohonIndexRoute
@@ -754,6 +775,7 @@ export interface FileRouteTypes {
     | '/tentang-kami/kelompok-komunitas'
     | '/admin/master/pohon/add-master-tree'
     | '/admin/tentang-kami/kelompok-komunitas/add-komunitas'
+    | '/admin/config/role-permission'
     | '/admin/config/user'
     | '/admin/data/pohon'
     | '/admin/master/pohon'
@@ -789,6 +811,7 @@ export interface FileRouteTypes {
     | '/tentang-kami/kelompok-komunitas'
     | '/admin/master/pohon/add-master-tree'
     | '/admin/tentang-kami/kelompok-komunitas/add-komunitas'
+    | '/admin/config/role-permission'
     | '/admin/config/user'
     | '/admin/data/pohon'
     | '/admin/master/pohon'
@@ -825,6 +848,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tentang-kami/kelompok-komunitas/'
     | '/_authenticated_admin/admin/master/pohon/add-master-tree'
     | '/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/add-komunitas'
+    | '/_authenticated_admin/admin/config/role-permission/'
     | '/_authenticated_admin/admin/config/user/'
     | '/_authenticated_admin/admin/data/pohon/'
     | '/_authenticated_admin/admin/master/pohon/'
@@ -903,6 +927,7 @@ export const routeTree = rootRoute
         "/_authenticated_admin/admin/",
         "/_authenticated_admin/admin/master/pohon/add-master-tree",
         "/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/add-komunitas",
+        "/_authenticated_admin/admin/config/role-permission/",
         "/_authenticated_admin/admin/config/user/",
         "/_authenticated_admin/admin/data/pohon/",
         "/_authenticated_admin/admin/master/pohon/",
@@ -984,6 +1009,10 @@ export const routeTree = rootRoute
     },
     "/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/add-komunitas": {
       "filePath": "_authenticated_admin/admin/tentang-kami/kelompok-komunitas/add-komunitas.tsx",
+      "parent": "/_authenticated_admin"
+    },
+    "/_authenticated_admin/admin/config/role-permission/": {
+      "filePath": "_authenticated_admin/admin/config/role-permission/index.tsx",
       "parent": "/_authenticated_admin"
     },
     "/_authenticated_admin/admin/config/user/": {

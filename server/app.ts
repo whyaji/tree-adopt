@@ -6,6 +6,8 @@ import { authRoute } from './routes/auth.js';
 import { kelompokKomunitasRoute } from './routes/kelompokkomunitas.js';
 import { massUploadRoute } from './routes/massUpload.js';
 import { masterTreeRoute } from './routes/masterTree.js';
+import { permissionsRoute } from './routes/permissions.js';
+import { rolesRoute } from './routes/roles.js';
 import { surveyHistoryRoute } from './routes/surveyHistory.js';
 import { treeRoute } from './routes/tree.js';
 import { treeCodeRoute } from './routes/treeCode.js';
@@ -26,7 +28,9 @@ const apiRoutes = app
   .route('/tree', treeRoute)
   .route('/survey-history', surveyHistoryRoute)
   .route('/adopt-history', authRoute)
-  .route('/mass-upload', massUploadRoute);
+  .route('/mass-upload', massUploadRoute)
+  .route('/permissions', permissionsRoute)
+  .route('/roles', rolesRoute);
 
 // Serve files from public directory
 app.get('/uploads/*', serveStatic({ root: './server/public' }));

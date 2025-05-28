@@ -104,7 +104,10 @@ const navMainAdmin: {
   {
     title: 'Konfigurasi',
     icon: SettingsIcon,
-    items: [{ title: 'User', url: '/admin/config/user' }],
+    items: [
+      { title: 'User', url: '/admin/config/user' },
+      { title: 'Role Permission', url: '/admin/config/role-permission' },
+    ],
   },
   {
     title: 'Master',

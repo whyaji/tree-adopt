@@ -1,11 +1,11 @@
 import { zValidator } from '@hono/zod-validator';
 import bcrypt from 'bcryptjs';
-import { eq } from 'drizzle-orm';
+import { and, eq, inArray } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { z } from 'zod';
 
 import { db } from '../db/database.js';
-import { kelompokKomunitasSchema, userSchema } from '../db/schema/schema.js';
+import { kelompokKomunitasSchema, userHasRolesSchema, userSchema } from '../db/schema/schema.js';
 import { getDataBy } from '../lib/dataBy.js';
 import { getPaginationData } from '../lib/pagination.js';
 import type { RelationsType } from '../lib/relation.js';
@@ -101,4 +101,58 @@ export const usersRoute = new Hono()
       return c.notFound();
     }
     return c.json({ message: 'User deleted' });
-  });
+  })
+
+  // SAVE ROLES
+  .post(
+    '/:id{[0-9]+}/save-roles',
+    zValidator('json', z.object({ roleIds: z.array(z.number().int().positive()) })),
+    async (c) => {
+      const id = parseInt(c.req.param('id'));
+      const { roleIds } = c.req.valid('json');
+
+      // Check if user exists
+      const user = await db.query.userSchema.findFirst({
+        where: (users, { eq }) => eq(users.id, id),
+      });
+      if (!user) {
+        return c.notFound();
+      }
+
+      // get users roles list
+      const existingRoles = await db.query.userHasRolesSchema.findMany({
+        where: (userHasRoles, { eq }) => eq(userHasRoles.userId, id),
+      });
+
+      // Exclude existing roles
+      const newRoleIds = roleIds.filter(
+        (roleId) => !existingRoles.some((ur) => ur.roleId === roleId)
+      );
+
+      // Remove roles that are not in the new list
+      const rolesToRemove = existingRoles
+        .filter((ur) => !roleIds.includes(ur.roleId))
+        .map((ur) => ur.id);
+
+      // insert new roles
+      if (newRoleIds.length > 0) {
+        await db.insert(userHasRolesSchema).values(
+          newRoleIds.map((roleId) => ({
+            userId: id,
+            roleId,
+          }))
+        );
+      }
+
+      // remove roles that are not in the new list
+      if (rolesToRemove.length > 0) {
+        await db
+          .delete(userHasRolesSchema)
+          .where(
+            and(eq(userHasRolesSchema.userId, id), inArray(userHasRolesSchema.id, rolesToRemove))
+          );
+      }
+
+      return c.json({ message: 'User roles saved' }, 201);
+    }
+  );

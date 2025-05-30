@@ -4,5 +4,5 @@ import { FormUser } from '../components/form-user/FormUser';
 
 export function UpdateUserScreen() {
   const { user } = Route.useLoaderData();
-  return <FormUser user={user} />;
+  return user && <FormUser user={user} />;
 }

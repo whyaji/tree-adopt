@@ -4,6 +4,7 @@ import Cookies from 'js-cookie';
 import { Button } from '@/components/ui/button';
 import { ROLE } from '@/enum/role.enum';
 import { userQueryOptions } from '@/lib/api/authApi';
+import { useUserStore } from '@/lib/stores/userStore';
 
 const Onboard = () => {
   return (
@@ -21,11 +22,17 @@ const Onboard = () => {
 
 const Component = () => {
   const { user } = Route.useRouteContext();
+  const setUser = useUserStore((state) => state.setUser);
+  const clearUser = useUserStore((state) => state.clearUser);
+
   if (!user) {
+    clearUser();
     Cookies.remove('auth_token');
     Cookies.remove('user');
     return <Onboard />;
   }
+
+  setUser(user.data);
 
   if (user.data.role !== ROLE.ADMIN) {
     return <Onboard />;

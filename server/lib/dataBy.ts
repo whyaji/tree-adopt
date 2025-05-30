@@ -6,15 +6,19 @@ import type { BlankInput } from 'hono/types';
 
 import { db } from '../db/database.js';
 import {
+  extendWithArrayFromManyRelations,
+  extendWithArrayFromRelations,
   generateQueryOneToOne,
   getDataQueryLatestInserted,
   getDataQueryOneToMany,
+  reformatFromManyToMany,
   reformatMainKey,
   type RelationsType,
 } from './relation.js';
 import { toCamelCase } from './utils.js';
 
 export async function getDataBy({
+  id,
   c,
   table,
   getBy = 'id',
@@ -22,6 +26,7 @@ export async function getDataBy({
   relations,
   primaryKey = 'id',
 }: {
+  id?: number | string;
   c: Context<object, any, BlankInput>;
   table: MySqlTableWithColumns<any>;
   getBy?: string;
@@ -29,9 +34,22 @@ export async function getDataBy({
   relations?: RelationsType;
   primaryKey?: string;
 }) {
-  const valueId = valueTypeData === 'number' ? parseInt(c.req.param(getBy)) : c.req.param(getBy);
+  const idReqParam = valueTypeData === 'number' ? parseInt(c.req.param(getBy)) : c.req.param(getBy);
+  const valueId = id ?? idReqParam;
+
   const withString = c.req.query('with') ?? null;
-  const withArray = withString ? (withString as string).split(',') : null;
+  const withArrayList = extendWithArrayFromRelations(
+    withString ? (withString as string).split(',') : null
+  );
+  const manyToManyRelation = Object.keys(relations ?? {}).filter(
+    (key) => relations?.[key].type === 'many-to-many' && withArrayList?.includes(key)
+  );
+
+  const withArray =
+    manyToManyRelation.length > 0
+      ? extendWithArrayFromManyRelations(withArrayList, manyToManyRelation, relations)
+      : withArrayList;
+
   let query = db
     .select()
     .from(table)
@@ -54,6 +72,11 @@ export async function getDataBy({
     data.length > 0
       ? await getDataQueryOneToMany(data, primaryKey, undefined, undefined, relations, withArray)
       : [];
+
+  data =
+    withArray && relations && manyToManyRelation.length > 0
+      ? reformatFromManyToMany(data, manyToManyRelation, relations, withArray)
+      : data;
 
   data =
     data.length > 0

@@ -28,6 +28,7 @@ export function AppSidebar({
       title: string;
       url: string;
       icon?: LucideIcon;
+      hide?: boolean;
     }[];
   }[];
   navSecondary?: {

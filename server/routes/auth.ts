@@ -1,17 +1,26 @@
 import { zValidator } from '@hono/zod-validator';
 import bcrypt from 'bcryptjs';
-import { eq } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { deleteCookie } from 'hono/cookie';
 import { sign } from 'hono/jwt';
 import { z } from 'zod';
 
 import { db } from '../db/database.js';
-import { kelompokKomunitasSchema, userSchema } from '../db/schema/schema.js';
+import {
+  kelompokKomunitasSchema,
+  permissionsSchema,
+  roleHasPermissionsSchema,
+  rolesSchema,
+  userHasRolesSchema,
+  userSchema,
+} from '../db/schema/schema.js';
 import env from '../lib/env.js';
 import { logger } from '../lib/logger.js';
 import { reformatMainKey } from '../lib/relation.js';
 import authMiddleware from '../middleware/jwt.js';
+import type { Permission } from './permissions.js';
+import type { Role } from './roles.js';
 
 // JWT secret key
 const JWT_SECRET = env.JWT_SECRET;
@@ -103,13 +112,8 @@ export const authRoute = new Hono()
   .get('/profile', authMiddleware, async (c) => {
     const payload = c.get('jwtPayload');
     try {
-      const user = await db.select().from(userSchema).where(eq(userSchema.id, payload.userId));
-
-      if (user.length === 0) {
-        return c.json({ message: 'User not found.' }, 404);
-      }
-
-      return c.json({ data: user[0] });
+      const user = await getUserByIdWithRoles(payload.userId);
+      return c.json({ data: user });
     } catch (error) {
       logger.error('Error fetching profile:', error);
       return c.json({ message: 'Internal server error.' }, 500);
@@ -119,3 +123,63 @@ export const authRoute = new Hono()
     deleteCookie(c, 'auth_token');
     return c.json({ message: 'Logout successful.' });
   });
+
+export async function getUserByIdWithRoles(userId: number) {
+  const userQueryResult = await db.select().from(userSchema).where(eq(userSchema.id, userId));
+
+  if (userQueryResult.length === 0) {
+    throw new Error('User not found');
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let user: any = userQueryResult[0];
+
+  const roles = await db
+    .select()
+    .from(userHasRolesSchema)
+    .where(eq(userHasRolesSchema.userId, user.id))
+    .leftJoin(rolesSchema, eq(userHasRolesSchema.roleId, rolesSchema.id));
+
+  if (roles.length > 0) {
+    user = {
+      ...user,
+      roles: roles.map((role) => role.roles),
+    };
+    const roleIds: number[] = user.roles.map((role: Role) => role.id);
+
+    const permissions = await db
+      .select()
+      .from(roleHasPermissionsSchema)
+      .where(inArray(roleHasPermissionsSchema.roleId, roleIds))
+      .leftJoin(permissionsSchema, eq(roleHasPermissionsSchema.permissionId, permissionsSchema.id));
+
+    if (permissions.length > 0) {
+      user.roles = user.roles.map((role: Role) => ({
+        ...role,
+        permissions: permissions
+          .map((perm) => (role.id === perm.role_has_permissions.roleId ? perm.permissions : null))
+          .filter((perm) => perm !== null),
+      }));
+    }
+  }
+
+  const responseRoles = user.roles.map((role: Role) => ({
+    name: role.name,
+    code: role.code,
+  }));
+
+  const responsePermissions: string[] = user.roles.flatMap(
+    (role: Role & { permissions: Permission[] }) =>
+      role.permissions.map((perm) => perm.groupCode + '.' + perm.code) || []
+  );
+
+  const uniquePermissions = Array.from(new Set(responsePermissions));
+
+  user = {
+    ...user,
+    roles: responseRoles,
+    permissions: uniquePermissions,
+  };
+
+  return user;
+}

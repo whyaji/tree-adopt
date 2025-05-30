@@ -42,8 +42,8 @@ export const rolesSchema = mysqlTable('roles', {
 
 export const permissionsSchema = mysqlTable('permissions', {
   id: bigint('id', { mode: 'number', unsigned: true }).autoincrement().notNull().primaryKey(),
-  code: varchar('code', { length: 255 }).notNull().unique(),
-  name: varchar('name', { length: 255 }).notNull().unique(),
+  code: varchar('code', { length: 255 }).notNull(),
+  name: varchar('name', { length: 255 }).notNull(),
   groupCode: varchar('group_code', { length: 255 }).notNull(),
   groupName: varchar('group_name', { length: 255 }).notNull(),
   description: varchar('description', { length: 255 }),

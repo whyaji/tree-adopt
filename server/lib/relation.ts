@@ -15,13 +15,17 @@ type OneToManyRelation = {
   type: 'one-to-many';
 };
 
+type ManyToManyRelation = {
+  type: 'many-to-many';
+};
+
 type LatestInsertedRelation = {
   type: 'latest-inserted';
 };
 
 export type RelationsType = Record<
   string,
-  (OneToOneRelation | OneToManyRelation | LatestInsertedRelation) & {
+  (OneToOneRelation | OneToManyRelation | ManyToManyRelation | LatestInsertedRelation) & {
     table: MySqlTableWithColumns<any>;
     on: string;
     from?: string;
@@ -84,7 +88,9 @@ export async function getDataQueryOneToMany(
 ) {
   let dataInFunction = data;
   const oneToManyRelation = Object.keys(relations ?? {}).filter(
-    (key) => relations?.[key].type === 'one-to-many' && withArray?.includes(key)
+    (key) =>
+      (relations?.[key].type === 'one-to-many' || relations?.[key].type === 'many-to-many') &&
+      withArray?.includes(key)
   );
 
   const idsString: string = dataInFunction
@@ -96,7 +102,11 @@ export async function getDataQueryOneToMany(
   if (withArray && relations && oneToManyRelation.length > 0) {
     for (const relation of withArray) {
       const relationObj = relations?.[relation];
-      if (!relationObj || relationObj.type !== 'one-to-many') continue;
+      if (
+        !relationObj ||
+        (relationObj.type !== 'one-to-many' && relationObj.type !== 'many-to-many')
+      )
+        continue;
       const queryOneToMany = db.select().from(relationObj.table);
       const filterDataOneToManyString = `${relationObj.on}:${idsString}:in`;
       const filterDataOneToMany = parseFilterQuery(filterDataOneToManyString);
@@ -205,20 +215,32 @@ async function recursionDataRelation(
   relations?: RelationsType,
   withArray?: string[] | null
 ) {
+  const manyToManyRelation = Object.keys(relations ?? {}).filter(
+    (key) => relations?.[key].type === 'many-to-many' && withArray?.includes(key)
+  );
+
   const oneToOneRelation = Object.keys(relations ?? {}).filter(
     (key) => relations?.[key].type === 'one-to-one' && withArray?.includes(key)
   );
+
   query = generateQueryOneToOne(query, table, oneToOneRelation, relations, withArray);
 
   const rawData = await query;
+
   let data =
     withArray && relations && oneToOneRelation.length > 0
       ? reformatMainKey(rawData, withArray)
       : rawData;
+
   data =
     data.length > 0
       ? await getDataQueryOneToMany(data, primaryKey, undefined, undefined, relations, withArray)
       : [];
+
+  data =
+    withArray && relations && manyToManyRelation.length > 0
+      ? reformatFromManyToMany(data, manyToManyRelation, relations, withArray)
+      : data;
 
   data =
     data.length > 0
@@ -233,3 +255,78 @@ async function recursionDataRelation(
       : [];
   return data;
 }
+
+export const reformatFromManyToMany = (
+  data: any[],
+  manyToManyRelation: string[],
+  relations?: RelationsType | undefined,
+  withArray?: string[] | null
+) => {
+  if (!relations || manyToManyRelation.length === 0 || !withArray || !relations) return data;
+
+  return data.map((item) => {
+    const newItem = { ...item };
+
+    for (const relationKey of manyToManyRelation) {
+      const relationData = item[relationKey];
+      const relationMeta = relations[relationKey];
+      if (!relationData || !Array.isArray(relationData) || !relationMeta?.child) continue;
+
+      const childKey = Object.keys(relationMeta.child)[0];
+      const childRelation = relationMeta.child[childKey];
+
+      const nestedAlias = childRelation.alias;
+      if (!nestedAlias) continue;
+
+      newItem[relationKey] = relationData
+        .map((entry: any) => entry[nestedAlias])
+        .filter((entry: any) => entry !== null);
+    }
+
+    return newItem;
+  });
+};
+
+export const extendWithArrayFromRelations = (withArray: string[] | null) => {
+  if (!withArray) return [];
+
+  const extended = new Set<string>();
+
+  for (const entry of withArray) {
+    // Split by comma in case multiple paths are in a single string
+    const paths = entry.split(',');
+    for (const path of paths) {
+      const parts = path.split('.');
+      let current = '';
+      for (const part of parts) {
+        current = current ? `${current}.${part}` : part;
+        extended.add(current);
+      }
+    }
+  }
+
+  return Array.from(extended);
+};
+
+export const extendWithArrayFromManyRelations = (
+  withArray: string[] | null | undefined,
+  manyToManyRelation: string[],
+  relations: RelationsType | undefined
+) => {
+  if (!withArray || !relations) return withArray;
+  let extended: string[] = [...withArray];
+
+  for (const relationKey of manyToManyRelation) {
+    const relationMeta = relations[relationKey];
+    if (!relationMeta?.child) continue;
+
+    for (const childKey in relationMeta.child) {
+      const index = extended.indexOf(relationKey);
+      if (index !== -1 && !extended.includes(childKey)) {
+        extended = [...extended.slice(0, index + 1), childKey, ...extended.slice(index + 1)];
+      }
+    }
+  }
+
+  return extended;
+};

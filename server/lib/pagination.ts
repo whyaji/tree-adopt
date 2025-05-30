@@ -8,9 +8,11 @@ import { db } from '../db/database.js';
 import { getAllConditions, parseFilterQuery } from './filter.js';
 import { getSortDirection } from './order.js';
 import {
+  extendWithArrayFromManyRelations,
   generateQueryOneToOne,
   getDataQueryLatestInserted,
   getDataQueryOneToMany,
+  reformatFromManyToMany,
   reformatMainKey,
   type RelationsType,
 } from './relation.js';
@@ -56,7 +58,16 @@ export async function getPaginationData({
 
   let query = db.select().from(table).where(whereClause).limit(limit);
 
-  const withArray = withString ? (withString as string).split(',') : null;
+  const withArrayList = withString ? (withString as string).split(',') : null;
+
+  const manyToManyRelation = Object.keys(relations ?? {}).filter(
+    (key) => relations?.[key].type === 'many-to-many' && withArrayList?.includes(key)
+  );
+
+  const withArray =
+    manyToManyRelation.length > 0
+      ? extendWithArrayFromManyRelations(withArrayList, manyToManyRelation, relations)
+      : withArrayList;
 
   const oneToOneRelation = Object.keys(relations ?? {}).filter(
     (key) => relations?.[key].type === 'one-to-one' && withArray?.includes(key)
@@ -82,6 +93,11 @@ export async function getPaginationData({
     data.length > 0
       ? await getDataQueryOneToMany(data, primaryKey, sortBy, order, relations, withArray)
       : [];
+
+  data =
+    withArray && relations && manyToManyRelation.length > 0
+      ? reformatFromManyToMany(data, manyToManyRelation, relations, withArray)
+      : data;
 
   data =
     data.length > 0

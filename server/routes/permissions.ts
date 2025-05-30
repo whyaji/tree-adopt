@@ -1,5 +1,5 @@
 import { zValidator } from '@hono/zod-validator';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { z } from 'zod';
 
@@ -39,6 +39,18 @@ export const permissionsRoute = new Hono()
 
   .post('/', zValidator('json', createPermissionSchema), async (c) => {
     const permission = c.req.valid('json');
+    const existingPermission = await db
+      .select()
+      .from(permissionsSchema)
+      .where(
+        and(
+          eq(permissionsSchema.code, permission.code),
+          eq(permissionsSchema.groupCode, permission.groupCode)
+        )
+      );
+    if (existingPermission.length > 0) {
+      return c.json({ message: 'Permission already exists' }, 409);
+    }
     await db.insert(permissionsSchema).values(permission);
     return c.json({ message: 'Permission created' }, 201);
   })

@@ -1,4 +1,5 @@
 import { useForm } from '@tanstack/react-form';
+import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { FC } from 'react';
 import { toast } from 'sonner';
@@ -6,12 +7,48 @@ import { toast } from 'sonner';
 import { ConfirmationDialog } from '@/components/confimation-dialog';
 import { FieldForm, FieldItemType } from '@/components/field-form';
 import { Button } from '@/components/ui/button';
-import { createUser, updateUser } from '@/lib/api/userApi';
+import { usePaginationFilter } from '@/hooks/use-pagination-filter';
+import { createUser, saveUserRoles, updateUser } from '@/lib/api/userApi';
+import { useUserStore } from '@/lib/stores/userStore';
+import { RoleType } from '@/types/role.type';
 import { UserType } from '@/types/user.type';
+
+import { getRoles } from '../../../role-permission/api/rolePermissionApi';
+
+const saveRoles = async (userId: number, rolesIds: string[]) => {
+  try {
+    await saveUserRoles(
+      userId,
+      rolesIds.filter((id) => id !== '' && id !== '0').map((id) => Number(id))
+    );
+  } catch (error) {
+    console.error('Failed to save user roles:', error);
+    toast.error('Failed to save user roles');
+  }
+};
 
 export const FormUser: FC<{
   user?: UserType | null;
 }> = ({ user }) => {
+  const loggedInUser = useUserStore((state) => state.user);
+  const paginationParams = usePaginationFilter({
+    limit: 9999,
+    filter: loggedInUser?.permissions?.includes('user-management.create-level-global')
+      ? undefined
+      : 'code:admin-global:notin',
+  });
+
+  const { data } = useQuery({
+    queryKey: ['get-roles', paginationParams],
+    queryFn: () => getRoles(paginationParams),
+  });
+
+  const dataRole: RoleType[] = data?.data ?? [];
+  const roles = dataRole.map((role) => ({
+    label: role.name,
+    value: String(role.id),
+  }));
+
   const navigate = useNavigate();
 
   const form = useForm({
@@ -21,28 +58,36 @@ export const FormUser: FC<{
       password: '',
       role: user ? String(user.role) : '',
       groupId: user?.groupId ? String(user.groupId) : '',
+      rolesIds: user?.roles?.map((role) => String(role.id)) ?? [],
     },
     onSubmit: async ({ value }) => {
       try {
+        const dataValue = {
+          name: value.name,
+          email: value.email,
+          role: Number(value.role),
+          groupId: value.groupId ? Number(value.groupId) : undefined,
+        };
         if (user) {
-          const dataValue = {
-            name: value.name,
-            email: value.email,
+          const updateData = {
+            id: user.id,
+            ...dataValue,
             password: value.password === '' ? user.password : value.password,
-            role: Number(value.role),
-            groupId: value.groupId ? Number(value.groupId) : undefined,
           };
-          await updateUser({ id: user.id, ...dataValue });
+          await updateUser(updateData);
+          await saveRoles(user.id, value.rolesIds);
           toast('User updated successfully');
         } else {
-          const dataValue = {
-            name: value.name,
-            email: value.email,
+          const createData = {
+            ...dataValue,
             password: value.password,
           };
-          await createUser(dataValue);
+          const result = await createUser(createData);
+          const userId = result.data.userId;
+          await saveRoles(userId, value.rolesIds);
           toast('User added successfully');
         }
+
         form.reset();
         navigate({ to: '/admin/config/user' });
       } catch {
@@ -61,7 +106,7 @@ export const FormUser: FC<{
     { name: 'password', label: 'Password', type: 'password' },
     {
       name: 'role',
-      label: 'Role',
+      label: 'Type',
       type: 'dropdown',
       data: [
         { label: 'Admin', value: '0' },
@@ -69,6 +114,12 @@ export const FormUser: FC<{
       ],
     },
     { name: 'groupId', label: 'Kelompok Komunitas', type: 'dropdown-comunity-group' },
+    {
+      name: 'rolesIds',
+      label: 'Roles',
+      type: 'multi-select',
+      data: roles,
+    },
   ];
 
   return (

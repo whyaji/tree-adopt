@@ -4,9 +4,15 @@ import { Hono } from 'hono';
 import { z } from 'zod';
 
 import { db } from '../db/database.js';
-import { roleHasPermissionsSchema, rolesSchema, userHasRolesSchema } from '../db/schema/schema.js';
+import {
+  permissionsSchema,
+  roleHasPermissionsSchema,
+  rolesSchema,
+  userHasRolesSchema,
+} from '../db/schema/schema.js';
 import { getDataBy } from '../lib/dataBy.js';
 import { getPaginationData } from '../lib/pagination.js';
+import type { RelationsType } from '../lib/relation.js';
 import authMiddleware from '../middleware/jwt.js';
 
 // === ZOD SCHEMAS ===
@@ -20,6 +26,16 @@ const roleSchemaZod = z.object({
   deletedAt: z.string().datetime().optional(),
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const rolePermissionsZod = z.object({
+  id: z.number().int().positive(),
+  roleId: z.number().int().positive(),
+  permissionId: z.number().int().positive(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+  deletedAt: z.string().datetime().optional(),
+});
+
 const createRoleSchema = roleSchemaZod.omit({
   id: true,
   createdAt: true,
@@ -28,12 +44,31 @@ const createRoleSchema = roleSchemaZod.omit({
 });
 
 export type Role = z.infer<typeof roleSchemaZod>;
+export type RolePermissions = z.infer<typeof rolePermissionsZod>;
+
+// === RELATIONS ===
+const relations: RelationsType = {
+  permissions: {
+    type: 'many-to-many',
+    table: roleHasPermissionsSchema,
+    on: 'roleId',
+    child: {
+      'permissions.permissionId': {
+        type: 'one-to-one',
+        table: permissionsSchema,
+        on: 'id',
+        from: 'permissionId',
+        alias: 'permission',
+      },
+    },
+  },
+};
 
 // === ROUTES ===
 export const rolesRoute = new Hono()
   .use(authMiddleware)
   .get('/', async (c) => {
-    return await getPaginationData({ c, table: rolesSchema, searchBy: 'name,code' });
+    return await getPaginationData({ c, table: rolesSchema, searchBy: 'name,code', relations });
   })
 
   .post('/', zValidator('json', createRoleSchema), async (c) => {

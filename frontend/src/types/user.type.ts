@@ -1,3 +1,8 @@
 import { User } from '@server/routes/auth';
 
-export type UserType = User;
+import { RoleType } from './role.type';
+
+export type UserType = User & {
+  roles?: RoleType[];
+  permissions?: string[]; // List of permission codes
+};

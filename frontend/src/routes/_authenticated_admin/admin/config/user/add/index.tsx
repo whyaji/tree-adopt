@@ -1,7 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router';
 
 import { AddUserScreen } from '@/features/admin-panel/screen/config/screen/user/screen/AddUserScreen';
+import { useProtectRoute } from '@/hooks/use-protect-route';
+
+const Component = () => {
+  useProtectRoute(['user-management.create-level-group', 'user-management.create-level-global']);
+  return <AddUserScreen />;
+};
 
 export const Route = createFileRoute('/_authenticated_admin/admin/config/user/add/')({
-  component: AddUserScreen,
+  component: Component,
 });

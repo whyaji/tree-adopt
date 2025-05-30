@@ -21,7 +21,13 @@ export async function getUsers({
   return res.json();
 }
 
-export async function createUser(user: { password: string; name: string; email: string }) {
+export async function createUser(user: {
+  password: string;
+  name: string;
+  email: string;
+  groupId?: number;
+  role?: number;
+}) {
   const res = await userApi.$post({
     json: user,
   });

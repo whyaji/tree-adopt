@@ -5,7 +5,14 @@ import { Hono } from 'hono';
 import { z } from 'zod';
 
 import { db } from '../db/database.js';
-import { kelompokKomunitasSchema, userHasRolesSchema, userSchema } from '../db/schema/schema.js';
+import {
+  kelompokKomunitasSchema,
+  permissionsSchema,
+  roleHasPermissionsSchema,
+  rolesSchema,
+  userHasRolesSchema,
+  userSchema,
+} from '../db/schema/schema.js';
 import { getDataBy } from '../lib/dataBy.js';
 import { getPaginationData } from '../lib/pagination.js';
 import type { RelationsType } from '../lib/relation.js';
@@ -25,9 +32,7 @@ const userSchemaZod = z.object({
 
 const createUserSchema = userSchemaZod.omit({
   id: true,
-  groupId: true,
   reset_token: true,
-  role: true,
   avatar: true,
 });
 
@@ -47,6 +52,36 @@ const relations: RelationsType = {
     type: 'one-to-one',
     table: kelompokKomunitasSchema,
     on: 'id',
+  },
+  roles: {
+    type: 'many-to-many',
+    table: userHasRolesSchema,
+    on: 'userId',
+    child: {
+      'roles.roleId': {
+        type: 'one-to-one',
+        table: rolesSchema,
+        on: 'id',
+        from: 'roleId',
+        alias: 'role',
+        child: {
+          'roles.roleId.permissions': {
+            type: 'many-to-many',
+            table: roleHasPermissionsSchema,
+            on: 'roleId',
+            child: {
+              'roles.roleId.permissions.permissionId': {
+                type: 'one-to-one',
+                table: permissionsSchema,
+                on: 'id',
+                from: 'permissionId',
+                alias: 'permission',
+              },
+            },
+          },
+        },
+      },
+    },
   },
 };
 
@@ -69,7 +104,15 @@ export const usersRoute = new Hono()
     if (!created) {
       return c.json({ message: 'Failed to create user' }, 500);
     }
-    return c.json({ message: 'User created', data: created });
+    return c.json(
+      {
+        message: 'User created',
+        data: {
+          userId: created[0].insertId,
+        },
+      },
+      201
+    );
   })
 
   .get('/:id{[0-9]+}', async (c) => {

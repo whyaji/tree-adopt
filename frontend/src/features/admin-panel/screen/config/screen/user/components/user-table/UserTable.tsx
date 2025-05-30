@@ -16,7 +16,15 @@ import {
 import { deleteUser } from '@/lib/api/userApi';
 import { UserType } from '@/types/user.type';
 
-export function UserTable({ data, isPending }: { data?: UserType[]; isPending: boolean }) {
+export function UserTable({
+  data,
+  isPending,
+  isEditor,
+}: {
+  data?: UserType[];
+  isPending: boolean;
+  isEditor?: boolean;
+}) {
   const navigate = useNavigate();
 
   if (!data && !isPending) {
@@ -53,37 +61,41 @@ export function UserTable({ data, isPending }: { data?: UserType[]; isPending: b
                 </TableCell>
                 <TableCell>
                   <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      onClick={() =>
-                        navigate({
-                          to: `/admin/config/user/${user.id}/update`,
-                        })
-                      }>
-                      <Pen className="h-4 w-4" />
-                      Edit
-                    </Button>
-                    <ConfirmationDialog
-                      title="Apakah anda yakin untuk menghapus?"
-                      message="Data yang dihapus tidak dapat dikembalikan."
-                      confirmText="Delete"
-                      onConfirm={async () => {
-                        try {
-                          await deleteUser(String(user.id));
-                          window.location.reload();
-                        } catch (error) {
-                          console.error(error);
-                          toast.error('Failed to delete komunitas');
-                        }
-                      }}
-                      confirmVarriant="destructive"
-                      triggerButton={
-                        <Button variant="destructive">
-                          <Trash className="h-4 w-4" />
-                          Delete
+                    {isEditor && (
+                      <>
+                        <Button
+                          variant="outline"
+                          onClick={() =>
+                            navigate({
+                              to: `/admin/config/user/${user.id}/update`,
+                            })
+                          }>
+                          <Pen className="h-4 w-4" />
+                          Edit
                         </Button>
-                      }
-                    />
+                        <ConfirmationDialog
+                          title="Apakah anda yakin untuk menghapus?"
+                          message="Data yang dihapus tidak dapat dikembalikan."
+                          confirmText="Delete"
+                          onConfirm={async () => {
+                            try {
+                              await deleteUser(String(user.id));
+                              window.location.reload();
+                            } catch (error) {
+                              console.error(error);
+                              toast.error('Failed to delete komunitas');
+                            }
+                          }}
+                          confirmVarriant="destructive"
+                          triggerButton={
+                            <Button variant="destructive">
+                              <Trash className="h-4 w-4" />
+                              Delete
+                            </Button>
+                          }
+                        />
+                      </>
+                    )}
                   </div>
                 </TableCell>
               </TableRow>

@@ -15,13 +15,14 @@ import FormRolesPermission from '../components/form-roles-permission/FormRolesPe
 import RoleTable from '../components/role-table/RoleTable';
 
 export function RolePermissionScreen() {
-  const { page, setPage, limit, setLimit, search, tempSearch, setTempSearch } =
-    usePaginationFilter();
+  const paginationParams = usePaginationFilter({ withData: 'permissions' });
 
   const { isPending, error, data, refetch } = useQuery({
-    queryKey: ['get-roles', search, page, limit],
-    queryFn: () => getRoles({ search, page, limit }),
+    queryKey: ['get-roles', paginationParams],
+    queryFn: () => getRoles(paginationParams),
   });
+
+  const { page, setPage, limit, setLimit, tempSearch, setTempSearch } = paginationParams;
 
   const totalPage = data?.totalPage ?? 0;
 
@@ -29,9 +30,10 @@ export function RolePermissionScreen() {
     isPending: isPendingPermission,
     error: errorPermission,
     data: dataPermission,
+    refetch: refetchPermissions,
   } = useQuery({
     queryKey: ['get-permissions'],
-    queryFn: () => getPermissions({ page: 1, limit: 9999 }),
+    queryFn: () => getPermissions({ page: 1, limit: 9999, sortBy: 'groupName', order: 'asc' }),
   });
 
   const [selectedRole, setSelectedRole] = useState<RoleType | undefined>(undefined);
@@ -39,13 +41,6 @@ export function RolePermissionScreen() {
   if (error || errorPermission) {
     return <div>Error: {error?.message ?? errorPermission?.message}</div>;
   }
-
-  // const permissionSchemaZod = z.object({
-  //   id: z.number().int().positive(),
-  //   name: z.string().min(1),
-  //   code: z.string().min(1),
-  //   groupCode: z.string().min(1),
-  //   groupName: z.string().min(1),
 
   const permissions: PermissionType[] = dataPermission?.data ?? [];
 
@@ -115,22 +110,24 @@ export function RolePermissionScreen() {
                 </DialogTrigger>
                 <DialogFormPermissionContent
                   type="create"
-                  onSave={refetch}
+                  onSave={refetchPermissions}
                   groupSuggestions={groupNames}
                 />
               </Dialog>
             </div>
             {selectedRole && (
-              <>
-                <h2 className="text-xl font-semibold mb-4">
-                  Edit Permissions Role: {selectedRole.name}
-                </h2>
-                {isPendingPermission ? (
-                  <p>Loading permissions...</p>
-                ) : (
-                  <FormRolesPermission role={selectedRole} groupPermissions={groupedPermissions} />
-                )}
-              </>
+              <h2 className="text-xl font-semibold mb-4">
+                Edit Permissions Role: {selectedRole.name}
+              </h2>
+            )}
+            {isPendingPermission ? (
+              <p>Loading permissions...</p>
+            ) : (
+              <FormRolesPermission
+                role={selectedRole}
+                groupPermissions={groupedPermissions}
+                onSaved={refetch}
+              />
             )}
           </div>
         </div>

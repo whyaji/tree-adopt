@@ -16,6 +16,7 @@ import { AppSidebar } from '@/components/app-sidebar';
 import { SiteHeader } from '@/components/site-header';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { Toaster } from '@/components/ui/sonner';
+import { PERMISSION } from '@/enum/permission.enum';
 import { ROLE } from '@/enum/role.enum';
 import { useUserStore } from '@/lib/stores/userStore';
 
@@ -114,12 +115,12 @@ const Root = () => {
         {
           title: 'User',
           url: '/admin/config/user',
-          hide: !permissions.includes('user-management.view'),
+          hide: !permissions.includes(PERMISSION.USER_MANAGEMENT_VIEW),
         },
         {
           title: 'Role Permission',
           url: '/admin/config/role-permission',
-          hide: !permissions.includes('role-permission-management.view'),
+          hide: !permissions.includes(PERMISSION.ROLE_PERMISSION_MANAGEMENT_VIEW),
         },
       ],
     },

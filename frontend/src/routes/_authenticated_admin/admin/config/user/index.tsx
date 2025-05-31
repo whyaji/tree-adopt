@@ -1,10 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router';
 
+import { PERMISSION } from '@/enum/permission.enum';
 import { UserListScreen } from '@/features/admin-panel/screen/config/screen/user/screen/UserListScreen';
 import { useProtectRoute } from '@/hooks/use-protect-route';
 
 const Component = () => {
-  useProtectRoute(['user-management.view']);
+  useProtectRoute([PERMISSION.USER_MANAGEMENT_VIEW]);
   return <UserListScreen />;
 };
 

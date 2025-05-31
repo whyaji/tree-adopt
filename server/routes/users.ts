@@ -14,6 +14,7 @@ import {
   userSchema,
 } from '../db/schema/schema.js';
 import { getDataBy } from '../lib/dataBy.js';
+import env from '../lib/env.js';
 import { getPaginationData } from '../lib/pagination.js';
 import type { RelationsType } from '../lib/relation.js';
 import authMiddleware from '../middleware/jwt.js';
@@ -99,7 +100,7 @@ export const usersRoute = new Hono()
 
   .post('/', zValidator('json', createUserSchema), async (c) => {
     const user = c.req.valid('json');
-    const hashedPassword = await bcrypt.hash(user.password, 10);
+    const hashedPassword = await bcrypt.hash(user.password, env.HASH_SALT ?? 'salt');
     const created = await db.insert(userSchema).values({ ...user, password: hashedPassword });
     if (!created) {
       return c.json({ message: 'Failed to create user' }, 500);
@@ -122,7 +123,9 @@ export const usersRoute = new Hono()
   .put('/:id{[0-9]+}', zValidator('json', updateSchemaZod), async (c) => {
     const id = parseInt(c.req.param('id'));
     const user = c.req.valid('json');
-    const hashedPassword = user.password ? await bcrypt.hash(user.password, 10) : undefined;
+    const hashedPassword = user.password
+      ? await bcrypt.hash(user.password, env.HASH_SALT ?? 'salt')
+      : undefined;
     const updateData = {
       ...user,
       password: hashedPassword,

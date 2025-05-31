@@ -53,8 +53,8 @@ export const authRoute = new Hono()
       }
 
       // Verify password
-      const isValidPassword = await bcrypt.compare(password, user[0].password);
-      if (!isValidPassword) {
+      const hashedPassword = await bcrypt.hash(password, env.HASH_SALT ?? 'salt');
+      if (hashedPassword !== user[0].password) {
         return c.json({ message: 'Invalid email or password.' }, 401);
       }
 
@@ -94,7 +94,7 @@ export const authRoute = new Hono()
       }
 
       // Hash password
-      const hashedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = await bcrypt.hash(password, env.HASH_SALT ?? 'salt');
 
       // Insert new user
       await db.insert(userSchema).values({
@@ -133,6 +133,8 @@ export async function getUserByIdWithRoles(userId: number) {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let user: any = userQueryResult[0];
+  // remove password from user object
+  user = { ...user, password: undefined };
 
   const roles = await db
     .select()

@@ -1,9 +1,12 @@
-import { FC, useEffect, useState } from 'react';
-import { useMemo } from 'react';
+import { ChevronUp } from 'lucide-react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
+import { getCurrentUser } from '@/lib/api/authApi';
+import { useUserStore } from '@/lib/stores/userStore';
 import { GroupedPermissionType } from '@/types/permission.type';
 import { RoleType } from '@/types/role.type';
 
@@ -14,17 +17,33 @@ const FormRolesPermission: FC<{
   groupPermissions: GroupedPermissionType[];
   onSaved?: () => void;
 }> = ({ groupPermissions, role, onSaved }) => {
-  const [permissionsIds, setPermissionsIds] = useState<number[]>([]);
+  const user = useUserStore((state) => state.user);
+  const setUser = useUserStore((state) => state.setUser);
 
-  const defaultPermissionsIds = useMemo(() => role?.permissions?.map((p) => p.id) ?? [], [role]);
+  const [permissionsIds, setPermissionsIds] = useState<number[]>([]);
+  const [defaultPermissionsIds, setDefaultPermissionsIds] = useState<number[]>([]);
 
   useEffect(() => {
     if (role) {
-      setPermissionsIds(defaultPermissionsIds);
-    } else {
-      setPermissionsIds([]);
+      const permissions = role.permissions?.map((p) => p.id) ?? [];
+      setDefaultPermissionsIds(permissions);
+      setPermissionsIds(permissions);
     }
-  }, [defaultPermissionsIds, role]);
+  }, [role]);
+
+  const refreshUser = async () => {
+    try {
+      const refreshedUser = await getCurrentUser();
+      if (refreshedUser.data) {
+        setUser(refreshedUser.data);
+      } else {
+        throw new Error('User data is empty');
+      }
+    } catch (error) {
+      console.error('Failed to refresh user:', error);
+      toast.error('Failed to refresh user');
+    }
+  };
 
   const handleSavePermissions = async () => {
     if (!role) {
@@ -36,7 +55,11 @@ const FormRolesPermission: FC<{
     try {
       await saveRolePermissions(role.id, permissionsIds);
       onSaved?.();
+      setDefaultPermissionsIds(permissionsIds);
       toast.success('Permissions saved successfully');
+      if (user?.roles?.some((r) => r.code === role.code)) {
+        await refreshUser();
+      }
     } catch (error) {
       console.error('Failed to save permissions:', error);
       toast.error('Failed to save permissions');
@@ -52,40 +75,109 @@ const FormRolesPermission: FC<{
     );
   }, [permissionsIds, defaultPermissionsIds]);
 
+  const [groupedCodesCollapsed, setGroupedCodesCollapsed] = useState<string[]>(
+    groupPermissions.map((group) => group.groupCode)
+  );
+
+  const setGroupedCollapsed = (groupCode: string) => {
+    setGroupedCodesCollapsed((prev) =>
+      prev.includes(groupCode) ? prev.filter((code) => code !== groupCode) : [...prev, groupCode]
+    );
+  };
+
+  const isGroupCollapsed = (groupCode: string) => {
+    return groupedCodesCollapsed.includes(groupCode);
+  };
+
   return (
     <div className="flex flex-col gap-4">
-      {groupPermissions.map((group) => (
-        <div key={group.groupCode} className="space-y-2">
-          <h3 className="text-lg font-semibold">{group.groupName}</h3>
-          {role ? (
-            <ul className="list-disc pl-5">
-              {group.permissions.map((permission) => (
-                <li key={permission.id} className="flex items-center gap-2 text-sm">
-                  <Checkbox
-                    checked={permissionsIds.includes(permission.id)}
-                    onCheckedChange={(checked) => {
-                      if (checked) {
-                        setPermissionsIds((prev) => [...prev, permission.id]);
-                      } else {
-                        setPermissionsIds((prev) => prev.filter((id) => id !== permission.id));
+      {groupPermissions.map((group) => {
+        const isOpen = isGroupCollapsed(group.groupCode);
+        const onOpenChange = () => setGroupedCollapsed(group.groupCode);
+        const permissions = (group.permissions ?? [])
+          .slice()
+          .sort((a, b) => a.name.localeCompare(b.name));
+
+        return (
+          <Collapsible
+            key={group.groupCode}
+            open={isOpen}
+            onOpenChange={onOpenChange}
+            className="border-b border-gray-200 dark:border-gray-800 pb-4">
+            <div className="space-y-2">
+              <div className="flex flex-row justify-between">
+                <div className="flex flex-row items-center gap-2">
+                  {role && (
+                    <Checkbox
+                      className="mr-2"
+                      iconType={
+                        group.permissions.every((p) => permissionsIds.includes(p.id))
+                          ? 'check'
+                          : 'minus'
                       }
-                    }}
+                      checked={group.permissions.some((p) => permissionsIds.includes(p.id))}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setPermissionsIds((prev) => [
+                            ...prev,
+                            ...group.permissions.map((p) => p.id),
+                          ]);
+                        } else {
+                          setPermissionsIds((prev) =>
+                            prev.filter((id) => !group.permissions.some((p) => p.id === id))
+                          );
+                        }
+                      }}
+                    />
+                  )}
+                  <h3 className="text-lg font-semibold">{group.groupName}</h3>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 shrink-0"
+                  onClick={onOpenChange}>
+                  <ChevronUp
+                    size={20}
+                    className={`transition-transform duration-300 ${isOpen ? 'rotate-0' : 'rotate-180'}`}
                   />
-                  {permission.name}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <ul className="list-disc pl-5">
-              {group.permissions.map((permission) => (
-                <li key={permission.id} className="text-sm">
-                  {permission.name}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      ))}
+                </Button>
+              </div>
+              <CollapsibleContent>
+                {role ? (
+                  <ul className="list-disc pl-5">
+                    {permissions.map((permission) => (
+                      <li key={permission.id} className="flex items-center gap-2 text-sm">
+                        <Checkbox
+                          checked={permissionsIds.includes(permission.id)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setPermissionsIds((prev) => [...prev, permission.id]);
+                            } else {
+                              setPermissionsIds((prev) =>
+                                prev.filter((id) => id !== permission.id)
+                              );
+                            }
+                          }}
+                        />
+                        {permission.name}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <ul className="list-disc pl-5">
+                    {permissions.map((permission) => (
+                      <li key={permission.id} className="text-sm">
+                        {permission.name}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </CollapsibleContent>
+            </div>
+          </Collapsible>
+        );
+      })}
       {role && isPermissionsChanged && (
         // Button cancel and save permissions
         <div className="flex justify-end gap-2">

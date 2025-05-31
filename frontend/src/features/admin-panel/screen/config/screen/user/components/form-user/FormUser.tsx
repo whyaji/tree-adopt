@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { ConfirmationDialog } from '@/components/confimation-dialog';
 import { FieldForm, FieldItemType } from '@/components/field-form';
 import { Button } from '@/components/ui/button';
+import { PERMISSION } from '@/enum/permission.enum';
 import { usePaginationFilter } from '@/hooks/use-pagination-filter';
 import { createUser, saveUserRoles, updateUser } from '@/lib/api/userApi';
 import { useUserStore } from '@/lib/stores/userStore';
@@ -33,7 +34,7 @@ export const FormUser: FC<{
   const loggedInUser = useUserStore((state) => state.user);
   const paginationParams = usePaginationFilter({
     limit: 9999,
-    filter: loggedInUser?.permissions?.includes('user-management.create-level-global')
+    filter: loggedInUser?.permissions?.includes(PERMISSION.USER_MANAGEMENT_CREATE_LEVEL_GLOBAL)
       ? undefined
       : 'code:admin-global:notin',
   });

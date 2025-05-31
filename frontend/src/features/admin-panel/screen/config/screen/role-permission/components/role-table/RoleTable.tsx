@@ -15,6 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { RoleType } from '@/types/role.type';
 
 import { deleteRole } from '../../api/rolePermissionApi';
@@ -52,48 +53,54 @@ const RoleTable: FC<{
               </TableRow>
             ))
           : data?.map((role) => (
-              <TableRow
-                key={role.id}
-                onClick={() => setSelectedRole?.(role)}
-                className={`${selectedRole?.id === role.id ? 'bg-muted' : ''}`}>
-                <TableCell>{role.id}</TableCell>
-                <TableCell>{role.name}</TableCell>
-                <TableCell>{role.code}</TableCell>
-                <TableCell>
-                  <div className="flex gap-2">
-                    <Dialog key="add-role-dialog">
-                      <DialogTrigger asChild>
-                        <Button variant="outline">
-                          <Pen className="h-4 w-4" />
-                          Edit
-                        </Button>
-                      </DialogTrigger>
-                      <DialogFormRoleContent type="create" onSave={onRefresh} role={role} />
-                    </Dialog>
-                    <ConfirmationDialog
-                      title="Apakah anda yakin untuk menghapus?"
-                      message="Data yang dihapus tidak dapat dikembalikan."
-                      confirmText="Delete"
-                      onConfirm={async () => {
-                        try {
-                          await deleteRole(String(role.id));
-                          window.location.reload();
-                        } catch (error) {
-                          console.error(error);
-                          toast.error('Failed to delete role');
-                        }
-                      }}
-                      confirmVarriant="destructive"
-                      triggerButton={
-                        <Button variant="destructive">
-                          <Trash className="h-4 w-4" />
-                          Delete
-                        </Button>
-                      }
-                    />
-                  </div>
-                </TableCell>
-              </TableRow>
+              <Tooltip key={role.id}>
+                <TooltipTrigger asChild>
+                  <TableRow
+                    onClick={() => setSelectedRole?.(role)}
+                    className={`${selectedRole?.id === role.id ? 'bg-muted' : ''}`}>
+                    <TableCell>{role.id}</TableCell>
+                    <TableCell>{role.name}</TableCell>
+                    <TableCell>{role.code}</TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Dialog key="add-role-dialog">
+                          <DialogTrigger asChild>
+                            <Button variant="outline">
+                              <Pen className="h-4 w-4" />
+                              Edit
+                            </Button>
+                          </DialogTrigger>
+                          <DialogFormRoleContent type="create" onSave={onRefresh} role={role} />
+                        </Dialog>
+                        <ConfirmationDialog
+                          title="Apakah anda yakin untuk menghapus?"
+                          message="Data yang dihapus tidak dapat dikembalikan."
+                          confirmText="Delete"
+                          onConfirm={async () => {
+                            try {
+                              await deleteRole(String(role.id));
+                              window.location.reload();
+                            } catch (error) {
+                              console.error(error);
+                              toast.error('Failed to delete role');
+                            }
+                          }}
+                          confirmVarriant="destructive"
+                          triggerButton={
+                            <Button variant="destructive">
+                              <Trash className="h-4 w-4" />
+                              Delete
+                            </Button>
+                          }
+                        />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{role.description}</p>
+                </TooltipContent>
+              </Tooltip>
             ))}
       </TableBody>
     </Table>

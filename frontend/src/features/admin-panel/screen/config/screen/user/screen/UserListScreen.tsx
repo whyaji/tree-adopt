@@ -1,9 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { TableData } from '@/components/table-data';
+import { PERMISSION } from '@/enum/permission.enum';
 import { usePaginationFilter } from '@/hooks/use-pagination-filter';
 import { getUsers } from '@/lib/api/userApi';
 import { useUserStore } from '@/lib/stores/userStore';
+import { checkPermission } from '@/lib/utils/permissions';
 import { UserType } from '@/types/user.type';
 
 import { UserTable } from '../components/user-table/UserTable';
@@ -25,15 +27,15 @@ export function UserListScreen() {
 
   if (error) return <div>Error: {error.message}</div>;
 
-  const createPermission =
-    user?.permissions?.some((perm) =>
-      ['user-management.create-level-group', 'user-management.create-level-global'].includes(perm)
-    ) ?? false;
+  const createPermission = checkPermission(user?.permissions ?? [], [
+    PERMISSION.USER_MANAGEMENT_CREATE_LEVEL_GLOBAL,
+    PERMISSION.USER_MANAGEMENT_CREATE_LEVEL_GROUP,
+  ]);
 
-  const isEditor =
-    user?.permissions?.some((perm) =>
-      ['user-management.update-level-group', 'user-management.update-level-global'].includes(perm)
-    ) ?? false;
+  const isEditor = checkPermission(user?.permissions ?? [], [
+    PERMISSION.USER_MANAGEMENT_UPDATE_LEVEL_GLOBAL,
+    PERMISSION.USER_MANAGEMENT_UPDATE_LEVEL_GROUPT,
+  ]);
 
   return (
     <TableData

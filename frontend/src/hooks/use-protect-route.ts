@@ -6,7 +6,6 @@ export function useProtectRoute(perms: string[], idCheck?: string, availableIds?
   const navigate = useNavigate();
   const user = useUserStore((state) => state.user);
   const permissions = user?.permissions ?? [];
-  console.log('permissions', permissions);
   if (perms.length > 0 && !permissions.some((perm) => perms.includes(perm))) {
     navigate({ to: '/not-authorized', replace: true });
   }

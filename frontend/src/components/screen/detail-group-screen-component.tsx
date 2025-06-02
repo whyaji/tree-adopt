@@ -1,7 +1,9 @@
+import { useNavigate } from '@tanstack/react-router';
 import { icon, LatLngTuple } from 'leaflet';
 import { FC } from 'react';
 import { Marker, Popup } from 'react-leaflet';
 
+import { baseUrl } from '@/lib/api/api';
 import { getCenterCoordAndZoom } from '@/lib/utils/maps';
 import { KelompokKomunitasType } from '@/types/kelompokKomunitas.type';
 
@@ -9,7 +11,9 @@ import { MapsLocation } from '../maps-location';
 
 export const DetailGroupScreenComponent: FC<{
   kelompokKomunitas: KelompokKomunitasType;
-}> = ({ kelompokKomunitas }) => {
+  allPhotosRoute?: string;
+}> = ({ kelompokKomunitas, allPhotosRoute }) => {
+  const navigate = useNavigate();
   const position: LatLngTuple = [kelompokKomunitas.latitude, kelompokKomunitas.longitude];
 
   const kupsList = kelompokKomunitas.kups?.split(',') ?? [];
@@ -74,6 +78,39 @@ export const DetailGroupScreenComponent: FC<{
               <div className="font-semibold">Alamat</div>
               <div>:</div>
               <div>{kelompokKomunitas.address}</div>
+
+              {/* Scroll horizontal images with height 100 */}
+              {kelompokKomunitas.groupActivities &&
+                kelompokKomunitas.groupActivities.length > 0 && (
+                  <div className="col-span-3">
+                    <div className="flex overflow-x-auto py-2">
+                      {kelompokKomunitas.groupActivities.map((activity) =>
+                        activity.image ? (
+                          <div key={activity.id} className="flex-shrink-0">
+                            <img
+                              src={baseUrl + '\\thumbnails' + activity.image}
+                              alt={activity.title}
+                              className="h-24 w-auto object-cover border"
+                              style={{ minWidth: 100, maxHeight: 100 }}
+                            />
+                          </div>
+                        ) : null
+                      )}
+                    </div>
+                  </div>
+                )}
+              {/* max width, text center, and can click to navigate to route gallery */}
+              <div className="col-span-3 flex justify-center">
+                <button
+                  onClick={() => {
+                    if (allPhotosRoute) {
+                      navigate({ to: allPhotosRoute });
+                    }
+                  }}
+                  className="block max-w-xs w-full text-center text-primary hover:underline cursor-pointer font-semibold">
+                  Click to see all photos
+                </button>
+              </div>
             </div>
           </div>
         </div>

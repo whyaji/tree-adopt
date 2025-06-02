@@ -9,7 +9,7 @@ export const Route = createFileRoute(
   loader: async ({ params }) => {
     if (params.kelompokKomunitasId && params.groupActivityId) {
       try {
-        const groupActivity = await getGroupActivity(params.kelompokKomunitasId);
+        const groupActivity = await getGroupActivity(params.groupActivityId);
 
         if (groupActivity.data) {
           return {

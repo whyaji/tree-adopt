@@ -10,5 +10,10 @@ export function DetailKelompokKomunitasScreen() {
     return <div>Kelompok Komunitas tidak ditemukan.</div>;
   }
 
-  return <DetailGroupScreenComponent kelompokKomunitas={kelompokKomunitas} />;
+  return (
+    <DetailGroupScreenComponent
+      kelompokKomunitas={kelompokKomunitas}
+      allPhotosRoute={`/admin/tentang-kami/kelompok-komunitas/${kelompokKomunitas.id}/all-photos`}
+    />
+  );
 }

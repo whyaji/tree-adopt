@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 
-import { PaginationParams } from '@/interface/pagination.interface';
+import { PaginationParams, PaginationResponse } from '@/interface/pagination.interface';
 import { GroupActivityType } from '@/types/groupActivity.type';
 
 import { api, baseApiUrl } from './api';
@@ -27,7 +27,7 @@ export async function getGroupActivities(paginationParams: PaginationParams) {
     query: { with: withData, ...params },
   });
   if (!res.ok) throw new Error(res.statusText);
-  return res.json();
+  return res.json() as Promise<PaginationResponse<GroupActivityType>>;
 }
 
 export async function getGroupActivityImages({

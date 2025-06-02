@@ -3,6 +3,7 @@ import { Link } from '@tanstack/react-router';
 
 import { baseUrl } from '@/lib/api/api';
 import { getKelompokKomunitas } from '@/lib/api/kelompokKomunitasApi';
+import { KelompokKomunitasType } from '@/types/kelompokKomunitas.type';
 
 export function KelompokKomunitasScreen() {
   const search = '';
@@ -27,7 +28,7 @@ export function KelompokKomunitasScreen() {
       </p>
       {/* Menu for each one row is two item card with image */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
-        {data?.data.map((item) => (
+        {((data?.data ?? []) as KelompokKomunitasType[]).map((item) => (
           <div key={item.name} className="relative">
             <Link
               to={`/tentang-kami/kelompok-komunitas/$kelompokKomunitasName`}
@@ -39,7 +40,7 @@ export function KelompokKomunitasScreen() {
                 <img
                   src={
                     item.image
-                      ? `${baseUrl}/${item.image}`
+                      ? `${baseUrl}${item.image}`
                       : 'https://place.abh.ai/s3fs-public/placeholder/DSC_0110_400x400.JPG'
                   }
                   alt={item.name}

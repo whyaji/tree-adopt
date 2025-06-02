@@ -3,6 +3,7 @@ import { Hono } from 'hono';
 import { logger } from 'hono/logger';
 
 import { authRoute } from './routes/auth.js';
+import { groupActivityRoute } from './routes/groupActivity.js';
 import { kelompokKomunitasRoute } from './routes/kelompokkomunitas.js';
 import { massUploadRoute } from './routes/massUpload.js';
 import { masterTreeRoute } from './routes/masterTree.js';
@@ -23,6 +24,7 @@ const apiRoutes = app
   .route('/', authRoute)
   .route('/users', usersRoute)
   .route('/kelompok-komunitas', kelompokKomunitasRoute)
+  .route('/group-activity', groupActivityRoute)
   .route('/master-tree', masterTreeRoute)
   .route('/tree-code', treeCodeRoute)
   .route('/tree', treeRoute)

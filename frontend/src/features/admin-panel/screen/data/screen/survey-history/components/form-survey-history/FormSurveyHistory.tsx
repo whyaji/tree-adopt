@@ -67,6 +67,7 @@ export const FormSurveyHistory: FC<{
       treeId: tree ? String(tree?.id) : '',
       userId: user ? String(user.id) : '',
       surveyDate: survey ? survey.surveyDate : toDbDate(moment().toString()),
+      surveyTime: survey ? survey.surveyTime : moment().format('HH:mm'),
       category: survey ? String(survey.category) : '',
       circumference: survey ? String(survey.circumference) : '',
       height: survey ? String(survey.height) : '',
@@ -108,6 +109,7 @@ export const FormSurveyHistory: FC<{
 
   const formItem: FieldItemType<keyof (typeof form)['state']['values']>[] = [
     { name: 'surveyDate', label: 'Survey Date', type: 'date' },
+    { name: 'surveyTime', label: 'Survey Time', type: 'text' },
     { name: 'category', label: 'Category', type: 'dropdown', data: ListTreeCategory },
     { name: 'circumference', label: 'Circumference (cm)', type: 'number' },
     { name: 'height', label: 'Height (m)', type: 'number' },

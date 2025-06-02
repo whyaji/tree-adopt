@@ -7,17 +7,32 @@ export const uploadFile = async (
     withThumbnail?: boolean; // thumbnail with max height 150px, dynamic width
   }
 ) => {
+  const sharp = await import('sharp');
   const fs = await import('fs/promises');
   const path = await import('path');
   const uploadsDir = path.resolve(`server/public/${dir ?? ''}`);
   await fs.mkdir(uploadsDir, { recursive: true });
+
+  // Extract file extension
   const fileName = `${options?.withTimeMilis ? Date.now() + '-' : ''}${file.name}`;
   const filePath = path.join(uploadsDir, fileName);
   const fileBuffer = Buffer.from(await file.arrayBuffer());
-  await fs.writeFile(filePath, fileBuffer);
+  // Check image height and only resize if greater than 960px
+  const image = sharp.default(fileBuffer);
+  const metadata = await image.metadata();
+  if (metadata.height && metadata.height > 960) {
+    await image
+      .resize({
+        height: 960,
+        fit: 'inside',
+        withoutEnlargement: true,
+      })
+      .toFile(filePath);
+  } else {
+    await fs.writeFile(filePath, fileBuffer);
+  }
 
   if (options?.withThumbnail) {
-    const sharp = await import('sharp');
     const thumbnailDir = path.resolve(`server/public/thumbnails/${dir ?? ''}`);
     // Ensure the thumbnail directory exists
     await fs.mkdir(thumbnailDir, { recursive: true });
@@ -34,7 +49,10 @@ export const uploadFile = async (
     console.log(`Thumbnail created at: ${thumbnailPath}`);
   }
 
-  return filePath;
+  const relativeDir = path.join('/', dir ?? '');
+  const relativePath = path.join(relativeDir, fileName);
+
+  return relativePath.replace(/\\/g, '/');
 };
 
 export const deleteImage = async (dir: string) => {

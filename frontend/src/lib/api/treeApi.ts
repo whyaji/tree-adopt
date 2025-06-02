@@ -15,17 +15,10 @@ export async function createTree(tree: Omit<Tree, 'id'>) {
   return res.json();
 }
 
-export async function getTrees({
-  search,
-  page,
-  limit,
-  filter,
-  withData,
-  sortBy,
-  order,
-}: PaginationParams) {
+export async function getTrees(paginationParams: PaginationParams) {
+  const { withData, ...params } = paginationParams;
   const res = await treeApi.$get({
-    query: { search, page, limit, with: withData, filter, sortBy, order },
+    query: { ...params, with: withData },
   });
   if (!res.ok) throw new Error(res.statusText);
   return res.json();

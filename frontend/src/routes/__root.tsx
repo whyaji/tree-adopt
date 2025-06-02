@@ -19,12 +19,11 @@ import { Toaster } from '@/components/ui/sonner';
 import { PERMISSION } from '@/enum/permission.enum';
 import { ROLE } from '@/enum/role.enum';
 import { useUserStore } from '@/lib/stores/userStore';
+import { checkPermission } from '@/lib/utils/permissions';
 
 const Root = () => {
   const user = useUserStore((state) => state.user);
   const permissions = user?.permissions ?? [];
-
-  console.log('user', user);
 
   const navMain: {
     title: string;
@@ -134,7 +133,14 @@ const Root = () => {
       icon: Info,
       items: [
         { title: 'Apa itu Adopsi Pohon', url: '/admin/tentang-kami/apa-itu-adopsi-pohon' },
-        { title: 'Kelompok komunitas', url: '/admin/tentang-kami/kelompok-komunitas' },
+        {
+          title: 'Kelompok komunitas',
+          url: '/admin/tentang-kami/kelompok-komunitas',
+          hide: !checkPermission(permissions, [
+            PERMISSION.COMUNITY_GROUP_VIEW_LEVEL_GLOBAL,
+            PERMISSION.COMUNITY_GROUP_VIEW_LEVEL_GROUP,
+          ]),
+        },
         { title: 'Laporan-laporan', url: '/admin/tentang-kami/laporan-laporan' },
       ],
     },

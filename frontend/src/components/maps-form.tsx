@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { MapContainer, Marker, Popup, TileLayer, useMapEvents } from 'react-leaflet';
+import { Marker, Popup, useMapEvents } from 'react-leaflet';
 
+import { MapsLocation } from './maps-location';
 import { FieldInfo } from './ui/field-info';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
@@ -30,22 +31,18 @@ export function MapsForm(props: {
       <div className="flex flex-col gap-2">
         <Label>Pilih Lokasi</Label>
         <div className="h-92 w-full rounded-md overflow-hidden relative z-0">
-          <MapContainer
+          <MapsLocation
             ref={props.mapRef}
             center={props.mapCenter}
             zoom={5}
             style={{ height: '100%', width: '100%' }}>
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            />
             <ClickHandler onLocationSelect={props.handleLocationSelect} />
             {props.markerPosition && (
               <Marker position={props.markerPosition}>
                 <Popup>Lokasi terpilih</Popup>
               </Marker>
             )}
-          </MapContainer>
+          </MapsLocation>
         </div>
       </div>
       <div className="grid grid-cols-2 gap-4">

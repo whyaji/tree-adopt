@@ -3,10 +3,10 @@ import { useForm, useStore } from '@tanstack/react-form';
 import { useNavigate } from '@tanstack/react-router';
 import L from 'leaflet';
 import { FC, useEffect, useRef, useState } from 'react';
-import { MapContainer, Marker, Popup, TileLayer, useMapEvents } from 'react-leaflet';
 import { toast } from 'sonner';
 
 import { ConfirmationDialog } from '@/components/confimation-dialog';
+import { MapsForm } from '@/components/maps-form';
 import { Button } from '@/components/ui/button';
 import { FieldInfo } from '@/components/ui/field-info';
 import { Input } from '@/components/ui/input';
@@ -14,19 +14,6 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { MAPS_CENTER } from '@/constants/maps';
 import { createKelompokKomunitas, updateKelompokKomunitas } from '@/lib/api/kelompokKomunitasApi';
-
-function ClickHandler({
-  onLocationSelect,
-}: {
-  onLocationSelect: (lat: number, lng: number) => void;
-}) {
-  useMapEvents({
-    click(e) {
-      onLocationSelect(e.latlng.lat, e.latlng.lng);
-    },
-  });
-  return null;
-}
 
 export const FormKelompokKomunitas: FC<{
   kelompokKomunitas?: KelompokKomunitas | null;
@@ -129,7 +116,9 @@ export const FormKelompokKomunitas: FC<{
         e.stopPropagation();
         form.handleSubmit();
       }}>
-      <h2 className="text-2xl font-bold">Add Komunitas</h2>
+      <h2 className="text-2xl font-bold">
+        {kelompokKomunitas ? 'Update Kelompok Komunitas' : 'Add Kelompok Komunitas'}
+      </h2>
       {formItem.map((item) => (
         <form.Field key={item.name} name={item.name}>
           {(field) => (
@@ -158,61 +147,15 @@ export const FormKelompokKomunitas: FC<{
           )}
         </form.Field>
       ))}
-      <div className="mt-4">
-        <Label>Pilih Lokasi</Label>
-        <div className="h-92 w-full rounded-md overflow-hidden relative z-0">
-          <MapContainer
-            ref={mapRef}
-            center={mapCenter}
-            zoom={5}
-            style={{ height: '100%', width: '100%' }}>
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            />
-            <ClickHandler onLocationSelect={handleLocationSelect} />
-            {markerPosition && (
-              <Marker position={markerPosition}>
-                <Popup>Lokasi terpilih</Popup>
-              </Marker>
-            )}
-          </MapContainer>
-        </div>
-      </div>
-      <div className="grid grid-cols-2 gap-4">
-        <form.Field name="latitude">
-          {(field) => (
-            <div>
-              <Label htmlFor={field.name}>Latitude</Label>
-              <Input
-                id={field.name}
-                name={field.name}
-                type="text"
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
-              />
-              <FieldInfo field={field} />
-            </div>
-          )}
-        </form.Field>
-        <form.Field name="longitude">
-          {(field) => (
-            <div>
-              <Label htmlFor={field.name}>Longitude</Label>
-              <Input
-                id={field.name}
-                name={field.name}
-                type="text"
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
-              />
-              <FieldInfo field={field} />
-            </div>
-          )}
-        </form.Field>
-      </div>
+
+      <MapsForm
+        form={form}
+        mapRef={mapRef}
+        mapCenter={mapCenter}
+        markerPosition={markerPosition}
+        handleLocationSelect={handleLocationSelect}
+      />
+
       <div className="mt-4">
         <Label>Upload Image</Label>
         <Input

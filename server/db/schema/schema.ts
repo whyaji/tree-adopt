@@ -108,6 +108,32 @@ export const kelompokKomunitasSchema = mysqlTable('kelompok_komunitas', {
   deletedAt: timestamp('deleted_at'),
 });
 
+export const groupActivitySchema = mysqlTable(
+  'group_activity',
+  {
+    id: bigint('id', { mode: 'number', unsigned: true }).autoincrement().notNull().primaryKey(),
+    kelompokKomunitasId: bigint('kelompok_komunitas_id', { mode: 'number', unsigned: true })
+      .notNull()
+      .references(() => kelompokKomunitasSchema.id),
+    code: varchar('code', { length: 255 }).notNull().unique(),
+    title: varchar('title', { length: 255 }).notNull(),
+    location: varchar('location', { length: 255 }).notNull(),
+    date: varchar('date', { length: 255 }).notNull(),
+    time: varchar('time', { length: 255 }).notNull(),
+    description: varchar('description', { length: 255 }),
+    image: varchar('image', { length: 255 }).unique(),
+    latitude: double('latitude').notNull(),
+    longitude: double('longitude').notNull(),
+    createdBy: bigint('created_by', { mode: 'number', unsigned: true })
+      .notNull()
+      .references(() => userSchema.id),
+    createdAt: timestamp('created_at').defaultNow(),
+    updatedAt: timestamp('updated_at').defaultNow(),
+    deletedAt: timestamp('deleted_at'),
+  },
+  (table) => [index('kelompok_komunitas_id_idx_group_activity').on(table.kelompokKomunitasId)]
+);
+
 export const masterTreeSchema = mysqlTable('master_tree', {
   id: bigint('id', { mode: 'number', unsigned: true }).autoincrement().notNull().primaryKey(),
   latinName: varchar('latin_name', { length: 255 }).notNull(),

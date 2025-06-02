@@ -1,6 +1,6 @@
 'use client';
 
-import { Link, useRouterState } from '@tanstack/react-router';
+import { useNavigate, useRouterState } from '@tanstack/react-router';
 import { ChevronRight, type LucideIcon } from 'lucide-react';
 
 import {
@@ -32,6 +32,7 @@ export function NavMain({
   }[];
 }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const navigate = useNavigate();
   return (
     <SidebarGroup>
       <SidebarGroupContent className="flex flex-col gap-2">
@@ -79,9 +80,13 @@ export function NavMain({
                               <SidebarMenuSubButton
                                 asChild
                                 isActive={pathname.includes(subItem.url)}>
-                                <a href={subItem.url}>
+                                <button
+                                  type="button"
+                                  onClick={() => navigate({ to: subItem.url })}
+                                  className="w-full text-left"
+                                  tabIndex={0}>
                                   <span>{subItem.title}</span>
-                                </a>
+                                </button>
                               </SidebarMenuSubButton>
                             </SidebarMenuSubItem>
                           )
@@ -93,10 +98,13 @@ export function NavMain({
             ) : (
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton asChild tooltip={item.title} isActive={item.url === pathname}>
-                  <Link to={item.url} className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => navigate({ to: item.url })}
+                    className="flex items-center gap-2 w-full text-left">
                     {item.icon && <item.icon />}
                     {item.title}
-                  </Link>
+                  </button>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             )

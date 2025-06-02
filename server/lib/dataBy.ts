@@ -25,6 +25,7 @@ export async function getDataBy({
   valueTypeData = 'number',
   relations,
   primaryKey = 'id',
+  selectObject,
 }: {
   id?: number | string;
   c: Context<object, any, BlankInput>;
@@ -33,6 +34,7 @@ export async function getDataBy({
   valueTypeData?: 'string' | 'number';
   relations?: RelationsType;
   primaryKey?: string;
+  selectObject?: Record<string, any>;
 }) {
   const idReqParam = valueTypeData === 'number' ? parseInt(c.req.param(getBy)) : c.req.param(getBy);
   const valueId = id ?? idReqParam;
@@ -50,10 +52,19 @@ export async function getDataBy({
       ? extendWithArrayFromManyRelations(withArrayList, manyToManyRelation, relations)
       : withArrayList;
 
-  let query = db
-    .select()
-    .from(table)
-    .where(eq(table[toCamelCase(getBy) as keyof typeof table as string], valueId));
+  let query;
+
+  if (selectObject) {
+    query = db
+      .select(selectObject)
+      .from(table)
+      .where(eq(table[toCamelCase(getBy) as keyof typeof table as string], valueId));
+  } else {
+    query = db
+      .select()
+      .from(table)
+      .where(eq(table[toCamelCase(getBy) as keyof typeof table as string], valueId));
+  }
 
   const oneToOneRelation = Object.keys(relations ?? {}).filter(
     (key) => relations?.[key].type === 'one-to-one' && withArray?.includes(key)

@@ -6,6 +6,7 @@ import { deleteCookie } from 'hono/cookie';
 import { sign } from 'hono/jwt';
 import { z } from 'zod';
 
+import { ROLE } from '../../frontend/src/enum/role.enum.js';
 import { db } from '../db/database.js';
 import {
   kelompokKomunitasSchema,
@@ -54,6 +55,8 @@ export const authRoute = new Hono()
 
       // Verify password
       const hashedPassword = await bcrypt.hash(password, env.HASH_SALT ?? 'salt');
+      console.log('Hashed Password:', hashedPassword);
+      console.log('Stored Password:', user[0].password);
       if (hashedPassword !== user[0].password) {
         return c.json({ message: 'Invalid email or password.' }, 401);
       }
@@ -125,14 +128,28 @@ export const authRoute = new Hono()
   });
 
 export async function getUserByIdWithRoles(userId: number) {
-  const userQueryResult = await db.select().from(userSchema).where(eq(userSchema.id, userId));
+  const userQueryResult = await db
+    .select()
+    .from(userSchema)
+    .where(eq(userSchema.id, userId))
+    .leftJoin(kelompokKomunitasSchema, eq(userSchema.groupId, kelompokKomunitasSchema.id));
 
   if (userQueryResult.length === 0) {
     throw new Error('User not found');
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let user: any = userQueryResult[0];
+  let user: any = {
+    ...userQueryResult[0].users,
+    kelompokKomunitas: userQueryResult[0].kelompok_komunitas,
+    roles: [],
+    permissions: [],
+  };
+
+  if (user.role === ROLE.USER) {
+    return user;
+  }
+
   // remove password from user object
   user = { ...user, password: undefined };
 

@@ -24,12 +24,14 @@ export async function getPaginationData({
   searchBy,
   relations,
   primaryKey = 'id',
+  selectObject,
 }: {
   c: Context<object, any, BlankInput>;
   table: MySqlTableWithColumns<any>;
   searchBy: string;
   relations?: RelationsType;
   primaryKey?: string;
+  selectObject?: Record<string, any>;
 }) {
   const search = c.req.query('search') ?? '';
   const page = parseInt(c.req.query('page') ?? '1');
@@ -40,6 +42,14 @@ export async function getPaginationData({
 
   const sortBy = c.req.query('sortBy') ?? 'createdAt';
   const order = c.req.query('order') ?? 'desc';
+
+  const selectFromQuery = c.req.query('select');
+  const selectObjectFromQuery = selectFromQuery
+    ? selectFromQuery.split(',').reduce((acc, key) => {
+        acc[key] = table[key];
+        return acc;
+      }, {} as Record<string, any>)
+    : null;
 
   if (!(sortBy in table)) {
     return c.json({ error: 'Invalid sortBy column' }, 400);
@@ -56,7 +66,15 @@ export async function getPaginationData({
     ...(conditions || [])
   );
 
-  let query = db.select().from(table).where(whereClause).limit(limit);
+  let query;
+
+  if (selectObject) {
+    query = db.select(selectObject).from(table).where(whereClause).limit(limit);
+  } else if (selectObjectFromQuery) {
+    query = db.select(selectObjectFromQuery).from(table).where(whereClause).limit(limit);
+  } else {
+    query = db.select().from(table).where(whereClause).limit(limit);
+  }
 
   const withArrayList = withString ? (withString as string).split(',') : null;
 

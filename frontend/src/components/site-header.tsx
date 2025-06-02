@@ -1,4 +1,4 @@
-import { useRouterState } from '@tanstack/react-router';
+import { useNavigate, useRouterState } from '@tanstack/react-router';
 import { Link } from '@tanstack/react-router';
 import Cookies from 'js-cookie';
 import {
@@ -14,7 +14,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   Breadcrumb,
   BreadcrumbItem,
-  BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
@@ -34,6 +33,7 @@ import { UserType } from '@/types/user.type';
 
 export function SiteHeader() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const navigate = useNavigate();
   const stringUser = Cookies.get('user');
   const user: UserType = stringUser ? JSON.parse(stringUser) : null;
 
@@ -47,9 +47,12 @@ export function SiteHeader() {
         <Breadcrumb className="w-full">
           <BreadcrumbList className="flex items-center gap-2">
             <BreadcrumbItem>
-              <BreadcrumbLink className="flex items-center" href="/">
+              <button
+                type="button"
+                onClick={() => navigate({ to: '/' })}
+                className="flex items-center">
                 <HomeIcon className="mr-1" />
-              </BreadcrumbLink>
+              </button>
               {pathSegments.length > 0 && <BreadcrumbSeparator />}
             </BreadcrumbItem>
             {pathSegments.map((segment, index) => {
@@ -64,7 +67,9 @@ export function SiteHeader() {
                 <BreadcrumbItem key={href}>
                   {!isLast ? (
                     <>
-                      <BreadcrumbLink href={href}>{formattedSegment}</BreadcrumbLink>
+                      <button type="button" onClick={() => navigate({ to: href })}>
+                        {formattedSegment}
+                      </button>
                       <BreadcrumbSeparator />
                     </>
                   ) : (

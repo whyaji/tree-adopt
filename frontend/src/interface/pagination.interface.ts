@@ -6,6 +6,7 @@ export interface PaginationParams {
   withData?: string;
   sortBy?: string;
   order?: string;
+  select?: string;
 }
 
 export interface PaginationParamsOptional {
@@ -16,6 +17,7 @@ export interface PaginationParamsOptional {
   withData?: string;
   sortBy?: string;
   order?: string;
+  select?: string;
 }
 
 export interface PaginationResponse<T> {

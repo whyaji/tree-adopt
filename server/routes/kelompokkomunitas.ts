@@ -4,11 +4,11 @@ import path from 'path';
 import { z } from 'zod';
 
 import { db } from '../db/database.js';
-import { kelompokKomunitasSchema, treeSchema } from '../db/schema/schema.js';
+import { groupActivitySchema, kelompokKomunitasSchema, treeSchema } from '../db/schema/schema.js';
 import { getDataBy } from '../lib/dataBy.js';
 import { validateImage } from '../lib/image.js';
 import { getPaginationData } from '../lib/pagination.js';
-import type { RelationsType } from '../lib/relation.js';
+import { type RelationsType } from '../lib/relation.js';
 import { deleteImage, uploadFile } from '../lib/upload.js';
 import authMiddleware from '../middleware/jwt.js';
 
@@ -31,9 +31,14 @@ export type KelompokKomunitas = InferSelectModel<typeof kelompokKomunitasSchema>
 
 // === RELATIONS ===
 const relations: RelationsType = {
-  tree: {
+  trees: {
     type: 'one-to-many',
     table: treeSchema,
+    on: 'kelompokKomunitasId',
+  },
+  groupActivities: {
+    type: 'one-to-many',
+    table: groupActivitySchema,
     on: 'kelompokKomunitasId',
   },
 };
@@ -49,6 +54,18 @@ export const kelompokKomunitasRoute = new Hono()
       searchBy: 'name',
       relations,
     });
+  })
+
+  .get('/by-name/:name', async (c) => {
+    const name = c.req.param('name');
+    const data = await db
+      .select()
+      .from(kelompokKomunitasSchema)
+      .where(eq(kelompokKomunitasSchema.name, name));
+
+    if (data.length === 0) return c.notFound();
+
+    return c.json({ data: data[0] });
   })
 
   .get('/total', async (c) => {

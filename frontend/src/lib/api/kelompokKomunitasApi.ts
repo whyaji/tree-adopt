@@ -46,11 +46,11 @@ export async function getKelompokKomunitasById(id: string) {
 }
 
 export async function getKelompokKomunitasByName(name: string) {
-  const res = await kelompokKomunitasApi.$get({
-    query: { search: undefined, page: 1, limit: 1, filter: `name:${name}:eq` },
+  const res = await kelompokKomunitasApi['by-name'][':name'].$get({
+    param: { name },
   });
   if (!res.ok) throw new Error(res.statusText);
-  return res.json();
+  return res.json() as Promise<{ data: KelompokKomunitas }>;
 }
 
 export async function updateKelompokKomunitas(id: number, formData: FormData) {

@@ -31,7 +31,7 @@ export function SurveyHistoryTreeScreen() {
 
   return (
     <TableData
-      title="Pohon"
+      title={`Survey History for ${tree?.code}`}
       tempSearch={tempSearch}
       setTempSearch={setTempSearch}
       page={paginationParams.page}

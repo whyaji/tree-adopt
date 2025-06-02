@@ -10,6 +10,7 @@ export function usePaginationFilter<T>(defaultParams?: {
   withData?: string;
   sortBy?: string;
   order?: string;
+  select?: string;
 }) {
   const [page, setPage] = useState(defaultParams?.page ?? 1);
   const [limit, setLimit] = useState(defaultParams?.limit ?? 10);
@@ -19,6 +20,7 @@ export function usePaginationFilter<T>(defaultParams?: {
   const [sortBy, setSortBy] = useState(defaultParams?.sortBy ?? 'createdAt');
   const [order, setOrder] = useState(defaultParams?.order ?? 'desc');
   const [tempSearch, setTempSearch] = useState(defaultParams?.search ?? '');
+  const [select, setSelect] = useState(defaultParams?.select ?? '');
   const [data, setData] = useState<T[]>([]);
 
   useEffect(() => {
@@ -37,6 +39,7 @@ export function usePaginationFilter<T>(defaultParams?: {
     withData,
     sortBy,
     order,
+    select,
   };
 
   return {
@@ -55,6 +58,8 @@ export function usePaginationFilter<T>(defaultParams?: {
     setSortBy,
     order,
     setOrder,
+    select,
+    setSelect,
     paginationParams,
     data,
     setData,

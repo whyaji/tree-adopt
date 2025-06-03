@@ -2,6 +2,7 @@ import {
   bigint,
   double,
   float,
+  foreignKey,
   index,
   int,
   json,
@@ -238,5 +239,111 @@ export const surveyHistorySchema = mysqlTable(
   (table) => [
     index('kelompok_komunitas_id_idx_survey_history').on(table.kelompokKomunitasId),
     index('tree_id_idx_survey_history').on(table.treeId),
+  ]
+);
+
+export const boundaryMarkerCodeSchema = mysqlTable(
+  'boundary_marker_code',
+  {
+    id: bigint('id', { mode: 'number', unsigned: true }).autoincrement().notNull().primaryKey(),
+    code: varchar('code', { length: 255 }).unique().notNull(),
+    kelompokKomunitasId: bigint('kelompok_komunitas_id', {
+      mode: 'number',
+      unsigned: true,
+    }).notNull(),
+    status: int('status').default(0),
+    taggedBy: bigint('tagged_by', { mode: 'number', unsigned: true }),
+    taggedAt: varchar('tagged_at', { length: 255 }),
+    createdAt: timestamp('created_at').defaultNow(),
+    updatedAt: timestamp('updated_at').defaultNow(),
+    deletedAt: timestamp('deleted_at'),
+  },
+  (table) => [
+    foreignKey({
+      name: 'kk_bmc_id_fk',
+      columns: [table.kelompokKomunitasId],
+      foreignColumns: [kelompokKomunitasSchema.id],
+    }),
+    foreignKey({
+      name: 'tagged_bmc_id_fk',
+      columns: [table.taggedBy],
+      foreignColumns: [userSchema.id],
+    }),
+    index('kelompok_komunitas_id_idx_boundary_marker_code').on(table.kelompokKomunitasId),
+  ]
+);
+
+export const boundaryMarkerSchema = mysqlTable(
+  'boundary_marker',
+  {
+    id: bigint('id', { mode: 'number', unsigned: true }).autoincrement().notNull().primaryKey(),
+    code: varchar('code', { length: 255 }).unique().notNull(),
+    kelompokKomunitasId: bigint('kelompok_komunitas_id', {
+      mode: 'number',
+      unsigned: true,
+    }).notNull(),
+    checkerId: bigint('checker_id', { mode: 'number', unsigned: true }).notNull(),
+    installYear: int('install_year').notNull(),
+    latitude: double('latitude').notNull(),
+    longitude: double('longitude').notNull(),
+    description: varchar('description', { length: 255 }),
+    status: int('status').default(1), // 0 = inactive, 1 = active
+    createdAt: timestamp('created_at').defaultNow(),
+    updatedAt: timestamp('updated_at').defaultNow(),
+    deletedAt: timestamp('deleted_at'),
+  },
+  (table) => [
+    foreignKey({
+      name: 'kk_bm_id_fk',
+      columns: [table.kelompokKomunitasId],
+      foreignColumns: [kelompokKomunitasSchema.id],
+    }),
+    foreignKey({
+      name: 'checker_bm_id_fk',
+      columns: [table.checkerId],
+      foreignColumns: [userSchema.id],
+    }),
+    index('kelompok_komunitas_id_idx_boundary_marker').on(table.kelompokKomunitasId),
+  ]
+);
+
+export const checkBoundaryMarkerHistorySchema = mysqlTable(
+  'check_boundary_marker_history',
+  {
+    id: bigint('id', { mode: 'number', unsigned: true }).autoincrement().notNull().primaryKey(),
+    kelompokKomunitasId: bigint('kelompok_komunitas_id', {
+      mode: 'number',
+      unsigned: true,
+    }).notNull(),
+    boundaryMarkerId: bigint('boundary_marker_id', { mode: 'number', unsigned: true }).notNull(),
+    boundaryMarkerCode: varchar('boundary_marker_code', { length: 255 }),
+    checkerId: bigint('checker_id', { mode: 'number', unsigned: true }).notNull(),
+    conditions: json('condition').notNull(), // json condition form data string and parse to json when store to db ex. dynamic key and data type { good: true, damaged: false, lost: false }
+    actions: json('action').notNull(), // json action form data string and parse to json when store to db ex. dynamic key and data type { move: true, replace: false, remove: false }
+    images: json('image').notNull(), // json list image form data image and store the path ['image1.jpg', 'image2.jpg']
+    checkDate: varchar('check_date', { length: 255 }).notNull(),
+    checkTime: varchar('check_time', { length: 255 }).notNull(),
+    createdAt: timestamp('created_at').defaultNow(),
+    updatedAt: timestamp('updated_at').defaultNow(),
+    deletedAt: timestamp('deleted_at'),
+  },
+  (table) => [
+    foreignKey({
+      name: 'kk_cbmh_id_fk',
+      columns: [table.kelompokKomunitasId],
+      foreignColumns: [kelompokKomunitasSchema.id],
+    }),
+    foreignKey({
+      name: 'bm_cbmh_id_fk',
+      columns: [table.boundaryMarkerId],
+      foreignColumns: [boundaryMarkerSchema.id],
+    }),
+    foreignKey({
+      name: 'checker_cbmh_id_fk',
+      columns: [table.checkerId],
+      foreignColumns: [userSchema.id],
+    }),
+    index('kelompok_komunitas_id_idx_check_boundary_marker_history').on(table.kelompokKomunitasId),
+    index('boundary_marker_id_idx_check_boundary_     marker_history').on(table.boundaryMarkerId),
   ]
 );

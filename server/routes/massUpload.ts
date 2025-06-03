@@ -4,13 +4,19 @@ import { Hono } from 'hono';
 import { STATUS_RECORD } from '../constants/STATUS_RECORD.js';
 import { db } from '../db/database.js';
 import {
+  boundaryMarkerCodeSchema,
+  boundaryMarkerSchema,
+  checkBoundaryMarkerHistorySchema,
   masterTreeSchema,
   surveyHistorySchema,
   treeCodeSchema,
   treeSchema,
 } from '../db/schema/schema.js';
-import { uploadFile } from '../lib/upload.js';
+import { massUploadFiles } from '../lib/upload.js';
 import authMiddleware from '../middleware/jwt.js';
+import type { BoundaryMarker } from './boundary-marker/boundaryMarker.js';
+import type { CheckBoundaryMarkerHistory } from './boundary-marker/boundaryMarkerCheckHistory.js';
+import type { BoundaryMarkerCode } from './boundary-marker/boundaryMarkerCode.js';
 import type { SurveyHistory } from './surveyHistory.js';
 import type { Tree } from './tree.js';
 import type { TreeCode } from './treeCode.js';
@@ -291,44 +297,247 @@ export const massUploadRoute = new Hono()
     }
   })
 
+  .post('/boundary-marker', async (c) => {
+    const data: {
+      boundaryMarkers: BoundaryMarker[];
+      checkBoundaryMarkerHistories: Omit<CheckBoundaryMarkerHistory, 'boundaryMarkerId'>[];
+      boundaryMarkerCodes: BoundaryMarkerCode[];
+      boundaryMarkerCodesUpdate: BoundaryMarkerCode[];
+    } = await c.req.json();
+
+    if (data.boundaryMarkers === undefined || data.checkBoundaryMarkerHistories === undefined) {
+      return c.json({ message: 'No data provided' }, 400);
+    }
+    const boundaryMarkers = data.boundaryMarkers;
+    const checkBoundaryMarkerHistories = data.checkBoundaryMarkerHistories;
+    const boundaryMarkerCodes = data.boundaryMarkerCodes;
+    const boundaryMarkerCodesUpdate = data.boundaryMarkerCodesUpdate;
+    const dir = '/uploads/boundary-marker/';
+    const resultBoundaryMarkers: {
+      id: number;
+      status: number;
+      message?: string;
+    }[] = [];
+    const failedBoundaryMarkerUploadsCode: string[] = [];
+    const resultCheckBoundaryMarkerHistories: {
+      id: number;
+      status: number;
+      message?: string;
+    }[] = [];
+    const resultBoundaryMarkerCodes: {
+      id: number;
+      status: number;
+      message?: string;
+    }[] = [];
+    const resultBoundaryMarkerCodesUpdate: {
+      id: number;
+      status: number;
+      message?: string;
+    }[] = [];
+
+    const boundaryMarkerCodeList = boundaryMarkerCodes.map((code) => code.code);
+    const boundaryMarkerCodeListUpdate = boundaryMarkerCodesUpdate.map((code) => code.code);
+
+    try {
+      await db.transaction(async (tx) => {
+        const sortedBoundaryMarkers = [...boundaryMarkers].sort((a, b) => a.id - b.id);
+        for (const marker of sortedBoundaryMarkers) {
+          try {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { id, createdAt, updatedAt, deletedAt, ...rest } = marker;
+            const upload = await tx.insert(boundaryMarkerSchema).values(rest);
+
+            if (upload) {
+              resultBoundaryMarkers.push({ id, status: STATUS_RECORD.UPLOADED });
+            } else {
+              resultBoundaryMarkers.push({
+                id: id,
+                status: STATUS_RECORD.FAILED,
+                message: 'Failed to insert boundary marker',
+              });
+              failedBoundaryMarkerUploadsCode.push(marker.code);
+            }
+          } catch (error) {
+            console.error('Error inserting boundary marker:', error);
+            resultBoundaryMarkers.push({
+              id: marker.id,
+              status: STATUS_RECORD.FAILED,
+              message: String(error),
+            });
+            failedBoundaryMarkerUploadsCode.push(marker.code);
+          }
+        }
+      });
+
+      const boundaryMarkersForCheckFromCode = await db
+        .select({
+          id: boundaryMarkerSchema.id,
+          code: boundaryMarkerSchema.code,
+        })
+        .from(boundaryMarkerSchema)
+        .where(inArray(boundaryMarkerSchema.code, boundaryMarkerCodeList));
+
+      await db.transaction(async (tx) => {
+        const sortedCheckHistories = [...checkBoundaryMarkerHistories].sort((a, b) => a.id - b.id);
+        for (const checkHistory of sortedCheckHistories) {
+          try {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { id, createdAt, updatedAt, deletedAt, boundaryMarkerCode, images, ...rest } =
+              checkHistory;
+
+            const markerFailedInNewTree = failedBoundaryMarkerUploadsCode.find(
+              (markerCode) => markerCode === boundaryMarkerCode
+            );
+            if (markerFailedInNewTree) {
+              resultCheckBoundaryMarkerHistories.push({
+                id: checkHistory.id,
+                status: STATUS_RECORD.FAILED,
+                message: 'Your Boundary Marker Failed to Upload',
+              });
+              continue;
+            }
+            const marker = boundaryMarkersForCheckFromCode.find(
+              (marker) => marker.code === boundaryMarkerCode
+            );
+            if (!marker) {
+              resultCheckBoundaryMarkerHistories.push({
+                id: checkHistory.id,
+                status: STATUS_RECORD.FAILED,
+                message: 'Boundary marker not found',
+              });
+              continue;
+            }
+            const listImages = images.map((image) => {
+              return dir + image;
+            });
+            const upload = await tx.insert(checkBoundaryMarkerHistorySchema).values({
+              boundaryMarkerId: marker.id,
+              boundaryMarkerCode,
+              ...rest,
+              images: listImages,
+            });
+            if (upload) {
+              resultCheckBoundaryMarkerHistories.push({ id, status: STATUS_RECORD.UPLOADED });
+            } else {
+              resultCheckBoundaryMarkerHistories.push({
+                id,
+                status: STATUS_RECORD.FAILED,
+                message: 'Failed to insert check boundary marker history',
+              });
+            }
+          } catch (error) {
+            console.error('Error inserting check boundary marker history:', error);
+            resultCheckBoundaryMarkerHistories.push({
+              id: checkHistory.id,
+              status: STATUS_RECORD.FAILED,
+              message: String(error),
+            });
+          }
+        }
+      });
+      await db.transaction(async (tx) => {
+        const sortedBoundaryMarkerCodes = [...boundaryMarkerCodes].sort((a, b) => a.id - b.id);
+        for (const markerCode of sortedBoundaryMarkerCodes) {
+          try {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { id, createdAt, updatedAt, deletedAt, ...rest } = markerCode;
+            const upload = await tx.insert(boundaryMarkerCodeSchema).values(rest);
+            if (upload) {
+              resultBoundaryMarkerCodes.push({ id: id, status: STATUS_RECORD.UPLOADED });
+            } else {
+              resultBoundaryMarkerCodes.push({
+                id: id,
+                status: STATUS_RECORD.FAILED,
+                message: 'Failed to insert boundary marker code',
+              });
+            }
+          } catch (error) {
+            console.error('Error inserting boundary marker code:', error);
+            resultBoundaryMarkerCodes.push({
+              id: markerCode.id,
+              status: STATUS_RECORD.FAILED,
+              message: String(error),
+            });
+          }
+        }
+      });
+
+      const boundaryMarkerCodesToUpdate = await db
+        .select({
+          id: boundaryMarkerCodeSchema.id,
+          code: boundaryMarkerCodeSchema.code,
+        })
+        .from(boundaryMarkerCodeSchema)
+        .where(inArray(boundaryMarkerCodeSchema.code, boundaryMarkerCodeListUpdate));
+
+      await db.transaction(async (tx) => {
+        for (const markerCode of boundaryMarkerCodesUpdate) {
+          try {
+            const markerCodeToUpdate = boundaryMarkerCodesToUpdate.find(
+              (markerCodeToUpdate) => markerCodeToUpdate.code === markerCode.code
+            );
+            if (!markerCodeToUpdate) {
+              resultBoundaryMarkerCodesUpdate.push({
+                id: markerCode.id,
+                status: STATUS_RECORD.FAILED,
+                message: 'Boundary marker code not found',
+              });
+              continue;
+            }
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { id, createdAt, updatedAt, deletedAt, ...rest } = markerCode;
+            const update = await tx
+              .update(boundaryMarkerCodeSchema)
+              .set({
+                id: markerCodeToUpdate.id,
+                ...rest,
+              })
+              .where(eq(boundaryMarkerCodeSchema.id, markerCodeToUpdate.id));
+            if (update) {
+              resultBoundaryMarkerCodesUpdate.push({ id, status: STATUS_RECORD.UPLOADED });
+            } else {
+              resultBoundaryMarkerCodesUpdate.push({ id, status: STATUS_RECORD.FAILED });
+            }
+          } catch (error) {
+            console.error('Error updating boundary marker code:', error);
+            resultBoundaryMarkerCodesUpdate.push({
+              id: markerCode.id,
+              status: STATUS_RECORD.FAILED,
+              message: String(error),
+            });
+          }
+        }
+      });
+      return c.json(
+        {
+          message: 'Mass upload success',
+          resultBoundaryMarkers,
+          resultCheckBoundaryMarkerHistories,
+          resultBoundaryMarkerCodes,
+          resultBoundaryMarkerCodesUpdate,
+        },
+        201
+      );
+    } catch (error) {
+      console.error('Error mass upload:', error);
+      return c.json(
+        {
+          message: 'Error mass upload',
+          error: String(error),
+          resultBoundaryMarkers,
+          resultCheckBoundaryMarkerHistories,
+          resultBoundaryMarkerCodes,
+          resultBoundaryMarkerCodesUpdate,
+        },
+        500
+      );
+    }
+  })
+
   .post('/survey-images', async (c) => {
-    const formData = (await c.req.parseBody()) as Record<string, File>;
+    return await massUploadFiles({ c, dir: 'survey-history/' });
+  })
 
-    const formDataLength = Object.keys(formData).length;
-
-    if (formDataLength === 0) {
-      return c.json({ message: 'No files provided' }, 400);
-    }
-    const dir = 'uploads/survey-history';
-
-    const responses: { fileIndex: number; status: number; message: string }[] = [];
-
-    for (let i = 0; i < formDataLength; i++) {
-      const file = formData[`file[${i}]`] as File;
-
-      try {
-        await uploadFile(file, dir, {
-          withThumbnail: true,
-        });
-        responses.push({
-          fileIndex: i,
-          status: STATUS_RECORD.UPLOADED,
-          message: 'File uploaded successfully',
-        });
-      } catch (err) {
-        console.error(`Error uploading file at index ${i}:`, err);
-        responses.push({
-          fileIndex: i,
-          status: STATUS_RECORD.FAILED,
-          message: 'Error uploading file',
-        });
-      }
-    }
-
-    const notAllFilesUploaded = responses.some((response) => response.status === 0);
-    if (notAllFilesUploaded) {
-      return c.json({ message: 'Some files failed to upload', responses }, 500);
-    }
-
-    return c.json({ message: 'All files uploaded successfully', responses }, 201);
+  .post('/boundary-marker-images', async (c) => {
+    return await massUploadFiles({ c, dir: 'boundary-marker/' });
   });

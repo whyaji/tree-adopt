@@ -36,6 +36,13 @@
       "when": 1748835035987,
       "tag": "0004_gray_killer_shrike",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1748922689508,
+      "tag": "0005_bent_gauntlet",
+      "breakpoints": true
     }
   ]
 }

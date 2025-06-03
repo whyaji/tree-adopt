@@ -3,6 +3,9 @@ import { Hono } from 'hono';
 import { logger } from 'hono/logger';
 
 import { authRoute } from './routes/auth.js';
+import { boundaryMarkerRoute } from './routes/boundary-marker/boundaryMarker.js';
+import { boundaryMarkerCheckHistoryRoute } from './routes/boundary-marker/boundaryMarkerCheckHistory.js';
+import { boundaryMarkerCodeRoute } from './routes/boundary-marker/boundaryMarkerCode.js';
 import { groupActivityRoute } from './routes/groupActivity.js';
 import { kelompokKomunitasRoute } from './routes/kelompokkomunitas.js';
 import { massUploadRoute } from './routes/massUpload.js';
@@ -32,7 +35,10 @@ const apiRoutes = app
   .route('/adopt-history', authRoute)
   .route('/mass-upload', massUploadRoute)
   .route('/permissions', permissionsRoute)
-  .route('/roles', rolesRoute);
+  .route('/roles', rolesRoute)
+  .route('/boundary-marker', boundaryMarkerRoute)
+  .route('/boundary-marker/code', boundaryMarkerCodeRoute)
+  .route('/boundary-marker/check-history', boundaryMarkerCheckHistoryRoute);
 
 // Serve files from public directory
 app.get('/uploads/*', serveStatic({ root: './server/public' }));

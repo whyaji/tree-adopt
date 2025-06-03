@@ -1,3 +1,8 @@
+import type { Context } from 'hono';
+import type { BlankInput } from 'hono/types';
+
+import { STATUS_RECORD } from '../constants/STATUS_RECORD.js';
+
 export const uploadFile = async (
   file: File,
   dir?: string,
@@ -101,4 +106,49 @@ export async function cleanupUploadedImagesByArray(imageUploads: string[]) {
       }
     })
   );
+}
+
+export async function massUploadFiles(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  { c, dir: dirParam }: { c: Context<object, any, BlankInput>; dir?: string }
+) {
+  const formData = (await c.req.parseBody()) as Record<string, File>;
+
+  const formDataLength = Object.keys(formData).length;
+
+  if (formDataLength === 0) {
+    return c.json({ message: 'No files provided' }, 400);
+  }
+  const dir = 'uploads/' + (dirParam ?? '');
+
+  const responses: { fileIndex: number; status: number; message: string }[] = [];
+
+  for (let i = 0; i < formDataLength; i++) {
+    const file = formData[`file[${i}]`] as File;
+
+    try {
+      await uploadFile(file, dir, {
+        withThumbnail: true,
+      });
+      responses.push({
+        fileIndex: i,
+        status: STATUS_RECORD.UPLOADED,
+        message: 'File uploaded successfully',
+      });
+    } catch (err) {
+      console.error(`Error uploading file at index ${i}:`, err);
+      responses.push({
+        fileIndex: i,
+        status: STATUS_RECORD.FAILED,
+        message: 'Error uploading file',
+      });
+    }
+  }
+
+  const notAllFilesUploaded = responses.some((response) => response.status === 0);
+  if (notAllFilesUploaded) {
+    return c.json({ message: 'Some files failed to upload', responses }, 500);
+  }
+
+  return c.json({ message: 'All files uploaded successfully', responses }, 201);
 }

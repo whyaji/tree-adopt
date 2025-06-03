@@ -323,6 +323,7 @@ export const checkBoundaryMarkerHistorySchema = mysqlTable(
     images: json('image').notNull(), // json list image form data image and store the path ['image1.jpg', 'image2.jpg']
     checkDate: varchar('check_date', { length: 255 }).notNull(),
     checkTime: varchar('check_time', { length: 255 }).notNull(),
+    description: varchar('description', { length: 255 }),
     createdAt: timestamp('created_at').defaultNow(),
     updatedAt: timestamp('updated_at').defaultNow(),
     deletedAt: timestamp('deleted_at'),

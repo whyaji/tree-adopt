@@ -28,6 +28,7 @@ const checkBoundaryMarkerHistorySchemaZod = z.object({
   images: z.array(z.string()).nonempty(),
   checkDate: z.string(),
   checkTime: z.string(),
+  description: z.string().optional(),
   createdAt: z.string().optional(),
   updatedAt: z.string().optional(),
   deletedAt: z.string().optional(),

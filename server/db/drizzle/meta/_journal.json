@@ -43,6 +43,13 @@
       "when": 1748922689508,
       "tag": "0005_bent_gauntlet",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1748938944879,
+      "tag": "0006_same_killmonger",
+      "breakpoints": true
     }
   ]
 }

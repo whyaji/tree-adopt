@@ -1,0 +1,1 @@
+ALTER TABLE `check_boundary_marker_history` ADD `description` varchar(255);

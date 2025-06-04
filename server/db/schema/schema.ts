@@ -318,9 +318,9 @@ export const checkBoundaryMarkerHistorySchema = mysqlTable(
     boundaryMarkerId: bigint('boundary_marker_id', { mode: 'number', unsigned: true }).notNull(),
     boundaryMarkerCode: varchar('boundary_marker_code', { length: 255 }),
     checkerId: bigint('checker_id', { mode: 'number', unsigned: true }).notNull(),
-    conditions: json('condition').notNull(), // json condition form data string and parse to json when store to db ex. dynamic key and data type { good: true, damaged: false, lost: false }
-    actions: json('action').notNull(), // json action form data string and parse to json when store to db ex. dynamic key and data type { move: true, replace: false, remove: false }
-    images: json('image').notNull(), // json list image form data image and store the path ['image1.jpg', 'image2.jpg']
+    conditions: json('conditions').notNull(), // json condition form data string and parse to json when store to db ex. dynamic key and data type { good: true, damaged: false, lost: false }
+    actions: json('actions').notNull(), // json action form data string and parse to json when store to db ex. dynamic key and data type { move: true, replace: false, remove: false }
+    images: json('images').notNull(), // json list image form data image and store the path ['image1.jpg', 'image2.jpg']
     checkDate: varchar('check_date', { length: 255 }).notNull(),
     checkTime: varchar('check_time', { length: 255 }).notNull(),
     description: varchar('description', { length: 255 }),

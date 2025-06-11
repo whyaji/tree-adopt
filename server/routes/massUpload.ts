@@ -300,7 +300,12 @@ export const massUploadRoute = new Hono()
   .post('/boundary-marker', async (c) => {
     const data: {
       boundaryMarkers: BoundaryMarker[];
-      checkBoundaryMarkerHistories: Omit<CheckBoundaryMarkerHistory, 'boundaryMarkerId'>[];
+      checkBoundaryMarkerHistories: (Omit<
+        CheckBoundaryMarkerHistory,
+        'boundaryMarkerId' | 'boundaryMarakerCode'
+      > & {
+        boundaryMarkerCode: string;
+      })[];
       boundaryMarkerCodes: BoundaryMarkerCode[];
       boundaryMarkerCodesUpdate: BoundaryMarkerCode[];
     } = await c.req.json();
@@ -335,7 +340,9 @@ export const massUploadRoute = new Hono()
       message?: string;
     }[] = [];
 
-    const boundaryMarkerCodeList = boundaryMarkerCodes.map((code) => code.code);
+    const checkBmCodeList = checkBoundaryMarkerHistories.map(
+      (checkBm) => checkBm.boundaryMarkerCode
+    );
     const boundaryMarkerCodeListUpdate = boundaryMarkerCodesUpdate.map((code) => code.code);
 
     try {
@@ -375,7 +382,7 @@ export const massUploadRoute = new Hono()
           code: boundaryMarkerSchema.code,
         })
         .from(boundaryMarkerSchema)
-        .where(inArray(boundaryMarkerSchema.code, boundaryMarkerCodeList));
+        .where(inArray(boundaryMarkerSchema.code, checkBmCodeList));
 
       await db.transaction(async (tx) => {
         const sortedCheckHistories = [...checkBoundaryMarkerHistories].sort((a, b) => a.id - b.id);

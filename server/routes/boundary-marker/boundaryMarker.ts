@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { db } from '../../db/database.js';
 import {
   boundaryMarkerSchema,
+  checkBoundaryMarkerHistorySchema,
   kelompokKomunitasSchema,
   userSchema,
 } from '../../db/schema/schema.js';
@@ -51,6 +52,34 @@ const relations: RelationsType = {
     type: 'one-to-one',
     table: kelompokKomunitasSchema,
     on: 'id',
+  },
+  checkBoundaryMarkerHistory: {
+    type: 'one-to-many',
+    table: checkBoundaryMarkerHistorySchema,
+    on: 'boundaryMarkerId',
+    child: {
+      'checkBoundaryMarkerHistory.checkerId': {
+        type: 'one-to-one',
+        table: userSchema,
+        on: 'id',
+        from: 'checkerId',
+        alias: 'user',
+      },
+    },
+  },
+  checkBoundaryMarker: {
+    type: 'latest-inserted',
+    table: checkBoundaryMarkerHistorySchema,
+    on: 'boundaryMarkerId',
+    child: {
+      'checkBoundaryMarkerHistory.checkerId': {
+        type: 'one-to-one',
+        table: userSchema,
+        on: 'id',
+        from: 'checkerId',
+        alias: 'user',
+      },
+    },
   },
 };
 

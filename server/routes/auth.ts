@@ -61,9 +61,17 @@ export const authRoute = new Hono()
         return c.json({ message: 'Invalid email or password.' }, 401);
       }
 
-      // Generate JWT
+      // Calculate token expiration (e.g., 24 hours from now)
+      const tokenExpiredAt = Math.floor(Date.now() / 1000) + 24 * 60 * 60; // 24 hours in seconds
+
+      // Generate JWT with expiration
       const token = await sign(
-        { userId: user[0].id, email: user[0].email, groupId: user[0].groupId },
+        {
+          userId: user[0].id,
+          email: user[0].email,
+          groupId: user[0].groupId,
+          exp: tokenExpiredAt, // Add expiration to JWT payload
+        },
         JWT_SECRET
       );
 
@@ -79,7 +87,16 @@ export const authRoute = new Hono()
 
       userData = reformatMainKey(userData, ['groupId']);
 
-      return c.json({ data: { token, user: userData[0] } });
+      // Format tokenExpiredAt as 'YYYY-MM-DD HH:mm:ss'
+      const tokenExpiredAtFormatted = new Date(tokenExpiredAt * 1000).toISOString();
+
+      return c.json({
+        data: {
+          token,
+          tokenExpiredAt: tokenExpiredAtFormatted,
+          user: userData[0],
+        },
+      });
     } catch (error) {
       logger.error('Error during sign-in:', error);
       return c.json({ message: 'Internal server error.' }, 500);

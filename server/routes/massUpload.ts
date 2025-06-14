@@ -12,7 +12,7 @@ import {
   treeCodeSchema,
   treeSchema,
 } from '../db/schema/schema.js';
-import { massUploadFiles } from '../lib/upload.js';
+import { getYearMonthInNameImage, massUploadFiles } from '../lib/upload.js';
 import authMiddleware from '../middleware/jwt.js';
 import type { BoundaryMarker } from './boundary-marker/boundaryMarker.js';
 import type { CheckBoundaryMarkerHistory } from './boundary-marker/boundaryMarkerCheckHistory.js';
@@ -159,14 +159,45 @@ export const massUploadRoute = new Hono()
             }
 
             const listTreeImage = treeImage.map((image) => {
-              return dir + image;
+              const dateImage = getYearMonthInNameImage(image);
+              return dateImage ? `${dir}${dateImage}/${image}` : dir + image;
             });
-            const listLeafImage = leafImage ? leafImage.map((image) => dir + image) : null;
-            const listSkinImage = skinImage ? skinImage.map((image) => dir + image) : null;
-            const listFruitImage = fruitImage ? fruitImage.map((image) => dir + image) : null;
-            const listFlowerImage = flowerImage ? flowerImage.map((image) => dir + image) : null;
-            const listSapImage = sapImage ? sapImage.map((image) => dir + image) : null;
-            const listOtherImage = otherImage ? otherImage.map((image) => dir + image) : null;
+            const listLeafImage = leafImage
+              ? leafImage.map((image) => {
+                  const dateImage = getYearMonthInNameImage(image);
+                  return dateImage ? `${dir}${dateImage}/${image}` : dir + image;
+                })
+              : null;
+            const listSkinImage = skinImage
+              ? skinImage.map((image) => {
+                  const dateImage = getYearMonthInNameImage(image);
+                  return dateImage ? `${dir}${dateImage}/${image}` : dir + image;
+                })
+              : null;
+            const listFruitImage = fruitImage
+              ? fruitImage.map((image) => {
+                  const dateImage = getYearMonthInNameImage(image);
+                  return dateImage ? `${dir}${dateImage}/${image}` : dir + image;
+                })
+              : null;
+            const listFlowerImage = flowerImage
+              ? flowerImage.map((image) => {
+                  const dateImage = getYearMonthInNameImage(image);
+                  return dateImage ? `${dir}${dateImage}/${image}` : dir + image;
+                })
+              : null;
+            const listSapImage = sapImage
+              ? sapImage.map((image) => {
+                  const dateImage = getYearMonthInNameImage(image);
+                  return dateImage ? `${dir}${dateImage}/${image}` : dir + image;
+                })
+              : null;
+            const listOtherImage = otherImage
+              ? otherImage.map((image) => {
+                  const dateImage = getYearMonthInNameImage(image);
+                  return dateImage ? `${dir}${dateImage}/${image}` : dir + image;
+                })
+              : null;
 
             const upload = await tx.insert(surveyHistorySchema).values({
               treeId: tree.id,
@@ -415,7 +446,8 @@ export const massUploadRoute = new Hono()
               continue;
             }
             const listImages = images.map((image) => {
-              return dir + image;
+              const dateImage = getYearMonthInNameImage(image);
+              return dateImage ? `${dir}${dateImage}/${image}` : dir + image;
             });
             const upload = await tx.insert(checkBoundaryMarkerHistorySchema).values({
               boundaryMarkerId: marker.id,

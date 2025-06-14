@@ -108,6 +108,15 @@ export async function cleanupUploadedImagesByArray(imageUploads: string[]) {
   );
 }
 
+export function getYearMonthInNameImage(fileName: string) {
+  const parts = fileName.split('.')?.[0]?.split('_') ?? '';
+  if (parts.length < 5) {
+    return '';
+  }
+  const datePart = parts[4];
+  return `${datePart.slice(0, 4)}/${datePart.slice(4, 6)}`;
+}
+
 export async function massUploadFiles(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   { c, dir: dirParam }: { c: Context<object, any, BlankInput>; dir?: string }
@@ -126,8 +135,22 @@ export async function massUploadFiles(
   for (let i = 0; i < formDataLength; i++) {
     const file = formData[`file[${i}]`] as File;
 
+    const fileName = file.name;
+    if (!fileName) {
+      responses.push({
+        fileIndex: i,
+        status: STATUS_RECORD.FAILED,
+        message: 'File name is missing',
+      });
+      continue;
+    }
+
+    const date = getYearMonthInNameImage(fileName);
+
+    const newDir = date ? `${dir}${date}/` : dir;
+
     try {
-      await uploadFile(file, dir, {
+      await uploadFile(file, newDir, {
         withThumbnail: true,
       });
       responses.push({

@@ -3,15 +3,18 @@ import { useQuery } from '@tanstack/react-query';
 import { TableData } from '@/components/table-data';
 import { usePaginationFilter } from '@/hooks/use-pagination-filter';
 import { getTrees } from '@/lib/api/treeApi';
+import { useUserStore } from '@/lib/stores/userStore';
 import { TreeType } from '@/types/tree.type';
 
 import { PohonTable } from '../components/pohon-table/PohonTable';
 
 export function PohonListScreen() {
+  const user = useUserStore((state) => state.user);
   const { setPage, setLimit, tempSearch, setTempSearch, paginationParams } = usePaginationFilter({
     withData: 'masterTreeId,kelompokKomunitasId,adopter,adopter.userId,survey,survey.userId',
     sortBy: 'id',
     order: 'desc',
+    filter: user?.groupId ? `kelompokKomunitasId:${user.groupId}:eq` : undefined,
   });
 
   const { isPending, error, data } = useQuery({

@@ -69,8 +69,18 @@ export function DetailTreeScreenComponent({ tree }: { tree: TreeType | null }) {
       ])
       .flat() ?? [];
 
+  const getTreeLocalName = (tree: TreeType) => {
+    if (tree.masterTree?.localName) {
+      return tree.masterTree.localName;
+    }
+    if (tree.localTreeName) {
+      return tree.localTreeName;
+    }
+    return '-';
+  };
+
   const listDetail = [
-    { label: 'Nama Lokal', value: tree.masterTree?.localName ?? '-' },
+    { label: 'Nama Lokal', value: getTreeLocalName(tree) },
     { label: 'Nama Latin', value: tree.masterTree?.latinName ?? '-' },
     {
       label: 'Keliling',

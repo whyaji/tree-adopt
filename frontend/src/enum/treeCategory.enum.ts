@@ -1,17 +1,14 @@
 export enum TREE_CATEGORY {
-  POHON_DEWASA = 1,
-  POHON_REMAJA = 2,
-  BIBIT = 3,
+  TREE = 1,
+  POLE = 2,
 }
 
 export const TreeCategoryLabel: Record<number, string> = {
-  [TREE_CATEGORY.POHON_DEWASA]: 'Pohon Dewasa',
-  [TREE_CATEGORY.POHON_REMAJA]: 'Pohon Remaja',
-  [TREE_CATEGORY.BIBIT]: 'Bibit',
+  [TREE_CATEGORY.TREE]: 'Pohon',
+  [TREE_CATEGORY.POLE]: 'Tiang',
 };
 
 export const ListTreeCategory = [
-  { label: 'Pohon Dewasa', value: String(TREE_CATEGORY.POHON_DEWASA) },
-  { label: 'Pohon Remaja', value: String(TREE_CATEGORY.POHON_REMAJA) },
-  { label: 'Bibit', value: String(TREE_CATEGORY.BIBIT) },
+  { label: 'Pohon', value: String(TREE_CATEGORY.TREE) },
+  { label: 'Tiang', value: String(TREE_CATEGORY.POLE) },
 ];

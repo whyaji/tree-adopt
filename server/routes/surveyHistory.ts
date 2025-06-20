@@ -102,7 +102,14 @@ export const surveyHistoryRoute = new Hono()
     // Validate form data (except images)
     const validation = createSurveyHistorySchemaFormData.safeParse(formData);
     if (!validation.success) {
-      return c.json({ errors: validation.error.errors }, 400);
+      return c.json(
+        {
+          error: {
+            issues: validation.error.errors,
+          },
+        },
+        400
+      );
     }
 
     const dir = 'uploads/survey-history';
@@ -199,7 +206,14 @@ export const surveyHistoryRoute = new Hono()
     // Validate form data (except images)
     const validation = createSurveyHistoryByCodeSchemaFormData.safeParse(formData);
     if (!validation.success) {
-      return c.json({ errors: validation.error.errors }, 400);
+      return c.json(
+        {
+          error: {
+            issues: validation.error.errors,
+          },
+        },
+        400
+      );
     }
 
     const tree = await db
@@ -312,7 +326,14 @@ export const surveyHistoryRoute = new Hono()
     // Validate form data (except images)
     const validation = createSurveyHistorySchemaFormData.safeParse(formData);
     if (!validation.success) {
-      return c.json({ errors: validation.error.errors }, 400);
+      return c.json(
+        {
+          error: {
+            issues: validation.error.errors,
+          },
+        },
+        400
+      );
     }
 
     const existing = await db

@@ -97,7 +97,14 @@ export const groupActivityRoute = new Hono()
 
     const validation = creategroupActivitySchema.safeParse(formData);
     if (!validation.success) {
-      return c.json({ error: validation.error.errors }, 400);
+      return c.json(
+        {
+          error: {
+            issues: validation.error.errors,
+          },
+        },
+        400
+      );
     }
 
     let image;
@@ -145,7 +152,14 @@ export const groupActivityRoute = new Hono()
 
     const validation = creategroupActivitySchema.safeParse(formData);
     if (!validation.success) {
-      return c.json({ error: validation.error.errors }, 400);
+      return c.json(
+        {
+          error: {
+            issues: validation.error.errors,
+          },
+        },
+        400
+      );
     }
 
     const existing = await db

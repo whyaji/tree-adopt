@@ -84,7 +84,14 @@ export const boundaryMarkerCheckHistoryRoute = new Hono()
     // Validate form data (except images)
     const validation = createCheckBoundaryMarkerHistorySchemaFormData.safeParse(formData);
     if (!validation.success) {
-      return c.json({ errors: validation.error.errors }, 400);
+      return c.json(
+        {
+          error: {
+            issues: validation.error.errors,
+          },
+        },
+        400
+      );
     }
 
     const dir = 'uploads/check-boundary-marker-history';
@@ -152,7 +159,14 @@ export const boundaryMarkerCheckHistoryRoute = new Hono()
     // Validate form data (except images)
     const validation = createCheckBoundaryMarkerHistorySchemaFormData.safeParse(formData);
     if (!validation.success) {
-      return c.json({ errors: validation.error.errors }, 400);
+      return c.json(
+        {
+          error: {
+            issues: validation.error.errors,
+          },
+        },
+        400
+      );
     }
 
     const existing = await db

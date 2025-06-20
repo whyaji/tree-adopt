@@ -12,10 +12,15 @@ import { UserTable } from '../components/user-table/UserTable';
 
 export function UserListScreen() {
   const user = useUserStore((state) => state.user);
+  const isGlobalAdmin = checkPermission(user?.permissions ?? [], [
+    PERMISSION.USER_MANAGEMENT_CREATE_LEVEL_GLOBAL,
+    PERMISSION.USER_MANAGEMENT_UPDATE_LEVEL_GLOBAL,
+  ]);
   const { setPage, setLimit, tempSearch, setTempSearch, paginationParams } = usePaginationFilter({
     sortBy: 'id',
     order: 'desc',
     withData: 'roles',
+    filter: isGlobalAdmin ? undefined : `groupId:${user?.groupId}`,
   });
 
   const { isPending, error, data } = useQuery({

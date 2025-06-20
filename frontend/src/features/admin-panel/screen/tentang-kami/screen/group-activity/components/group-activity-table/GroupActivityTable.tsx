@@ -33,10 +33,14 @@ export function GroupActivityTable({
     return <div className="text-center">No data available</div>;
   }
 
-  const isEditor = checkPermission(user?.permissions ?? [], [
-    PERMISSION.COMUNITY_GROUP_ACTIVITY_UPDATE_LEVEL_GLOBAL,
-    PERMISSION.COMUNITY_GROUP_ACTIVITY_UPDATE_LEVEL_GROUP,
-  ]);
+  const isEditor =
+    checkPermission(user?.permissions ?? [], [
+      PERMISSION.COMUNITY_GROUP_ACTIVITY_UPDATE_LEVEL_GLOBAL,
+    ]) ||
+    (checkPermission(user?.permissions ?? [], [
+      PERMISSION.COMUNITY_GROUP_ACTIVITY_UPDATE_LEVEL_GROUP,
+    ]) &&
+      user?.kelompokKomunitas?.id === data?.[0]?.kelompokKomunitasId);
 
   return (
     <Table>

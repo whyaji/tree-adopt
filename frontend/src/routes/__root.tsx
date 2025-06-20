@@ -147,7 +147,13 @@ const Root = () => {
     {
       title: 'Data',
       icon: Database,
-      items: [{ title: 'Pohon', url: '/admin/data/pohon' }],
+      items: [
+        {
+          title: 'Pohon',
+          url: '/admin/data/pohon',
+          hide: !permissions.includes(PERMISSION.TREE_VIEW),
+        },
+      ],
     },
   ];
 

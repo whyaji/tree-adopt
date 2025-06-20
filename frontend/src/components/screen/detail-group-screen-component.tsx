@@ -5,6 +5,7 @@ import { Marker, Popup } from 'react-leaflet';
 
 import { baseUrl } from '@/lib/api/api';
 import { getCenterCoordAndZoom } from '@/lib/utils/maps';
+import { markerDefaultIcon } from '@/lib/utils/markerIcons';
 import { KelompokKomunitasType } from '@/types/kelompokKomunitas.type';
 
 import { MapsLocation } from '../maps-location';
@@ -125,7 +126,7 @@ export const DetailGroupScreenComponent: FC<{
                 scrollWheelZoom={true}
                 zoomControl={true}
                 className="w-full h-full">
-                <Marker position={position}>
+                <Marker position={position} icon={markerDefaultIcon}>
                   <Popup>Lokasi Kelompok Komunitas: {kelompokKomunitas.name}</Popup>
                 </Marker>
                 {kelompokKomunitas.trees?.map(

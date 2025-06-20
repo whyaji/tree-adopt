@@ -33,10 +33,14 @@ export function GroupActivityListScreen() {
 
   if (error) return <div>Error: {error.message}</div>;
 
-  const isCreator = checkPermission(user?.permissions ?? [], [
-    PERMISSION.COMUNITY_GROUP_ACTIVITY_CREATE_LEVEL_GLOBAL,
-    PERMISSION.COMUNITY_GROUP_ACTIVITY_CREATE_LEVEL_GROUP,
-  ]);
+  const isCreator =
+    checkPermission(user?.permissions ?? [], [
+      PERMISSION.COMUNITY_GROUP_ACTIVITY_CREATE_LEVEL_GLOBAL,
+    ]) ||
+    (checkPermission(user?.permissions ?? [], [
+      PERMISSION.COMUNITY_GROUP_ACTIVITY_CREATE_LEVEL_GROUP,
+    ]) &&
+      user?.kelompokKomunitas?.id === kelompokKomunitas.id);
 
   return (
     <TableData

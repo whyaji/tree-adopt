@@ -160,6 +160,7 @@ export const FormGroupActivity: FC<{
       ))}
 
       <MapsForm
+        required
         form={form}
         mapRef={mapRef}
         mapCenter={mapCenter}

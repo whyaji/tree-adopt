@@ -2,6 +2,8 @@ import { LatLngTuple } from 'leaflet';
 import { ComponentProps, useRef, useState } from 'react';
 import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
 
+import { markerDefaultIcon } from '@/lib/utils/markerIcons';
+
 export function MapsLocation(
   props: ComponentProps<typeof MapContainer> & {
     position?: LatLngTuple;
@@ -83,7 +85,7 @@ export function MapsLocation(
         {...props}>
         <TileLayer url={selectedMapTile.value} attribution={selectedMapTile.source} />
         {props.position && (
-          <Marker position={props.position}>
+          <Marker position={props.position} icon={markerDefaultIcon}>
             {props.popupContent && <Popup>{props.popupContent}</Popup>}
           </Marker>
         )}

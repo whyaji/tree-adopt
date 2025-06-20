@@ -31,8 +31,23 @@ export async function createUser(user: {
   const res = await userApi.$post({
     json: user,
   });
-  if (!res.ok) throw new Error(res.statusText);
-  return res.json();
+  if (!res.ok)
+    return (await res.json()) as unknown as {
+      success: boolean;
+      error: {
+        issues: {
+          code: string;
+          message: string;
+          path: string[];
+        }[];
+      };
+    };
+  return (await res.json()) as unknown as {
+    message: string;
+    data: {
+      userId: number;
+    };
+  };
 }
 
 export async function getUser(id: string, withData?: string) {
@@ -57,8 +72,23 @@ export async function updateUser(user: {
     json: user,
     param: { id: user.id.toString() },
   });
-  if (!res.ok) throw new Error(res.statusText);
-  return res.json();
+  if (!res.ok)
+    return (await res.json()) as unknown as {
+      success: boolean;
+      error: {
+        issues: {
+          code: string;
+          message: string;
+          path: string[];
+        }[];
+      };
+    };
+  return (await res.json()) as unknown as {
+    message: string;
+    data: {
+      userId: number;
+    };
+  };
 }
 
 export async function deleteUser(id: string) {

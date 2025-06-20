@@ -11,6 +11,8 @@ import { PERMISSION } from '@/enum/permission.enum';
 import { usePaginationFilter } from '@/hooks/use-pagination-filter';
 import { createUser, saveUserRoles, updateUser } from '@/lib/api/userApi';
 import { useUserStore } from '@/lib/stores/userStore';
+import { checkPermission } from '@/lib/utils/permissions';
+import { assertAndHandleFormErrors } from '@/lib/utils/setErrorForms';
 import { RoleType } from '@/types/role.type';
 import { UserType } from '@/types/user.type';
 
@@ -32,11 +34,13 @@ export const FormUser: FC<{
   user?: UserType | null;
 }> = ({ user }) => {
   const loggedInUser = useUserStore((state) => state.user);
+  const isGlobalAdmin = checkPermission(loggedInUser?.permissions ?? [], [
+    PERMISSION.USER_MANAGEMENT_CREATE_LEVEL_GLOBAL,
+    PERMISSION.USER_MANAGEMENT_UPDATE_LEVEL_GLOBAL,
+  ]);
   const paginationParams = usePaginationFilter({
     limit: 9999,
-    filter: loggedInUser?.permissions?.includes(PERMISSION.USER_MANAGEMENT_CREATE_LEVEL_GLOBAL)
-      ? undefined
-      : 'code:admin-global:notin',
+    filter: isGlobalAdmin ? undefined : 'code:admin-global:notin',
   });
 
   const { data } = useQuery({
@@ -52,59 +56,57 @@ export const FormUser: FC<{
 
   const navigate = useNavigate();
 
+  const loggedInUserGroupId = loggedInUser?.groupId ? String(loggedInUser.groupId) : '';
+
   const form = useForm({
     defaultValues: {
       name: user?.name ?? '',
       email: user?.email ?? '',
       password: '',
       role: user ? String(user.role) : '',
-      groupId: user?.groupId ? String(user.groupId) : '',
+      groupId: user?.groupId ? String(user.groupId) : loggedInUserGroupId,
       rolesIds: user?.roles?.map((role) => String(role.id)) ?? [],
     },
-    onSubmit: async ({ value }) => {
+    onSubmit: async ({ value, formApi }) => {
+      const dataValue = {
+        name: value.name,
+        email: value.email,
+        role: Number(value.role),
+        groupId: value.groupId ? Number(value.groupId) : undefined,
+        password: value.password,
+      };
+
       try {
-        const dataValue = {
-          name: value.name,
-          email: value.email,
-          role: Number(value.role),
-          groupId: value.groupId ? Number(value.groupId) : undefined,
-        };
+        let userId = user?.id;
         if (user) {
-          const updateData = {
-            id: user.id,
+          const result = await updateUser({
             ...dataValue,
-            password: value.password === '' ? user.password : value.password,
-          };
-          await updateUser(updateData);
-          await saveRoles(user.id, value.rolesIds);
+            id: user.id,
+            password: value.password || user.password,
+          });
+          assertAndHandleFormErrors<typeof value>(result, formApi.setFieldMeta);
           toast('User updated successfully');
         } else {
-          const createData = {
-            ...dataValue,
-            password: value.password,
-          };
-          const result = await createUser(createData);
-          const userId = result.data.userId;
-          await saveRoles(userId, value.rolesIds);
+          const result = await createUser(dataValue);
+          assertAndHandleFormErrors<typeof value>(result, formApi.setFieldMeta);
+          userId = result.data.userId;
           toast('User added successfully');
         }
+
+        if (userId) await saveRoles(userId, value.rolesIds);
 
         form.reset();
         navigate({ to: '/admin/config/user' });
       } catch {
-        if (user) {
-          toast.error('Failed to update user');
-        } else {
-          toast.error('Failed to add user');
-        }
+        toast.error(user ? 'Failed to update user' : 'Failed to add user');
       }
     },
   });
 
   const formItem: FieldItemType<keyof (typeof form)['state']['values']>[] = [
-    { name: 'name', label: 'Name', type: 'text' },
-    { name: 'email', label: 'Email', type: 'text' },
-    { name: 'password', label: 'Password', type: 'password' },
+    { name: 'name', label: 'Name', type: 'text', required: true },
+    { name: 'email', label: 'Email', type: 'text', required: true },
+    { name: 'password', label: 'Password', type: 'password', required: user ? false : true },
     {
       name: 'role',
       label: 'Type',
@@ -114,7 +116,14 @@ export const FormUser: FC<{
         { label: 'User', value: '1' },
       ],
     },
-    { name: 'groupId', label: 'Kelompok Komunitas', type: 'dropdown-comunity-group' },
+    {
+      name: 'groupId',
+      label: 'Kelompok Komunitas',
+      type: 'dropdown-comunity-group',
+      paginationParams: {
+        filter: isGlobalAdmin ? undefined : `id:${loggedInUser?.groupId}`,
+      },
+    },
     {
       name: 'rolesIds',
       label: 'Roles',
@@ -134,7 +143,7 @@ export const FormUser: FC<{
       <h2 className="text-2xl font-bold">{user ? 'Update User' : 'Tambah User'}</h2>
       {formItem.map((item) => (
         <form.Field key={item.name} name={item.name}>
-          {(field) => <FieldForm item={item} field={field}></FieldForm>}
+          {(field) => <FieldForm item={item} field={field} />}
         </form.Field>
       ))}
 

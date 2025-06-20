@@ -8,20 +8,35 @@ import { FieldForm, FieldItemType } from '@/components/field-form';
 import { MapsForm } from '@/components/maps-form';
 import { Button } from '@/components/ui/button';
 import { ListLandCover } from '@/enum/landCover.enum';
+import { PERMISSION } from '@/enum/permission.enum';
 import { useMapsState } from '@/hooks/use-maps-state';
 import { createTree, updateTree } from '@/lib/api/treeApi';
+import { useUserStore } from '@/lib/stores/userStore';
+import { checkPermission } from '@/lib/utils/permissions';
+import { assertAndHandleFormErrors } from '@/lib/utils/setErrorForms';
 import { TreeType } from '@/types/tree.type';
 
 export const FormPohon: FC<{
   tree?: TreeType | null;
 }> = ({ tree }) => {
+  const user = useUserStore((state) => state.user);
   const navigate = useNavigate();
+
+  const getTreeLocalName = (tree?: TreeType | null) => {
+    if (tree?.masterTree?.localName) {
+      return tree.masterTree.localName;
+    }
+    if (tree?.localTreeName) {
+      return tree.localTreeName;
+    }
+    return '';
+  };
 
   const form = useForm({
     defaultValues: {
       code: tree?.code ?? '',
       masterTreeId: tree?.masterTreeId ? String(tree.masterTreeId) : '',
-      localTreeName: tree?.masterTree?.localName ?? '',
+      localTreeName: getTreeLocalName(tree),
       kelompokKomunitasId: tree?.kelompokKomunitasId ? String(tree.kelompokKomunitasId) : '',
       surveyorId: tree?.surveyorId ? String(tree.surveyorId) : '',
       status: tree?.status ? String(tree.status) : '',
@@ -30,7 +45,7 @@ export const FormPohon: FC<{
       longitude: tree?.longitude ? String(tree.longitude) : '',
       landCover: tree?.landCover ? String(tree.landCover) : '',
     },
-    onSubmit: async ({ value }) => {
+    onSubmit: async ({ value, formApi }) => {
       const dataValue = {
         code: value.code,
         masterTreeId: Number(value.masterTreeId),
@@ -45,10 +60,12 @@ export const FormPohon: FC<{
       };
       try {
         if (tree) {
-          await updateTree({ id: tree.id, ...dataValue });
+          const result = await updateTree({ id: tree.id, ...dataValue });
+          assertAndHandleFormErrors<typeof value>(result, formApi.setFieldMeta);
           toast('Pohon updated successfully');
         } else {
-          await createTree(dataValue);
+          const result = await createTree(dataValue);
+          assertAndHandleFormErrors<typeof value>(result, formApi.setFieldMeta);
           toast('Pohon added successfully');
         }
         form.reset();
@@ -63,17 +80,37 @@ export const FormPohon: FC<{
     },
   });
 
+  const isGlobalAdmin = checkPermission(user?.permissions ?? [], [
+    PERMISSION.TREE_CREATE_LEVEL_GLOBAL,
+    PERMISSION.TREE_UPDATE_LEVEL_GLOBAL,
+  ]);
+
   const { mapRef, mapCenter, markerPosition, handleLocationSelect } = useMapsState({
     form,
     center: tree ? [tree.latitude, tree.longitude] : undefined,
   });
 
   const formItem: FieldItemType<keyof (typeof form)['state']['values']>[] = [
-    { name: 'code', label: 'Code', type: 'text' },
+    { name: 'code', label: 'Code', type: 'text', required: true },
     { name: 'masterTreeId', label: 'Tree', type: 'dropdown-master-tree' },
-    { name: 'localTreeName', label: 'Local Tree Name', type: 'text' },
-    { name: 'kelompokKomunitasId', label: 'Kelompok Komunitas', type: 'dropdown-comunity-group' },
-    { name: 'surveyorId', label: 'Surveyor', type: 'dropdown-surveyor' },
+    { name: 'localTreeName', label: 'Local Tree Name', type: 'text', required: true },
+    {
+      name: 'kelompokKomunitasId',
+      label: 'Kelompok Komunitas',
+      type: 'dropdown-comunity-group',
+      paginationParams: { limit: 9999, filter: isGlobalAdmin ? undefined : `id:${user?.groupId}` },
+      required: true,
+    },
+    {
+      name: 'surveyorId',
+      label: 'Surveyor',
+      type: 'dropdown-surveyor',
+      paginationParams: {
+        limit: 9999,
+        filter: isGlobalAdmin ? undefined : `groupId:${user?.groupId}`,
+      },
+      required: true,
+    },
     {
       name: 'status',
       label: 'Status',
@@ -83,8 +120,14 @@ export const FormPohon: FC<{
         { label: 'Tidak Aktif', value: '0' },
       ],
     },
-    { name: 'elevation', label: 'Elevation', type: 'number' },
-    { name: 'landCover', label: 'Land Cover', type: 'dropdown', data: ListLandCover },
+    { name: 'elevation', label: 'Elevation', type: 'number', required: true },
+    {
+      name: 'landCover',
+      label: 'Land Cover',
+      type: 'dropdown',
+      data: ListLandCover,
+      required: true,
+    },
   ];
 
   return (
@@ -103,6 +146,7 @@ export const FormPohon: FC<{
       ))}
 
       <MapsForm
+        required
         form={form}
         mapRef={mapRef}
         mapCenter={mapCenter}

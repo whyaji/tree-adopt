@@ -11,8 +11,18 @@ export async function createTree(tree: Omit<Tree, 'id'>) {
   const res = await treeApi.$post({
     json: tree,
   });
-  if (!res.ok) throw new Error(res.statusText);
-  return res.json();
+  if (!res.ok)
+    return (await res.json()) as unknown as {
+      success: boolean;
+      error: {
+        issues: {
+          code: string;
+          message: string;
+          path: string[];
+        }[];
+      };
+    };
+  return await res.json();
 }
 
 export async function getTrees(paginationParams: PaginationParams) {
@@ -20,8 +30,18 @@ export async function getTrees(paginationParams: PaginationParams) {
   const res = await treeApi.$get({
     query: { ...params, with: withData },
   });
-  if (!res.ok) throw new Error(res.statusText);
-  return res.json();
+  if (!res.ok)
+    return (await res.json()) as unknown as {
+      success: boolean;
+      error: {
+        issues: {
+          code: string;
+          message: string;
+          path: string[];
+        }[];
+      };
+    };
+  return await res.json();
 }
 
 export async function getTree(id: string, withData?: string) {
@@ -38,8 +58,18 @@ export async function updateTree(tree: Tree) {
     json: tree,
     param: { id: tree.id.toString() },
   });
-  if (!res.ok) throw new Error(res.statusText);
-  return res.json();
+  if (!res.ok)
+    return (await res.json()) as unknown as {
+      success: boolean;
+      error: {
+        issues: {
+          code: string;
+          message: string;
+          path: string[];
+        }[];
+      };
+    };
+  return await res.json();
 }
 
 export async function deleteTree(id: string) {

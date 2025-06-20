@@ -4,6 +4,7 @@ import { Label } from './ui/label';
 
 export function ImageForm(props: {
   label?: string;
+  required?: boolean;
   files: (File | string)[];
   setFiles: (files: File[]) => void;
   maxFiles?: number;
@@ -22,7 +23,10 @@ export function ImageForm(props: {
   return (
     <div>
       <div className="flex flex-col gap-2">
-        <Label>{label}</Label>
+        <Label>
+          {label}
+          {props.required ? <Label className="text-red-500">*</Label> : ''}
+        </Label>
         <Input
           type="file"
           accept="image/*"

@@ -1,17 +1,8 @@
 import { useEffect, useState } from 'react';
 
-import { PaginationParams } from '@/interface/pagination.interface';
+import { PaginationParams, PaginationParamsOptional } from '@/interface/pagination.interface';
 
-export function usePaginationFilter<T>(defaultParams?: {
-  page?: number;
-  limit?: number;
-  search?: string;
-  filter?: string;
-  withData?: string;
-  sortBy?: string;
-  order?: string;
-  select?: string;
-}) {
+export function usePaginationFilter<T>(defaultParams?: PaginationParamsOptional) {
   const [page, setPage] = useState(defaultParams?.page ?? 1);
   const [limit, setLimit] = useState(defaultParams?.limit ?? 10);
   const [search, setSearch] = useState(defaultParams?.search ?? '');

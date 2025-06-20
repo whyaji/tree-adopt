@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Marker, Popup, useMapEvents } from 'react-leaflet';
 
+import { markerDefaultIcon } from '@/lib/utils/markerIcons';
+
 import { MapsLocation } from './maps-location';
 import { FieldInfo } from './ui/field-info';
 import { Input } from './ui/input';
@@ -20,6 +22,7 @@ function ClickHandler({
 }
 
 export function MapsForm(props: {
+  required?: boolean;
   mapRef: React.RefObject<L.Map | null>;
   mapCenter: [number, number];
   markerPosition: [number, number] | null;
@@ -29,7 +32,10 @@ export function MapsForm(props: {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-2">
-        <Label>Pilih Lokasi</Label>
+        <Label>
+          {'Pilih Lokasi'}
+          {props.required ? <Label className="text-red-500">*</Label> : ''}
+        </Label>
         <div className="h-92 w-full rounded-md overflow-hidden relative z-0">
           <MapsLocation
             ref={props.mapRef}
@@ -38,7 +44,7 @@ export function MapsForm(props: {
             style={{ height: '100%', width: '100%' }}>
             <ClickHandler onLocationSelect={props.handleLocationSelect} />
             {props.markerPosition && (
-              <Marker position={props.markerPosition}>
+              <Marker position={props.markerPosition} icon={markerDefaultIcon}>
                 <Popup>Lokasi terpilih</Popup>
               </Marker>
             )}

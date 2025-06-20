@@ -6,7 +6,7 @@ import { getUser } from '@/lib/api/userApi';
 export const Route = createFileRoute('/_authenticated_admin/admin/config/user/$userId/update/')({
   loader: async ({ params }) => {
     try {
-      const res = await getUser(params.userId);
+      const res = await getUser(params.userId, 'roles');
       return { user: res.data };
     } catch {
       return { user: null };

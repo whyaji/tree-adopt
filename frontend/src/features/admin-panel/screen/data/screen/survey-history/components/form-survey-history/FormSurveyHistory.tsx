@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { ListTreeCategory } from '@/enum/treeCategory.enum';
 import { createSurveyHistory, updateSurveyHistory } from '@/lib/api/surveyHistoryApi';
 import { toDbDate } from '@/lib/utils/dateTimeFormat';
+import { assertAndHandleFormErrors } from '@/lib/utils/setErrorForms';
 import { SurveyHistoryType } from '@/types/surveyHistory.type';
 import { TreeType } from '@/types/tree.type';
 
@@ -73,7 +74,7 @@ export const FormSurveyHistory: FC<{
       height: survey ? String(survey.height) : '',
       serapanCo2: survey ? String(survey.serapanCo2) : '',
     },
-    onSubmit: async ({ value }) => {
+    onSubmit: async ({ value, formApi }) => {
       const formData = new FormData();
       Object.entries(value).forEach(([key, value]) => {
         formData.append(key, String(value));
@@ -93,10 +94,12 @@ export const FormSurveyHistory: FC<{
 
       try {
         if (survey) {
-          await updateSurveyHistory(survey.id, formData);
+          const result = await updateSurveyHistory(survey.id, formData);
+          assertAndHandleFormErrors<typeof value>(result, formApi.setFieldMeta);
           toast('Survey history updated successfully');
         } else {
-          await createSurveyHistory(formData);
+          const result = await createSurveyHistory(formData);
+          assertAndHandleFormErrors<typeof value>(result, formApi.setFieldMeta);
           toast('Survey history added successfully');
         }
         form.reset();
@@ -108,12 +111,18 @@ export const FormSurveyHistory: FC<{
   });
 
   const formItem: FieldItemType<keyof (typeof form)['state']['values']>[] = [
-    { name: 'surveyDate', label: 'Survey Date', type: 'date' },
-    { name: 'surveyTime', label: 'Survey Time', type: 'text' },
-    { name: 'category', label: 'Category', type: 'dropdown', data: ListTreeCategory },
-    { name: 'circumference', label: 'Circumference (cm)', type: 'number' },
-    { name: 'height', label: 'Height (m)', type: 'number' },
-    { name: 'serapanCo2', label: 'Serapan CO2 (kg)', type: 'number' },
+    { name: 'surveyDate', label: 'Survey Date', type: 'date', required: true },
+    { name: 'surveyTime', label: 'Survey Time', type: 'text', required: true },
+    {
+      name: 'category',
+      label: 'Category',
+      type: 'dropdown',
+      data: ListTreeCategory,
+      required: true,
+    },
+    { name: 'circumference', label: 'Circumference (cm)', type: 'number', required: true },
+    { name: 'height', label: 'Height (m)', type: 'number', required: true },
+    { name: 'serapanCo2', label: 'Serapan CO2 (kg)', type: 'number', required: true },
   ];
 
   // Handler for image changes
@@ -144,6 +153,7 @@ export const FormSurveyHistory: FC<{
         <div key={type} className="mb-2">
           <ImageForm
             label={type}
+            required={type === 'treeImage'}
             files={images[type] as (File | string)[]}
             setFiles={(files: File[]) => handleImageChange(type, files)}
             maxFiles={5}

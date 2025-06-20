@@ -17,8 +17,18 @@ export async function createSurveyHistory(formData: FormData) {
       Authorization: authToken ? `Bearer ${authToken}` : '',
     },
   });
-  if (!res.ok) throw new Error(res.statusText);
-  return res.json();
+  if (!res.ok)
+    return (await res.json()) as unknown as {
+      success: boolean;
+      error: {
+        issues: {
+          code: string;
+          message: string;
+          path: string[];
+        }[];
+      };
+    };
+  return await res.json();
 }
 
 export async function getSurveyHistories({
@@ -54,8 +64,18 @@ export async function updateSurveyHistory(id: number, formData: FormData) {
       Authorization: authToken ? `Bearer ${authToken}` : '',
     },
   });
-  if (!res.ok) throw new Error(res.statusText);
-  return res.json();
+  if (!res.ok)
+    return (await res.json()) as unknown as {
+      success: boolean;
+      error: {
+        issues: {
+          code: string;
+          message: string;
+          path: string[];
+        }[];
+      };
+    };
+  return await res.json();
 }
 
 export async function deleteSurveyHistory(id: string) {

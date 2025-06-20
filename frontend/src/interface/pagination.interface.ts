@@ -11,8 +11,8 @@ export interface PaginationParams {
 
 export interface PaginationParamsOptional {
   search?: string;
-  page: number;
-  limit: number;
+  page?: number;
+  limit?: number;
   filter?: string;
   withData?: string;
   sortBy?: string;

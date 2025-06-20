@@ -301,7 +301,7 @@ export function DropdownUserList({
   setValue,
   defaultParams,
 }: PaginationDropdownProps) {
-  const { page, setPage, limit, search, tempSearch, setTempSearch, data, setData } =
+  const { page, setPage, tempSearch, setTempSearch, data, setData, paginationParams } =
     usePaginationFilter<UserType>(defaultParams);
 
   const {
@@ -310,8 +310,8 @@ export function DropdownUserList({
     data: responseData,
     refetch,
   } = useQuery({
-    queryKey: ['get-users', search, page, limit],
-    queryFn: () => getUsers({ search, page, limit }),
+    queryKey: ['get-users', paginationParams],
+    queryFn: () => getUsers(paginationParams),
   });
 
   React.useEffect(() => {
@@ -358,7 +358,7 @@ export function DropdownComunityGroupList({
   setValue,
   defaultParams,
 }: PaginationDropdownProps) {
-  const { page, setPage, limit, search, tempSearch, setTempSearch, data, setData } =
+  const { page, setPage, tempSearch, setTempSearch, data, setData, paginationParams } =
     usePaginationFilter<KelompokKomunitasType>(defaultParams);
 
   const {
@@ -367,8 +367,8 @@ export function DropdownComunityGroupList({
     data: responseData,
     refetch,
   } = useQuery({
-    queryKey: ['get-kelompok-komunitas', search, page, limit],
-    queryFn: () => getKelompokKomunitas({ search, page, limit }),
+    queryKey: ['get-kelompok-komunitas', paginationParams],
+    queryFn: () => getKelompokKomunitas(paginationParams),
   });
 
   React.useEffect(() => {

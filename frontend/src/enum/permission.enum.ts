@@ -17,4 +17,9 @@ export enum PERMISSION {
   COMUNITY_GROUP_ACTIVITY_CREATE_LEVEL_GROUP = 'community-group-activity.create-level-group',
   COMUNITY_GROUP_ACTIVITY_UPDATE_LEVEL_GLOBAL = 'community-group-activity.update-level-global',
   COMUNITY_GROUP_ACTIVITY_UPDATE_LEVEL_GROUP = 'community-group-activity.update-level-group',
+  TREE_VIEW = 'tree.view',
+  TREE_CREATE_LEVEL_GLOBAL = 'tree.create-level-global',
+  TREE_CREATE_LEVEL_GROUP = 'tree.create-level-group',
+  TREE_UPDATE_LEVEL_GLOBAL = 'tree.update-level-global',
+  TREE_UPDATE_LEVEL_GROUP = 'tree.update-level-group',
 }

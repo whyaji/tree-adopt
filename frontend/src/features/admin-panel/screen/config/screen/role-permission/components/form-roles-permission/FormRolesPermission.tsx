@@ -1,22 +1,26 @@
-import { ChevronUp } from 'lucide-react';
+import { ChevronUp, Pencil } from 'lucide-react';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
+import { Dialog, DialogTrigger } from '@/components/ui/dialog';
 import { getCurrentUser } from '@/lib/api/authApi';
 import { useUserStore } from '@/lib/stores/userStore';
 import { GroupedPermissionType } from '@/types/permission.type';
 import { RoleType } from '@/types/role.type';
 
 import { saveRolePermissions } from '../../api/rolePermissionApi';
+import { DialogFormPermissionContent } from '../dialog-form-permission/DialogFormPermission';
 
 const FormRolesPermission: FC<{
   role?: RoleType;
   groupPermissions: GroupedPermissionType[];
   onSaved?: () => void;
-}> = ({ groupPermissions, role, onSaved }) => {
+  groupSuggestions?: string[];
+  onSavedPermission?: () => void;
+}> = ({ groupPermissions, role, onSaved, groupSuggestions, onSavedPermission }) => {
   const user = useUserStore((state) => state.user);
   const setUser = useUserStore((state) => state.setUser);
 
@@ -168,7 +172,22 @@ const FormRolesPermission: FC<{
                   <ul className="list-disc pl-5">
                     {permissions.map((permission) => (
                       <li key={permission.id} className="text-sm">
-                        {permission.name}
+                        <div className="flex items-center justify-between">
+                          {permission.name}
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <button>
+                                <Pencil size={12} />
+                              </button>
+                            </DialogTrigger>
+                            <DialogFormPermissionContent
+                              type="edit"
+                              permission={permission}
+                              onSave={onSavedPermission}
+                              groupSuggestions={groupSuggestions}
+                            />
+                          </Dialog>
+                        </div>
                       </li>
                     ))}
                   </ul>

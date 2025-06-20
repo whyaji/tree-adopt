@@ -127,6 +127,8 @@ export function RolePermissionScreen() {
                 role={selectedRole}
                 groupPermissions={groupedPermissions}
                 onSaved={refetch}
+                onSavedPermission={refetchPermissions}
+                groupSuggestions={groupNames}
               />
             )}
           </div>

@@ -8,12 +8,14 @@ import { MasterTreeType } from '@/types/masterTree.type';
 import { MasterPohonTable } from '../components/master-pohon-table/MasterPohonTable';
 
 export function MasterPohonListScreen() {
-  const { page, setPage, limit, setLimit, search, tempSearch, setTempSearch } =
-    usePaginationFilter();
+  const { page, setPage, limit, setLimit, tempSearch, setTempSearch, paginationParams } =
+    usePaginationFilter({
+      withData: 'masterLocalTree',
+    });
 
   const { isPending, error, data } = useQuery({
-    queryKey: ['get-master-tree', search, page, limit],
-    queryFn: () => getMasterTrees({ search, page, limit }),
+    queryKey: ['get-master-tree', paginationParams],
+    queryFn: () => getMasterTrees(paginationParams),
   });
 
   const totalPage = data?.totalPage ?? 0;

@@ -1,3 +1,7 @@
-import { MasterTree } from '@server/routes/masterTree';
+import { MasterLocalTree, MasterTree } from '@server/routes/masterTree';
 
-export type MasterTreeType = MasterTree;
+export type MasterLocalTreeType = MasterLocalTree;
+
+export type MasterTreeType = MasterTree & {
+  masterLocalTree?: MasterLocalTreeType[];
+};

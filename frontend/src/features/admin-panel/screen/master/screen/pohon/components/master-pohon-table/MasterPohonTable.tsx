@@ -52,7 +52,9 @@ export function MasterPohonTable({
               <TableRow key={masterTree.id}>
                 <TableCell>{masterTree.id}</TableCell>
                 <TableCell>{masterTree.latinName}</TableCell>
-                <TableCell>{masterTree.localName}</TableCell>
+                <TableCell>
+                  {masterTree.masterLocalTree?.map((localTree) => localTree.localName).join(', ')}
+                </TableCell>
                 <TableCell className="flex flex-row gap-4">
                   <Button
                     variant="outline"

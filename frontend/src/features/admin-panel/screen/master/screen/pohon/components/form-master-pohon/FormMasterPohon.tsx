@@ -1,6 +1,6 @@
 import { useForm } from '@tanstack/react-form';
 import { useNavigate } from '@tanstack/react-router';
-import { FC } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 import { ConfirmationDialog } from '@/components/confimation-dialog';
@@ -9,6 +9,7 @@ import { FieldInfo } from '@/components/ui/field-info';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { createMasterTree, updateMasterTree } from '@/lib/api/masterTreeApi';
+import { updateMasterTreeLocal } from '@/lib/api/masterTreeApi';
 import { MasterTreeType } from '@/types/masterTree.type';
 
 export const FormMasterPohon: FC<{
@@ -16,40 +17,87 @@ export const FormMasterPohon: FC<{
 }> = ({ masterTree }) => {
   const navigate = useNavigate();
 
+  // 👇 Local tree state management
+  const [localTrees, setLocalTrees] = useState<
+    { id?: number; localName: string; status: 'create' | 'update' | 'delete' }[]
+  >([]);
+
+  // 👇 Populate from props
+  useEffect(() => {
+    if (masterTree?.masterLocalTree) {
+      setLocalTrees(
+        masterTree.masterLocalTree.map((lt) => ({
+          id: lt.id,
+          localName: lt.localName,
+          status: 'update',
+        }))
+      );
+    }
+  }, [masterTree]);
+
   const form = useForm({
     defaultValues: {
       latinName: masterTree?.latinName ?? '',
-      localName: masterTree?.localName ?? '',
     },
     onSubmit: async ({ value }) => {
       try {
-        if (masterTree) {
-          await updateMasterTree({ id: masterTree.id, ...value });
+        let id = masterTree?.id;
+
+        if (masterTree && id) {
+          await updateMasterTree({ id, ...value });
           toast('Master pohon updated successfully');
         } else {
-          await createMasterTree(value);
+          const res = await createMasterTree(value);
+          id = res.masterTreeId;
           toast('Master pohon added successfully');
         }
+
+        // 👇 Sync local names if update
+        if (id) {
+          const payload = localTrees.filter((lt) => lt.status !== 'delete' || lt.id);
+          await updateMasterTreeLocal(String(id), payload);
+        }
+
         form.reset();
         navigate({ to: '/admin/master/pohon' });
-      } catch {
-        if (masterTree) {
-          toast.error('Failed to update Master pohon');
-        } else {
-          toast.error('Failed to add Master pohon');
-        }
+      } catch (error) {
+        console.error(error);
+        toast.error(masterTree ? 'Failed to update Master pohon' : 'Failed to add Master pohon');
       }
     },
   });
 
-  const formItem: {
-    name: keyof (typeof form)['state']['values'];
-    label: string;
-    type: string;
-  }[] = [
-    { name: 'latinName', label: 'Latin Name', type: 'text' },
-    { name: 'localName', label: 'Local Name', type: 'text' },
-  ];
+  // 👇 Handlers
+  const addLocalName = () => {
+    setLocalTrees((prev) => [...prev, { localName: '', status: 'create' }]);
+  };
+
+  const updateLocalName = (index: number, value: string) => {
+    setLocalTrees((prev) =>
+      prev.map((item, i) =>
+        i === index
+          ? {
+              ...item,
+              localName: value,
+              status: item.status === 'update' ? 'update' : 'create',
+            }
+          : item
+      )
+    );
+  };
+
+  const removeLocalName = (index: number) => {
+    setLocalTrees((prev) => {
+      const item = prev[index];
+      if (item.id) {
+        // mark for deletion
+        return [...prev.slice(0, index), { ...item, status: 'delete' }, ...prev.slice(index + 1)];
+      } else {
+        // remove unsaved
+        return [...prev.slice(0, index), ...prev.slice(index + 1)];
+      }
+    });
+  };
 
   return (
     <form
@@ -59,25 +107,48 @@ export const FormMasterPohon: FC<{
         e.stopPropagation();
         form.handleSubmit();
       }}>
-      <h2 className="text-2xl font-bold">Add Komunitas</h2>
-      {formItem.map((item) => (
-        <form.Field key={item.name} name={item.name}>
-          {(field) => (
-            <>
-              <Label htmlFor={field.name}>{item.label}</Label>
+      <h2 className="text-2xl font-bold">
+        {masterTree ? 'Update Master Tree' : 'Add Master Tree'}
+      </h2>
+
+      <form.Field name={'latinName'}>
+        {(field) => (
+          <>
+            <Label htmlFor={field.name}>Latin Name</Label>
+            <Input
+              id={field.name}
+              name={field.name}
+              type="text"
+              value={field.state.value}
+              onBlur={field.handleBlur}
+              onChange={(e) => field.handleChange(e.target.value)}
+            />
+            <FieldInfo field={field} />
+          </>
+        )}
+      </form.Field>
+
+      {/* 👇 Dynamic Local Name List */}
+      <div className="flex flex-col gap-2 mt-4">
+        <Label>Nama Lokal</Label>
+        {localTrees.map((lt, index) =>
+          lt.status !== 'delete' ? (
+            <div key={index} className="flex gap-2 items-center">
               <Input
-                id={field.name}
-                name={field.name}
-                type={item.type}
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
+                value={lt.localName}
+                onChange={(e) => updateLocalName(index, e.target.value)}
+                placeholder={`Nama Lokal ${index + 1}`}
               />
-              <FieldInfo field={field} />
-            </>
-          )}
-        </form.Field>
-      ))}
+              <Button type="button" variant="destructive" onClick={() => removeLocalName(index)}>
+                Hapus
+              </Button>
+            </div>
+          ) : null
+        )}
+        <Button type="button" onClick={addLocalName} className="mt-2">
+          + Tambah Nama Lokal
+        </Button>
+      </div>
 
       <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
         {([canSubmit, isSubmitting]) => (

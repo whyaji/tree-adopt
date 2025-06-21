@@ -7,6 +7,7 @@ import { db } from '../db/database.js';
 import {
   adoptHistorySchema,
   kelompokKomunitasSchema,
+  masterLocalTreeSchema,
   masterTreeSchema,
   surveyHistorySchema,
   treeSchema,
@@ -62,6 +63,14 @@ const relations: RelationsType = {
     type: 'one-to-one',
     table: masterTreeSchema,
     on: 'id',
+    child: {
+      'masterTreeId.masterLocalTree': {
+        type: 'one-to-many',
+        table: masterLocalTreeSchema,
+        on: 'masterTreeId',
+        from: 'id',
+      },
+    },
   },
   surveyHistory: {
     type: 'one-to-many',

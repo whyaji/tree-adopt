@@ -137,12 +137,26 @@ export const groupActivitySchema = mysqlTable(
 
 export const masterTreeSchema = mysqlTable('master_tree', {
   id: bigint('id', { mode: 'number', unsigned: true }).autoincrement().notNull().primaryKey(),
-  latinName: varchar('latin_name', { length: 255 }).notNull(),
-  localName: varchar('local_name', { length: 255 }).notNull(),
+  latinName: varchar('latin_name', { length: 255 }).notNull().unique(),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
   deletedAt: timestamp('deleted_at'),
 });
+
+export const masterLocalTreeSchema = mysqlTable(
+  'master_local_tree',
+  {
+    id: bigint('id', { mode: 'number', unsigned: true }).autoincrement().notNull().primaryKey(),
+    masterTreeId: bigint('master_tree_id', { mode: 'number', unsigned: true })
+      .notNull()
+      .references(() => masterTreeSchema.id),
+    localName: varchar('local_name', { length: 255 }).notNull().unique(),
+    createdAt: timestamp('created_at').defaultNow(),
+    updatedAt: timestamp('updated_at').defaultNow(),
+    deletedAt: timestamp('deleted_at'),
+  },
+  (table) => [index('master_tree_id_idx_master_local_tree').on(table.masterTreeId)]
+);
 
 export const treeCodeSchema = mysqlTable(
   'tree_code',

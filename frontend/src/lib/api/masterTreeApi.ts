@@ -46,6 +46,22 @@ export async function updateMasterTree(masterTree: MasterTreeType) {
   return res.json();
 }
 
+export async function updateMasterTreeLocal(
+  id: string,
+  localTrees: {
+    id?: number; // optional for create, required for update/delete
+    localName: string;
+    status: 'create' | 'update' | 'delete';
+  }[]
+) {
+  const res = await masterTreeApi[':id{[0-9]+}']['update-local'].$post({
+    json: localTrees,
+    param: { id },
+  });
+  if (!res.ok) throw new Error(res.statusText);
+  return res.json();
+}
+
 export async function deleteMasterTree(id: string) {
   const res = await masterTreeApi[':id{[0-9]+}'].$delete({
     param: { id },

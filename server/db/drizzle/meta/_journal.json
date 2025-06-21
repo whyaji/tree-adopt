@@ -57,6 +57,13 @@
       "when": 1749029517042,
       "tag": "0007_reflective_old_lace",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1750477216640,
+      "tag": "0008_secret_black_queen",
+      "breakpoints": true
     }
   ]
 }

@@ -8,7 +8,7 @@ export const Route = createFileRoute('/_authenticated_admin/admin/data/pohon/$tr
     try {
       const res = await getTree(
         params.treeId,
-        'kelompokKomunitasId,masterTreeId,adoptHistory,adoptHistory.userId,surveyHistory,surveyHistory.userId'
+        'kelompokKomunitasId,masterTreeId,adoptHistory,adoptHistory.userId,surveyHistory,surveyHistory.userId,masterLocalTree'
       );
       return { tree: res.data };
     } catch {

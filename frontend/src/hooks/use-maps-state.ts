@@ -30,6 +30,15 @@ export function useMapsState(defaultParams: { form: any; center?: [number, numbe
   const handleLocationSelect = (lat: number, lng: number) => {
     defaultParams.form.setFieldValue('latitude', String(lat));
     defaultParams.form.setFieldValue('longitude', String(lng));
+
+    defaultParams.form.setFieldMeta('latitude', (meta: any) => ({
+      ...meta,
+      errorMap: {},
+    }));
+    defaultParams.form.setFieldMeta('longitude', (meta: any) => ({
+      ...meta,
+      errorMap: {},
+    }));
   };
 
   return {

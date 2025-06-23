@@ -30,4 +30,9 @@ export enum PERMISSION {
   MASTER_BOUNDARY_MARKER_CODE_UPDATE_LEVEL_GLOBAL = 'master-boundary-marker-code.update-level-global',
   MASTER_BOUNDARY_MARKER_CODE_UPDATE_LEVEL_GROUP = 'master-boundary-marker-code.update-level-group',
   MASTER_BOUNDARY_MARKER_CODE_VIEW = 'master-boundary-marker-code.view',
+  BOUNDARY_MARKER_VIEW = 'boundary-marker.view',
+  BOUNDARY_MARKER_CREATE_LEVEL_GLOBAL = 'boundary-marker.create-level-global',
+  BOUNDARY_MARKER_CREATE_LEVEL_GROUP = 'boundary-marker.create-level-group',
+  BOUNDARY_MARKER_UPDATE_LEVEL_GLOBAL = 'boundary-marker.update-level-global',
+  BOUNDARY_MARKER_UPDATE_LEVEL_GROUP = 'boundary-marker.update-level-group',
 }

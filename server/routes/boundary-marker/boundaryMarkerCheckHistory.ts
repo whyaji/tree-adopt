@@ -7,6 +7,7 @@ import { db } from '../../db/database.js';
 import {
   boundaryMarkerSchema,
   checkBoundaryMarkerHistorySchema,
+  kelompokKomunitasSchema,
   userSchema,
 } from '../../db/schema/schema.js';
 import { getDataBy } from '../../lib/dataBy.js';
@@ -61,6 +62,11 @@ const relations: RelationsType = {
   boundaryMarkerId: {
     type: 'one-to-one',
     table: boundaryMarkerSchema,
+    on: 'id',
+  },
+  kelompokKomunitasId: {
+    type: 'one-to-one',
+    table: kelompokKomunitasSchema, // Assuming this is defined elsewhere
     on: 'id',
   },
 };

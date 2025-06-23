@@ -1,6 +1,5 @@
 import { useForm } from '@tanstack/react-form';
 import { useNavigate } from '@tanstack/react-router';
-import Cookies from 'js-cookie';
 import moment from 'moment';
 import { FC, useState } from 'react';
 import { toast } from 'sonner';
@@ -11,6 +10,7 @@ import { ImageForm } from '@/components/image-form';
 import { Button } from '@/components/ui/button';
 import { ListTreeCategory } from '@/enum/treeCategory.enum';
 import { createSurveyHistory, updateSurveyHistory } from '@/lib/api/surveyHistoryApi';
+import { useUserStore } from '@/lib/stores/userStore';
 import { toDbDate } from '@/lib/utils/dateTimeFormat';
 import { assertAndHandleFormErrors } from '@/lib/utils/setErrorForms';
 import { SurveyHistoryType } from '@/types/surveyHistory.type';
@@ -42,7 +42,7 @@ export const FormSurveyHistory: FC<{
   tree?: TreeType | null;
 }> = ({ survey, tree, title }) => {
   const navigate = useNavigate();
-  const user = Cookies.get('user') ? JSON.parse(Cookies.get('user') as string) : null;
+  const user = useUserStore((state) => state.user);
 
   // Initialize images state for each type, max 5 images each
   const [images, setImages] = useState<ImagesType>(() => {

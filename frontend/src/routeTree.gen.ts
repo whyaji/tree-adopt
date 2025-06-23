@@ -34,6 +34,7 @@ import { Route as AuthenticatedadminAdminMasterPohonIndexImport } from './routes
 import { Route as AuthenticatedadminAdminMasterPohonLokalIndexImport } from './routes/_authenticated_admin/admin/master/pohon-lokal/index'
 import { Route as AuthenticatedadminAdminMasterKodePatokBatasIndexImport } from './routes/_authenticated_admin/admin/master/kode-patok-batas/index'
 import { Route as AuthenticatedadminAdminDataPohonIndexImport } from './routes/_authenticated_admin/admin/data/pohon/index'
+import { Route as AuthenticatedadminAdminDataPatokBatasIndexImport } from './routes/_authenticated_admin/admin/data/patok-batas/index'
 import { Route as AuthenticatedadminAdminConfigUserIndexImport } from './routes/_authenticated_admin/admin/config/user/index'
 import { Route as AuthenticatedadminAdminConfigRolePermissionIndexImport } from './routes/_authenticated_admin/admin/config/role-permission/index'
 import { Route as AuthenticatedadminAdminTentangKamiKelompokKomunitasAddKomunitasImport } from './routes/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/add-komunitas'
@@ -43,6 +44,8 @@ import { Route as AuthenticatedadminAdminMasterPohonLokalAddIndexImport } from '
 import { Route as AuthenticatedadminAdminMasterKodePatokBatasAddIndexImport } from './routes/_authenticated_admin/admin/master/kode-patok-batas/add/index'
 import { Route as AuthenticatedadminAdminDataPohonAddIndexImport } from './routes/_authenticated_admin/admin/data/pohon/add/index'
 import { Route as AuthenticatedadminAdminDataPohonTreeIdIndexImport } from './routes/_authenticated_admin/admin/data/pohon/$treeId/index'
+import { Route as AuthenticatedadminAdminDataPatokBatasAddIndexImport } from './routes/_authenticated_admin/admin/data/patok-batas/add/index'
+import { Route as AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdIndexImport } from './routes/_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/index'
 import { Route as AuthenticatedadminAdminConfigUserAddIndexImport } from './routes/_authenticated_admin/admin/config/user/add/index'
 import { Route as AuthenticatedadminAdminMasterPohonUpdateMasterTreeIdImport } from './routes/_authenticated_admin/admin/master/pohon/update/$masterTreeId'
 import { Route as AuthenticatedadminAdminMasterPohonLokalUpdateMasterLocalTreeIdImport } from './routes/_authenticated_admin/admin/master/pohon-lokal/update/$masterLocalTreeId'
@@ -52,11 +55,15 @@ import { Route as AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKom
 import { Route as AuthenticatedadminAdminMasterKodePatokBatasBoundaryMarkerCodeIdUpdateIndexImport } from './routes/_authenticated_admin/admin/master/kode-patok-batas/$boundaryMarkerCodeId/update/index'
 import { Route as AuthenticatedadminAdminDataPohonTreeIdUpdateIndexImport } from './routes/_authenticated_admin/admin/data/pohon/$treeId/update/index'
 import { Route as AuthenticatedadminAdminDataPohonTreeIdSurveyHistoryIndexImport } from './routes/_authenticated_admin/admin/data/pohon/$treeId/survey-history/index'
+import { Route as AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdUpdateIndexImport } from './routes/_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/update/index'
+import { Route as AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdCheckHistoryIndexImport } from './routes/_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/check-history/index'
 import { Route as AuthenticatedadminAdminConfigUserUserIdUpdateIndexImport } from './routes/_authenticated_admin/admin/config/user/$userId/update/index'
 import { Route as AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdAktivitasAddIndexImport } from './routes/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/aktivitas/add/index'
 import { Route as AuthenticatedadminAdminDataPohonTreeIdSurveyHistoryAddIndexImport } from './routes/_authenticated_admin/admin/data/pohon/$treeId/survey-history/add/index'
+import { Route as AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdCheckHistoryAddIndexImport } from './routes/_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/check-history/add/index'
 import { Route as AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdAktivitasGroupActivityIdUpdateIndexImport } from './routes/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/aktivitas/$groupActivityId/update/index'
 import { Route as AuthenticatedadminAdminDataPohonTreeIdSurveyHistorySurveyHistoryIdUpdateIndexImport } from './routes/_authenticated_admin/admin/data/pohon/$treeId/survey-history/$surveyHistoryId/update/index'
+import { Route as AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdCheckHistoryCheckBmHistoryIdUpdateIndexImport } from './routes/_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/check-history/$checkBmHistoryId/update/index'
 
 // Create/Update Routes
 
@@ -211,6 +218,13 @@ const AuthenticatedadminAdminDataPohonIndexRoute =
     getParentRoute: () => AuthenticatedadminRoute,
   } as any)
 
+const AuthenticatedadminAdminDataPatokBatasIndexRoute =
+  AuthenticatedadminAdminDataPatokBatasIndexImport.update({
+    id: '/admin/data/patok-batas/',
+    path: '/admin/data/patok-batas/',
+    getParentRoute: () => AuthenticatedadminRoute,
+  } as any)
+
 const AuthenticatedadminAdminConfigUserIndexRoute =
   AuthenticatedadminAdminConfigUserIndexImport.update({
     id: '/admin/config/user/',
@@ -273,6 +287,20 @@ const AuthenticatedadminAdminDataPohonTreeIdIndexRoute =
   AuthenticatedadminAdminDataPohonTreeIdIndexImport.update({
     id: '/admin/data/pohon/$treeId/',
     path: '/admin/data/pohon/$treeId/',
+    getParentRoute: () => AuthenticatedadminRoute,
+  } as any)
+
+const AuthenticatedadminAdminDataPatokBatasAddIndexRoute =
+  AuthenticatedadminAdminDataPatokBatasAddIndexImport.update({
+    id: '/admin/data/patok-batas/add/',
+    path: '/admin/data/patok-batas/add/',
+    getParentRoute: () => AuthenticatedadminRoute,
+  } as any)
+
+const AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdIndexRoute =
+  AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdIndexImport.update({
+    id: '/admin/data/patok-batas/$boundaryMarkerId/',
+    path: '/admin/data/patok-batas/$boundaryMarkerId/',
     getParentRoute: () => AuthenticatedadminRoute,
   } as any)
 
@@ -347,6 +375,24 @@ const AuthenticatedadminAdminDataPohonTreeIdSurveyHistoryIndexRoute =
     getParentRoute: () => AuthenticatedadminRoute,
   } as any)
 
+const AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdUpdateIndexRoute =
+  AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdUpdateIndexImport.update(
+    {
+      id: '/admin/data/patok-batas/$boundaryMarkerId/update/',
+      path: '/admin/data/patok-batas/$boundaryMarkerId/update/',
+      getParentRoute: () => AuthenticatedadminRoute,
+    } as any,
+  )
+
+const AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdCheckHistoryIndexRoute =
+  AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdCheckHistoryIndexImport.update(
+    {
+      id: '/admin/data/patok-batas/$boundaryMarkerId/check-history/',
+      path: '/admin/data/patok-batas/$boundaryMarkerId/check-history/',
+      getParentRoute: () => AuthenticatedadminRoute,
+    } as any,
+  )
+
 const AuthenticatedadminAdminConfigUserUserIdUpdateIndexRoute =
   AuthenticatedadminAdminConfigUserUserIdUpdateIndexImport.update({
     id: '/admin/config/user/$userId/update/',
@@ -370,6 +416,15 @@ const AuthenticatedadminAdminDataPohonTreeIdSurveyHistoryAddIndexRoute =
     getParentRoute: () => AuthenticatedadminRoute,
   } as any)
 
+const AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdCheckHistoryAddIndexRoute =
+  AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdCheckHistoryAddIndexImport.update(
+    {
+      id: '/admin/data/patok-batas/$boundaryMarkerId/check-history/add/',
+      path: '/admin/data/patok-batas/$boundaryMarkerId/check-history/add/',
+      getParentRoute: () => AuthenticatedadminRoute,
+    } as any,
+  )
+
 const AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdAktivitasGroupActivityIdUpdateIndexRoute =
   AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdAktivitasGroupActivityIdUpdateIndexImport.update(
     {
@@ -384,6 +439,15 @@ const AuthenticatedadminAdminDataPohonTreeIdSurveyHistorySurveyHistoryIdUpdateIn
     {
       id: '/admin/data/pohon/$treeId/survey-history/$surveyHistoryId/update/',
       path: '/admin/data/pohon/$treeId/survey-history/$surveyHistoryId/update/',
+      getParentRoute: () => AuthenticatedadminRoute,
+    } as any,
+  )
+
+const AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdCheckHistoryCheckBmHistoryIdUpdateIndexRoute =
+  AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdCheckHistoryCheckBmHistoryIdUpdateIndexImport.update(
+    {
+      id: '/admin/data/patok-batas/$boundaryMarkerId/check-history/$checkBmHistoryId/update/',
+      path: '/admin/data/patok-batas/$boundaryMarkerId/check-history/$checkBmHistoryId/update/',
       getParentRoute: () => AuthenticatedadminRoute,
     } as any,
   )
@@ -546,6 +610,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedadminAdminConfigUserIndexImport
       parentRoute: typeof AuthenticatedadminImport
     }
+    '/_authenticated_admin/admin/data/patok-batas/': {
+      id: '/_authenticated_admin/admin/data/patok-batas/'
+      path: '/admin/data/patok-batas'
+      fullPath: '/admin/data/patok-batas'
+      preLoaderRoute: typeof AuthenticatedadminAdminDataPatokBatasIndexImport
+      parentRoute: typeof AuthenticatedadminImport
+    }
     '/_authenticated_admin/admin/data/pohon/': {
       id: '/_authenticated_admin/admin/data/pohon/'
       path: '/admin/data/pohon'
@@ -602,6 +673,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedadminAdminConfigUserAddIndexImport
       parentRoute: typeof AuthenticatedadminImport
     }
+    '/_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/': {
+      id: '/_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/'
+      path: '/admin/data/patok-batas/$boundaryMarkerId'
+      fullPath: '/admin/data/patok-batas/$boundaryMarkerId'
+      preLoaderRoute: typeof AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdIndexImport
+      parentRoute: typeof AuthenticatedadminImport
+    }
+    '/_authenticated_admin/admin/data/patok-batas/add/': {
+      id: '/_authenticated_admin/admin/data/patok-batas/add/'
+      path: '/admin/data/patok-batas/add'
+      fullPath: '/admin/data/patok-batas/add'
+      preLoaderRoute: typeof AuthenticatedadminAdminDataPatokBatasAddIndexImport
+      parentRoute: typeof AuthenticatedadminImport
+    }
     '/_authenticated_admin/admin/data/pohon/$treeId/': {
       id: '/_authenticated_admin/admin/data/pohon/$treeId/'
       path: '/admin/data/pohon/$treeId'
@@ -642,6 +727,20 @@ declare module '@tanstack/react-router' {
       path: '/admin/config/user/$userId/update'
       fullPath: '/admin/config/user/$userId/update'
       preLoaderRoute: typeof AuthenticatedadminAdminConfigUserUserIdUpdateIndexImport
+      parentRoute: typeof AuthenticatedadminImport
+    }
+    '/_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/check-history/': {
+      id: '/_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/check-history/'
+      path: '/admin/data/patok-batas/$boundaryMarkerId/check-history'
+      fullPath: '/admin/data/patok-batas/$boundaryMarkerId/check-history'
+      preLoaderRoute: typeof AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdCheckHistoryIndexImport
+      parentRoute: typeof AuthenticatedadminImport
+    }
+    '/_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/update/': {
+      id: '/_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/update/'
+      path: '/admin/data/patok-batas/$boundaryMarkerId/update'
+      fullPath: '/admin/data/patok-batas/$boundaryMarkerId/update'
+      preLoaderRoute: typeof AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdUpdateIndexImport
       parentRoute: typeof AuthenticatedadminImport
     }
     '/_authenticated_admin/admin/data/pohon/$treeId/survey-history/': {
@@ -686,6 +785,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdUpdateKomunitasIndexImport
       parentRoute: typeof AuthenticatedadminImport
     }
+    '/_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/check-history/add/': {
+      id: '/_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/check-history/add/'
+      path: '/admin/data/patok-batas/$boundaryMarkerId/check-history/add'
+      fullPath: '/admin/data/patok-batas/$boundaryMarkerId/check-history/add'
+      preLoaderRoute: typeof AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdCheckHistoryAddIndexImport
+      parentRoute: typeof AuthenticatedadminImport
+    }
     '/_authenticated_admin/admin/data/pohon/$treeId/survey-history/add/': {
       id: '/_authenticated_admin/admin/data/pohon/$treeId/survey-history/add/'
       path: '/admin/data/pohon/$treeId/survey-history/add'
@@ -698,6 +804,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/aktivitas/add'
       fullPath: '/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/aktivitas/add'
       preLoaderRoute: typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdAktivitasAddIndexImport
+      parentRoute: typeof AuthenticatedadminImport
+    }
+    '/_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/check-history/$checkBmHistoryId/update/': {
+      id: '/_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/check-history/$checkBmHistoryId/update/'
+      path: '/admin/data/patok-batas/$boundaryMarkerId/check-history/$checkBmHistoryId/update'
+      fullPath: '/admin/data/patok-batas/$boundaryMarkerId/check-history/$checkBmHistoryId/update'
+      preLoaderRoute: typeof AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdCheckHistoryCheckBmHistoryIdUpdateIndexImport
       parentRoute: typeof AuthenticatedadminImport
     }
     '/_authenticated_admin/admin/data/pohon/$treeId/survey-history/$surveyHistoryId/update/': {
@@ -760,6 +873,7 @@ interface AuthenticatedadminRouteChildren {
   AuthenticatedadminAdminTentangKamiKelompokKomunitasAddKomunitasRoute: typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasAddKomunitasRoute
   AuthenticatedadminAdminConfigRolePermissionIndexRoute: typeof AuthenticatedadminAdminConfigRolePermissionIndexRoute
   AuthenticatedadminAdminConfigUserIndexRoute: typeof AuthenticatedadminAdminConfigUserIndexRoute
+  AuthenticatedadminAdminDataPatokBatasIndexRoute: typeof AuthenticatedadminAdminDataPatokBatasIndexRoute
   AuthenticatedadminAdminDataPohonIndexRoute: typeof AuthenticatedadminAdminDataPohonIndexRoute
   AuthenticatedadminAdminMasterKodePatokBatasIndexRoute: typeof AuthenticatedadminAdminMasterKodePatokBatasIndexRoute
   AuthenticatedadminAdminMasterPohonLokalIndexRoute: typeof AuthenticatedadminAdminMasterPohonLokalIndexRoute
@@ -768,20 +882,26 @@ interface AuthenticatedadminRouteChildren {
   AuthenticatedadminAdminMasterPohonLokalUpdateMasterLocalTreeIdRoute: typeof AuthenticatedadminAdminMasterPohonLokalUpdateMasterLocalTreeIdRoute
   AuthenticatedadminAdminMasterPohonUpdateMasterTreeIdRoute: typeof AuthenticatedadminAdminMasterPohonUpdateMasterTreeIdRoute
   AuthenticatedadminAdminConfigUserAddIndexRoute: typeof AuthenticatedadminAdminConfigUserAddIndexRoute
+  AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdIndexRoute: typeof AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdIndexRoute
+  AuthenticatedadminAdminDataPatokBatasAddIndexRoute: typeof AuthenticatedadminAdminDataPatokBatasAddIndexRoute
   AuthenticatedadminAdminDataPohonTreeIdIndexRoute: typeof AuthenticatedadminAdminDataPohonTreeIdIndexRoute
   AuthenticatedadminAdminDataPohonAddIndexRoute: typeof AuthenticatedadminAdminDataPohonAddIndexRoute
   AuthenticatedadminAdminMasterKodePatokBatasAddIndexRoute: typeof AuthenticatedadminAdminMasterKodePatokBatasAddIndexRoute
   AuthenticatedadminAdminMasterPohonLokalAddIndexRoute: typeof AuthenticatedadminAdminMasterPohonLokalAddIndexRoute
   AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdIndexRoute: typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdIndexRoute
   AuthenticatedadminAdminConfigUserUserIdUpdateIndexRoute: typeof AuthenticatedadminAdminConfigUserUserIdUpdateIndexRoute
+  AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdCheckHistoryIndexRoute: typeof AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdCheckHistoryIndexRoute
+  AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdUpdateIndexRoute: typeof AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdUpdateIndexRoute
   AuthenticatedadminAdminDataPohonTreeIdSurveyHistoryIndexRoute: typeof AuthenticatedadminAdminDataPohonTreeIdSurveyHistoryIndexRoute
   AuthenticatedadminAdminDataPohonTreeIdUpdateIndexRoute: typeof AuthenticatedadminAdminDataPohonTreeIdUpdateIndexRoute
   AuthenticatedadminAdminMasterKodePatokBatasBoundaryMarkerCodeIdUpdateIndexRoute: typeof AuthenticatedadminAdminMasterKodePatokBatasBoundaryMarkerCodeIdUpdateIndexRoute
   AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdAktivitasIndexRoute: typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdAktivitasIndexRoute
   AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdAllPhotosIndexRoute: typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdAllPhotosIndexRoute
   AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdUpdateKomunitasIndexRoute: typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdUpdateKomunitasIndexRoute
+  AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdCheckHistoryAddIndexRoute: typeof AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdCheckHistoryAddIndexRoute
   AuthenticatedadminAdminDataPohonTreeIdSurveyHistoryAddIndexRoute: typeof AuthenticatedadminAdminDataPohonTreeIdSurveyHistoryAddIndexRoute
   AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdAktivitasAddIndexRoute: typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdAktivitasAddIndexRoute
+  AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdCheckHistoryCheckBmHistoryIdUpdateIndexRoute: typeof AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdCheckHistoryCheckBmHistoryIdUpdateIndexRoute
   AuthenticatedadminAdminDataPohonTreeIdSurveyHistorySurveyHistoryIdUpdateIndexRoute: typeof AuthenticatedadminAdminDataPohonTreeIdSurveyHistorySurveyHistoryIdUpdateIndexRoute
   AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdAktivitasGroupActivityIdUpdateIndexRoute: typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdAktivitasGroupActivityIdUpdateIndexRoute
 }
@@ -797,6 +917,8 @@ const AuthenticatedadminRouteChildren: AuthenticatedadminRouteChildren = {
     AuthenticatedadminAdminConfigRolePermissionIndexRoute,
   AuthenticatedadminAdminConfigUserIndexRoute:
     AuthenticatedadminAdminConfigUserIndexRoute,
+  AuthenticatedadminAdminDataPatokBatasIndexRoute:
+    AuthenticatedadminAdminDataPatokBatasIndexRoute,
   AuthenticatedadminAdminDataPohonIndexRoute:
     AuthenticatedadminAdminDataPohonIndexRoute,
   AuthenticatedadminAdminMasterKodePatokBatasIndexRoute:
@@ -813,6 +935,10 @@ const AuthenticatedadminRouteChildren: AuthenticatedadminRouteChildren = {
     AuthenticatedadminAdminMasterPohonUpdateMasterTreeIdRoute,
   AuthenticatedadminAdminConfigUserAddIndexRoute:
     AuthenticatedadminAdminConfigUserAddIndexRoute,
+  AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdIndexRoute:
+    AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdIndexRoute,
+  AuthenticatedadminAdminDataPatokBatasAddIndexRoute:
+    AuthenticatedadminAdminDataPatokBatasAddIndexRoute,
   AuthenticatedadminAdminDataPohonTreeIdIndexRoute:
     AuthenticatedadminAdminDataPohonTreeIdIndexRoute,
   AuthenticatedadminAdminDataPohonAddIndexRoute:
@@ -825,6 +951,10 @@ const AuthenticatedadminRouteChildren: AuthenticatedadminRouteChildren = {
     AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdIndexRoute,
   AuthenticatedadminAdminConfigUserUserIdUpdateIndexRoute:
     AuthenticatedadminAdminConfigUserUserIdUpdateIndexRoute,
+  AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdCheckHistoryIndexRoute:
+    AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdCheckHistoryIndexRoute,
+  AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdUpdateIndexRoute:
+    AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdUpdateIndexRoute,
   AuthenticatedadminAdminDataPohonTreeIdSurveyHistoryIndexRoute:
     AuthenticatedadminAdminDataPohonTreeIdSurveyHistoryIndexRoute,
   AuthenticatedadminAdminDataPohonTreeIdUpdateIndexRoute:
@@ -837,10 +967,14 @@ const AuthenticatedadminRouteChildren: AuthenticatedadminRouteChildren = {
     AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdAllPhotosIndexRoute,
   AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdUpdateKomunitasIndexRoute:
     AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdUpdateKomunitasIndexRoute,
+  AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdCheckHistoryAddIndexRoute:
+    AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdCheckHistoryAddIndexRoute,
   AuthenticatedadminAdminDataPohonTreeIdSurveyHistoryAddIndexRoute:
     AuthenticatedadminAdminDataPohonTreeIdSurveyHistoryAddIndexRoute,
   AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdAktivitasAddIndexRoute:
     AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdAktivitasAddIndexRoute,
+  AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdCheckHistoryCheckBmHistoryIdUpdateIndexRoute:
+    AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdCheckHistoryCheckBmHistoryIdUpdateIndexRoute,
   AuthenticatedadminAdminDataPohonTreeIdSurveyHistorySurveyHistoryIdUpdateIndexRoute:
     AuthenticatedadminAdminDataPohonTreeIdSurveyHistorySurveyHistoryIdUpdateIndexRoute,
   AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdAktivitasGroupActivityIdUpdateIndexRoute:
@@ -872,6 +1006,7 @@ export interface FileRoutesByFullPath {
   '/admin/tentang-kami/kelompok-komunitas/add-komunitas': typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasAddKomunitasRoute
   '/admin/config/role-permission': typeof AuthenticatedadminAdminConfigRolePermissionIndexRoute
   '/admin/config/user': typeof AuthenticatedadminAdminConfigUserIndexRoute
+  '/admin/data/patok-batas': typeof AuthenticatedadminAdminDataPatokBatasIndexRoute
   '/admin/data/pohon': typeof AuthenticatedadminAdminDataPohonIndexRoute
   '/admin/master/kode-patok-batas': typeof AuthenticatedadminAdminMasterKodePatokBatasIndexRoute
   '/admin/master/pohon-lokal': typeof AuthenticatedadminAdminMasterPohonLokalIndexRoute
@@ -880,20 +1015,26 @@ export interface FileRoutesByFullPath {
   '/admin/master/pohon-lokal/update/$masterLocalTreeId': typeof AuthenticatedadminAdminMasterPohonLokalUpdateMasterLocalTreeIdRoute
   '/admin/master/pohon/update/$masterTreeId': typeof AuthenticatedadminAdminMasterPohonUpdateMasterTreeIdRoute
   '/admin/config/user/add': typeof AuthenticatedadminAdminConfigUserAddIndexRoute
+  '/admin/data/patok-batas/$boundaryMarkerId': typeof AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdIndexRoute
+  '/admin/data/patok-batas/add': typeof AuthenticatedadminAdminDataPatokBatasAddIndexRoute
   '/admin/data/pohon/$treeId': typeof AuthenticatedadminAdminDataPohonTreeIdIndexRoute
   '/admin/data/pohon/add': typeof AuthenticatedadminAdminDataPohonAddIndexRoute
   '/admin/master/kode-patok-batas/add': typeof AuthenticatedadminAdminMasterKodePatokBatasAddIndexRoute
   '/admin/master/pohon-lokal/add': typeof AuthenticatedadminAdminMasterPohonLokalAddIndexRoute
   '/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId': typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdIndexRoute
   '/admin/config/user/$userId/update': typeof AuthenticatedadminAdminConfigUserUserIdUpdateIndexRoute
+  '/admin/data/patok-batas/$boundaryMarkerId/check-history': typeof AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdCheckHistoryIndexRoute
+  '/admin/data/patok-batas/$boundaryMarkerId/update': typeof AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdUpdateIndexRoute
   '/admin/data/pohon/$treeId/survey-history': typeof AuthenticatedadminAdminDataPohonTreeIdSurveyHistoryIndexRoute
   '/admin/data/pohon/$treeId/update': typeof AuthenticatedadminAdminDataPohonTreeIdUpdateIndexRoute
   '/admin/master/kode-patok-batas/$boundaryMarkerCodeId/update': typeof AuthenticatedadminAdminMasterKodePatokBatasBoundaryMarkerCodeIdUpdateIndexRoute
   '/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/aktivitas': typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdAktivitasIndexRoute
   '/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/all-photos': typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdAllPhotosIndexRoute
   '/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/update-komunitas': typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdUpdateKomunitasIndexRoute
+  '/admin/data/patok-batas/$boundaryMarkerId/check-history/add': typeof AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdCheckHistoryAddIndexRoute
   '/admin/data/pohon/$treeId/survey-history/add': typeof AuthenticatedadminAdminDataPohonTreeIdSurveyHistoryAddIndexRoute
   '/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/aktivitas/add': typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdAktivitasAddIndexRoute
+  '/admin/data/patok-batas/$boundaryMarkerId/check-history/$checkBmHistoryId/update': typeof AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdCheckHistoryCheckBmHistoryIdUpdateIndexRoute
   '/admin/data/pohon/$treeId/survey-history/$surveyHistoryId/update': typeof AuthenticatedadminAdminDataPohonTreeIdSurveyHistorySurveyHistoryIdUpdateIndexRoute
   '/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/aktivitas/$groupActivityId/update': typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdAktivitasGroupActivityIdUpdateIndexRoute
 }
@@ -920,6 +1061,7 @@ export interface FileRoutesByTo {
   '/admin/tentang-kami/kelompok-komunitas/add-komunitas': typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasAddKomunitasRoute
   '/admin/config/role-permission': typeof AuthenticatedadminAdminConfigRolePermissionIndexRoute
   '/admin/config/user': typeof AuthenticatedadminAdminConfigUserIndexRoute
+  '/admin/data/patok-batas': typeof AuthenticatedadminAdminDataPatokBatasIndexRoute
   '/admin/data/pohon': typeof AuthenticatedadminAdminDataPohonIndexRoute
   '/admin/master/kode-patok-batas': typeof AuthenticatedadminAdminMasterKodePatokBatasIndexRoute
   '/admin/master/pohon-lokal': typeof AuthenticatedadminAdminMasterPohonLokalIndexRoute
@@ -928,20 +1070,26 @@ export interface FileRoutesByTo {
   '/admin/master/pohon-lokal/update/$masterLocalTreeId': typeof AuthenticatedadminAdminMasterPohonLokalUpdateMasterLocalTreeIdRoute
   '/admin/master/pohon/update/$masterTreeId': typeof AuthenticatedadminAdminMasterPohonUpdateMasterTreeIdRoute
   '/admin/config/user/add': typeof AuthenticatedadminAdminConfigUserAddIndexRoute
+  '/admin/data/patok-batas/$boundaryMarkerId': typeof AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdIndexRoute
+  '/admin/data/patok-batas/add': typeof AuthenticatedadminAdminDataPatokBatasAddIndexRoute
   '/admin/data/pohon/$treeId': typeof AuthenticatedadminAdminDataPohonTreeIdIndexRoute
   '/admin/data/pohon/add': typeof AuthenticatedadminAdminDataPohonAddIndexRoute
   '/admin/master/kode-patok-batas/add': typeof AuthenticatedadminAdminMasterKodePatokBatasAddIndexRoute
   '/admin/master/pohon-lokal/add': typeof AuthenticatedadminAdminMasterPohonLokalAddIndexRoute
   '/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId': typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdIndexRoute
   '/admin/config/user/$userId/update': typeof AuthenticatedadminAdminConfigUserUserIdUpdateIndexRoute
+  '/admin/data/patok-batas/$boundaryMarkerId/check-history': typeof AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdCheckHistoryIndexRoute
+  '/admin/data/patok-batas/$boundaryMarkerId/update': typeof AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdUpdateIndexRoute
   '/admin/data/pohon/$treeId/survey-history': typeof AuthenticatedadminAdminDataPohonTreeIdSurveyHistoryIndexRoute
   '/admin/data/pohon/$treeId/update': typeof AuthenticatedadminAdminDataPohonTreeIdUpdateIndexRoute
   '/admin/master/kode-patok-batas/$boundaryMarkerCodeId/update': typeof AuthenticatedadminAdminMasterKodePatokBatasBoundaryMarkerCodeIdUpdateIndexRoute
   '/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/aktivitas': typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdAktivitasIndexRoute
   '/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/all-photos': typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdAllPhotosIndexRoute
   '/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/update-komunitas': typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdUpdateKomunitasIndexRoute
+  '/admin/data/patok-batas/$boundaryMarkerId/check-history/add': typeof AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdCheckHistoryAddIndexRoute
   '/admin/data/pohon/$treeId/survey-history/add': typeof AuthenticatedadminAdminDataPohonTreeIdSurveyHistoryAddIndexRoute
   '/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/aktivitas/add': typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdAktivitasAddIndexRoute
+  '/admin/data/patok-batas/$boundaryMarkerId/check-history/$checkBmHistoryId/update': typeof AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdCheckHistoryCheckBmHistoryIdUpdateIndexRoute
   '/admin/data/pohon/$treeId/survey-history/$surveyHistoryId/update': typeof AuthenticatedadminAdminDataPohonTreeIdSurveyHistorySurveyHistoryIdUpdateIndexRoute
   '/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/aktivitas/$groupActivityId/update': typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdAktivitasGroupActivityIdUpdateIndexRoute
 }
@@ -970,6 +1118,7 @@ export interface FileRoutesById {
   '/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/add-komunitas': typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasAddKomunitasRoute
   '/_authenticated_admin/admin/config/role-permission/': typeof AuthenticatedadminAdminConfigRolePermissionIndexRoute
   '/_authenticated_admin/admin/config/user/': typeof AuthenticatedadminAdminConfigUserIndexRoute
+  '/_authenticated_admin/admin/data/patok-batas/': typeof AuthenticatedadminAdminDataPatokBatasIndexRoute
   '/_authenticated_admin/admin/data/pohon/': typeof AuthenticatedadminAdminDataPohonIndexRoute
   '/_authenticated_admin/admin/master/kode-patok-batas/': typeof AuthenticatedadminAdminMasterKodePatokBatasIndexRoute
   '/_authenticated_admin/admin/master/pohon-lokal/': typeof AuthenticatedadminAdminMasterPohonLokalIndexRoute
@@ -978,20 +1127,26 @@ export interface FileRoutesById {
   '/_authenticated_admin/admin/master/pohon-lokal/update/$masterLocalTreeId': typeof AuthenticatedadminAdminMasterPohonLokalUpdateMasterLocalTreeIdRoute
   '/_authenticated_admin/admin/master/pohon/update/$masterTreeId': typeof AuthenticatedadminAdminMasterPohonUpdateMasterTreeIdRoute
   '/_authenticated_admin/admin/config/user/add/': typeof AuthenticatedadminAdminConfigUserAddIndexRoute
+  '/_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/': typeof AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdIndexRoute
+  '/_authenticated_admin/admin/data/patok-batas/add/': typeof AuthenticatedadminAdminDataPatokBatasAddIndexRoute
   '/_authenticated_admin/admin/data/pohon/$treeId/': typeof AuthenticatedadminAdminDataPohonTreeIdIndexRoute
   '/_authenticated_admin/admin/data/pohon/add/': typeof AuthenticatedadminAdminDataPohonAddIndexRoute
   '/_authenticated_admin/admin/master/kode-patok-batas/add/': typeof AuthenticatedadminAdminMasterKodePatokBatasAddIndexRoute
   '/_authenticated_admin/admin/master/pohon-lokal/add/': typeof AuthenticatedadminAdminMasterPohonLokalAddIndexRoute
   '/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/': typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdIndexRoute
   '/_authenticated_admin/admin/config/user/$userId/update/': typeof AuthenticatedadminAdminConfigUserUserIdUpdateIndexRoute
+  '/_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/check-history/': typeof AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdCheckHistoryIndexRoute
+  '/_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/update/': typeof AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdUpdateIndexRoute
   '/_authenticated_admin/admin/data/pohon/$treeId/survey-history/': typeof AuthenticatedadminAdminDataPohonTreeIdSurveyHistoryIndexRoute
   '/_authenticated_admin/admin/data/pohon/$treeId/update/': typeof AuthenticatedadminAdminDataPohonTreeIdUpdateIndexRoute
   '/_authenticated_admin/admin/master/kode-patok-batas/$boundaryMarkerCodeId/update/': typeof AuthenticatedadminAdminMasterKodePatokBatasBoundaryMarkerCodeIdUpdateIndexRoute
   '/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/aktivitas/': typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdAktivitasIndexRoute
   '/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/all-photos/': typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdAllPhotosIndexRoute
   '/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/update-komunitas/': typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdUpdateKomunitasIndexRoute
+  '/_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/check-history/add/': typeof AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdCheckHistoryAddIndexRoute
   '/_authenticated_admin/admin/data/pohon/$treeId/survey-history/add/': typeof AuthenticatedadminAdminDataPohonTreeIdSurveyHistoryAddIndexRoute
   '/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/aktivitas/add/': typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdAktivitasAddIndexRoute
+  '/_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/check-history/$checkBmHistoryId/update/': typeof AuthenticatedadminAdminDataPatokBatasBoundaryMarkerIdCheckHistoryCheckBmHistoryIdUpdateIndexRoute
   '/_authenticated_admin/admin/data/pohon/$treeId/survey-history/$surveyHistoryId/update/': typeof AuthenticatedadminAdminDataPohonTreeIdSurveyHistorySurveyHistoryIdUpdateIndexRoute
   '/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/aktivitas/$groupActivityId/update/': typeof AuthenticatedadminAdminTentangKamiKelompokKomunitasKelompokKomunitasIdAktivitasGroupActivityIdUpdateIndexRoute
 }
@@ -1020,6 +1175,7 @@ export interface FileRouteTypes {
     | '/admin/tentang-kami/kelompok-komunitas/add-komunitas'
     | '/admin/config/role-permission'
     | '/admin/config/user'
+    | '/admin/data/patok-batas'
     | '/admin/data/pohon'
     | '/admin/master/kode-patok-batas'
     | '/admin/master/pohon-lokal'
@@ -1028,20 +1184,26 @@ export interface FileRouteTypes {
     | '/admin/master/pohon-lokal/update/$masterLocalTreeId'
     | '/admin/master/pohon/update/$masterTreeId'
     | '/admin/config/user/add'
+    | '/admin/data/patok-batas/$boundaryMarkerId'
+    | '/admin/data/patok-batas/add'
     | '/admin/data/pohon/$treeId'
     | '/admin/data/pohon/add'
     | '/admin/master/kode-patok-batas/add'
     | '/admin/master/pohon-lokal/add'
     | '/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId'
     | '/admin/config/user/$userId/update'
+    | '/admin/data/patok-batas/$boundaryMarkerId/check-history'
+    | '/admin/data/patok-batas/$boundaryMarkerId/update'
     | '/admin/data/pohon/$treeId/survey-history'
     | '/admin/data/pohon/$treeId/update'
     | '/admin/master/kode-patok-batas/$boundaryMarkerCodeId/update'
     | '/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/aktivitas'
     | '/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/all-photos'
     | '/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/update-komunitas'
+    | '/admin/data/patok-batas/$boundaryMarkerId/check-history/add'
     | '/admin/data/pohon/$treeId/survey-history/add'
     | '/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/aktivitas/add'
+    | '/admin/data/patok-batas/$boundaryMarkerId/check-history/$checkBmHistoryId/update'
     | '/admin/data/pohon/$treeId/survey-history/$surveyHistoryId/update'
     | '/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/aktivitas/$groupActivityId/update'
   fileRoutesByTo: FileRoutesByTo
@@ -1067,6 +1229,7 @@ export interface FileRouteTypes {
     | '/admin/tentang-kami/kelompok-komunitas/add-komunitas'
     | '/admin/config/role-permission'
     | '/admin/config/user'
+    | '/admin/data/patok-batas'
     | '/admin/data/pohon'
     | '/admin/master/kode-patok-batas'
     | '/admin/master/pohon-lokal'
@@ -1075,20 +1238,26 @@ export interface FileRouteTypes {
     | '/admin/master/pohon-lokal/update/$masterLocalTreeId'
     | '/admin/master/pohon/update/$masterTreeId'
     | '/admin/config/user/add'
+    | '/admin/data/patok-batas/$boundaryMarkerId'
+    | '/admin/data/patok-batas/add'
     | '/admin/data/pohon/$treeId'
     | '/admin/data/pohon/add'
     | '/admin/master/kode-patok-batas/add'
     | '/admin/master/pohon-lokal/add'
     | '/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId'
     | '/admin/config/user/$userId/update'
+    | '/admin/data/patok-batas/$boundaryMarkerId/check-history'
+    | '/admin/data/patok-batas/$boundaryMarkerId/update'
     | '/admin/data/pohon/$treeId/survey-history'
     | '/admin/data/pohon/$treeId/update'
     | '/admin/master/kode-patok-batas/$boundaryMarkerCodeId/update'
     | '/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/aktivitas'
     | '/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/all-photos'
     | '/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/update-komunitas'
+    | '/admin/data/patok-batas/$boundaryMarkerId/check-history/add'
     | '/admin/data/pohon/$treeId/survey-history/add'
     | '/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/aktivitas/add'
+    | '/admin/data/patok-batas/$boundaryMarkerId/check-history/$checkBmHistoryId/update'
     | '/admin/data/pohon/$treeId/survey-history/$surveyHistoryId/update'
     | '/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/aktivitas/$groupActivityId/update'
   id:
@@ -1115,6 +1284,7 @@ export interface FileRouteTypes {
     | '/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/add-komunitas'
     | '/_authenticated_admin/admin/config/role-permission/'
     | '/_authenticated_admin/admin/config/user/'
+    | '/_authenticated_admin/admin/data/patok-batas/'
     | '/_authenticated_admin/admin/data/pohon/'
     | '/_authenticated_admin/admin/master/kode-patok-batas/'
     | '/_authenticated_admin/admin/master/pohon-lokal/'
@@ -1123,20 +1293,26 @@ export interface FileRouteTypes {
     | '/_authenticated_admin/admin/master/pohon-lokal/update/$masterLocalTreeId'
     | '/_authenticated_admin/admin/master/pohon/update/$masterTreeId'
     | '/_authenticated_admin/admin/config/user/add/'
+    | '/_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/'
+    | '/_authenticated_admin/admin/data/patok-batas/add/'
     | '/_authenticated_admin/admin/data/pohon/$treeId/'
     | '/_authenticated_admin/admin/data/pohon/add/'
     | '/_authenticated_admin/admin/master/kode-patok-batas/add/'
     | '/_authenticated_admin/admin/master/pohon-lokal/add/'
     | '/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/'
     | '/_authenticated_admin/admin/config/user/$userId/update/'
+    | '/_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/check-history/'
+    | '/_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/update/'
     | '/_authenticated_admin/admin/data/pohon/$treeId/survey-history/'
     | '/_authenticated_admin/admin/data/pohon/$treeId/update/'
     | '/_authenticated_admin/admin/master/kode-patok-batas/$boundaryMarkerCodeId/update/'
     | '/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/aktivitas/'
     | '/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/all-photos/'
     | '/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/update-komunitas/'
+    | '/_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/check-history/add/'
     | '/_authenticated_admin/admin/data/pohon/$treeId/survey-history/add/'
     | '/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/aktivitas/add/'
+    | '/_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/check-history/$checkBmHistoryId/update/'
     | '/_authenticated_admin/admin/data/pohon/$treeId/survey-history/$surveyHistoryId/update/'
     | '/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/aktivitas/$groupActivityId/update/'
   fileRoutesById: FileRoutesById
@@ -1205,6 +1381,7 @@ export const routeTree = rootRoute
         "/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/add-komunitas",
         "/_authenticated_admin/admin/config/role-permission/",
         "/_authenticated_admin/admin/config/user/",
+        "/_authenticated_admin/admin/data/patok-batas/",
         "/_authenticated_admin/admin/data/pohon/",
         "/_authenticated_admin/admin/master/kode-patok-batas/",
         "/_authenticated_admin/admin/master/pohon-lokal/",
@@ -1213,20 +1390,26 @@ export const routeTree = rootRoute
         "/_authenticated_admin/admin/master/pohon-lokal/update/$masterLocalTreeId",
         "/_authenticated_admin/admin/master/pohon/update/$masterTreeId",
         "/_authenticated_admin/admin/config/user/add/",
+        "/_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/",
+        "/_authenticated_admin/admin/data/patok-batas/add/",
         "/_authenticated_admin/admin/data/pohon/$treeId/",
         "/_authenticated_admin/admin/data/pohon/add/",
         "/_authenticated_admin/admin/master/kode-patok-batas/add/",
         "/_authenticated_admin/admin/master/pohon-lokal/add/",
         "/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/",
         "/_authenticated_admin/admin/config/user/$userId/update/",
+        "/_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/check-history/",
+        "/_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/update/",
         "/_authenticated_admin/admin/data/pohon/$treeId/survey-history/",
         "/_authenticated_admin/admin/data/pohon/$treeId/update/",
         "/_authenticated_admin/admin/master/kode-patok-batas/$boundaryMarkerCodeId/update/",
         "/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/aktivitas/",
         "/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/all-photos/",
         "/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/update-komunitas/",
+        "/_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/check-history/add/",
         "/_authenticated_admin/admin/data/pohon/$treeId/survey-history/add/",
         "/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/aktivitas/add/",
+        "/_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/check-history/$checkBmHistoryId/update/",
         "/_authenticated_admin/admin/data/pohon/$treeId/survey-history/$surveyHistoryId/update/",
         "/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/aktivitas/$groupActivityId/update/"
       ]
@@ -1306,6 +1489,10 @@ export const routeTree = rootRoute
       "filePath": "_authenticated_admin/admin/config/user/index.tsx",
       "parent": "/_authenticated_admin"
     },
+    "/_authenticated_admin/admin/data/patok-batas/": {
+      "filePath": "_authenticated_admin/admin/data/patok-batas/index.tsx",
+      "parent": "/_authenticated_admin"
+    },
     "/_authenticated_admin/admin/data/pohon/": {
       "filePath": "_authenticated_admin/admin/data/pohon/index.tsx",
       "parent": "/_authenticated_admin"
@@ -1338,6 +1525,14 @@ export const routeTree = rootRoute
       "filePath": "_authenticated_admin/admin/config/user/add/index.tsx",
       "parent": "/_authenticated_admin"
     },
+    "/_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/": {
+      "filePath": "_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/index.tsx",
+      "parent": "/_authenticated_admin"
+    },
+    "/_authenticated_admin/admin/data/patok-batas/add/": {
+      "filePath": "_authenticated_admin/admin/data/patok-batas/add/index.tsx",
+      "parent": "/_authenticated_admin"
+    },
     "/_authenticated_admin/admin/data/pohon/$treeId/": {
       "filePath": "_authenticated_admin/admin/data/pohon/$treeId/index.tsx",
       "parent": "/_authenticated_admin"
@@ -1360,6 +1555,14 @@ export const routeTree = rootRoute
     },
     "/_authenticated_admin/admin/config/user/$userId/update/": {
       "filePath": "_authenticated_admin/admin/config/user/$userId/update/index.tsx",
+      "parent": "/_authenticated_admin"
+    },
+    "/_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/check-history/": {
+      "filePath": "_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/check-history/index.tsx",
+      "parent": "/_authenticated_admin"
+    },
+    "/_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/update/": {
+      "filePath": "_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/update/index.tsx",
       "parent": "/_authenticated_admin"
     },
     "/_authenticated_admin/admin/data/pohon/$treeId/survey-history/": {
@@ -1386,12 +1589,20 @@ export const routeTree = rootRoute
       "filePath": "_authenticated_admin/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/update-komunitas/index.tsx",
       "parent": "/_authenticated_admin"
     },
+    "/_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/check-history/add/": {
+      "filePath": "_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/check-history/add/index.tsx",
+      "parent": "/_authenticated_admin"
+    },
     "/_authenticated_admin/admin/data/pohon/$treeId/survey-history/add/": {
       "filePath": "_authenticated_admin/admin/data/pohon/$treeId/survey-history/add/index.tsx",
       "parent": "/_authenticated_admin"
     },
     "/_authenticated_admin/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/aktivitas/add/": {
       "filePath": "_authenticated_admin/admin/tentang-kami/kelompok-komunitas/$kelompokKomunitasId/aktivitas/add/index.tsx",
+      "parent": "/_authenticated_admin"
+    },
+    "/_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/check-history/$checkBmHistoryId/update/": {
+      "filePath": "_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/check-history/$checkBmHistoryId/update/index.tsx",
       "parent": "/_authenticated_admin"
     },
     "/_authenticated_admin/admin/data/pohon/$treeId/survey-history/$surveyHistoryId/update/": {

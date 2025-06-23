@@ -9,11 +9,13 @@ import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { usePaginationFilter } from '@/hooks/use-pagination-filter';
 import { PaginationParamsOptional } from '@/interface/pagination.interface';
+import { getBoundaryMarkers } from '@/lib/api/boundaryMarkerApi';
 import { getKelompokKomunitas } from '@/lib/api/kelompokKomunitasApi';
 import { getMasterTrees } from '@/lib/api/masterTreeApi';
 import { getUsers } from '@/lib/api/userApi';
 import { cn } from '@/lib/utils';
 import { handleOnRefresh, handleResponseData, onEndReached } from '@/lib/utils/paginationConfig';
+import { BoundaryMarkerType } from '@/types/boundaryMarker.type';
 import { KelompokKomunitasType } from '@/types/kelompokKomunitas.type';
 import { MasterTreeType } from '@/types/masterTree.type';
 import { UserType } from '@/types/user.type';
@@ -392,6 +394,62 @@ export function DropdownComunityGroupList({
       label={label}
       data={data.map((item) => ({
         label: item.name,
+        value: item.id.toString(),
+      }))}
+      value={value}
+      setValue={setValue}
+      search={tempSearch}
+      setSearch={setTempSearch}
+      onEndReached={() => {
+        onEndReached({ isError, isPending, responseData, setPage });
+      }}
+      totalData={responseData?.total ?? undefined}
+      refreshing={refresing}
+      onRefresh={onRefresh}
+    />
+  );
+}
+
+export function DropdownBoundaryMarkerList({
+  label = 'Boundary Marker',
+  value,
+  setValue,
+  defaultParams,
+}: PaginationDropdownProps) {
+  const { page, setPage, tempSearch, setTempSearch, data, setData, paginationParams } =
+    usePaginationFilter<BoundaryMarkerType>(defaultParams);
+
+  const {
+    isPending,
+    isError,
+    data: responseData,
+    refetch,
+  } = useQuery({
+    queryKey: ['get-boundary-markers', paginationParams],
+    queryFn: () => getBoundaryMarkers(paginationParams),
+  });
+
+  React.useEffect(() => {
+    handleResponseData({
+      responseData,
+      isPending,
+      isError,
+      setData,
+      setPage,
+    });
+  }, [isError, isPending, responseData, responseData?.data, responseData?.page, setData, setPage]);
+
+  const refresing = isPending;
+
+  const onRefresh = () => {
+    handleOnRefresh({ page, refetch, setPage });
+  };
+
+  return (
+    <Dropdown
+      label={label}
+      data={data.map((item) => ({
+        label: item.code,
         value: item.id.toString(),
       }))}
       value={value}

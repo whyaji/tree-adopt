@@ -169,6 +169,11 @@ const Root = () => {
           url: '/admin/data/pohon',
           hide: !permissions.includes(PERMISSION.TREE_VIEW),
         },
+        {
+          title: 'Patok Batas',
+          url: '/admin/data/patok-batas',
+          hide: !permissions.includes(PERMISSION.BOUNDARY_MARKER_VIEW),
+        },
       ],
     },
   ];

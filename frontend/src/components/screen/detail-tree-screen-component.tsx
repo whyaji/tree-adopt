@@ -70,8 +70,8 @@ export function DetailTreeScreenComponent({ tree }: { tree: TreeType | null }) {
       .flat() ?? [];
 
   const getTreeLocalName = (tree: TreeType) => {
-    if (tree.masterTree?.localName) {
-      return tree.masterTree.localName;
+    if (tree.masterLocalTree) {
+      return tree.masterLocalTree.map((localTree) => localTree.localName).join(', ');
     }
     if (tree.localTreeName) {
       return tree.localTreeName;

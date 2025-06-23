@@ -127,8 +127,21 @@ const Root = () => {
       title: 'Master',
       icon: Database,
       items: [
-        { title: 'Pohon', url: '/admin/master/pohon' },
-        { title: 'Pohon Lokal', url: '/admin/master/pohon-lokal' },
+        {
+          title: 'Pohon',
+          url: '/admin/master/pohon',
+          hide: !permissions.includes(PERMISSION.MASTER_TREE_VIEW),
+        },
+        {
+          title: 'Pohon Lokal',
+          url: '/admin/master/pohon-lokal',
+          hide: !permissions.includes(PERMISSION.MASTER_TREE_VIEW),
+        },
+        {
+          title: 'Kode Patok Batas',
+          url: '/admin/master/kode-patok-batas',
+          hide: !permissions.includes(PERMISSION.MASTER_BOUNDARY_MARKER_CODE_VIEW),
+        },
       ],
     },
     {

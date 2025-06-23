@@ -22,4 +22,12 @@ export enum PERMISSION {
   TREE_CREATE_LEVEL_GROUP = 'tree.create-level-group',
   TREE_UPDATE_LEVEL_GLOBAL = 'tree.update-level-global',
   TREE_UPDATE_LEVEL_GROUP = 'tree.update-level-group',
+  MASTER_TREE_CREATE = 'master-tree.create',
+  MASTER_TREE_VIEW = 'master-tree.view',
+  MASTER_TREE_UPDATE = 'master-tree.update',
+  MASTER_BOUNDARY_MARKER_CODE_CREATE_LEVEL_GLOBAL = 'master-boundary-marker-code.create-level-global',
+  MASTER_BOUNDARY_MARKER_CODE_CREATE_LEVEL_GROUP = 'master-boundary-marker-code.create-level-group',
+  MASTER_BOUNDARY_MARKER_CODE_UPDATE_LEVEL_GLOBAL = 'master-boundary-marker-code.update-level-global',
+  MASTER_BOUNDARY_MARKER_CODE_UPDATE_LEVEL_GROUP = 'master-boundary-marker-code.update-level-group',
+  MASTER_BOUNDARY_MARKER_CODE_VIEW = 'master-boundary-marker-code.view',
 }

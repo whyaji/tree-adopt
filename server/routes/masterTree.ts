@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { db } from '../db/database.js';
 import { masterLocalTreeSchema, masterTreeSchema } from '../db/schema/schema.js';
 import { getDataBy } from '../lib/dataBy.js';
-import { getPaginationData } from '../lib/pagination.js';
+import { getPaginationData, getPaginationDataObject } from '../lib/pagination.js';
 import type { RelationsType } from '../lib/relation.js';
 import authMiddleware from '../middleware/jwt.js';
 
@@ -16,7 +16,6 @@ const masterTreeSchemaZod = z.object({
   latinName: z.string().min(1),
 });
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const masterLocalTreeSchemaZod = z.object({
   id: z.number().int().positive(),
   masterTreeId: z.number().int().positive(),
@@ -24,6 +23,7 @@ const masterLocalTreeSchemaZod = z.object({
 });
 
 const createMasterTreeSchema = masterTreeSchemaZod.omit({ id: true });
+const createMasterLocalTreeSchema = masterLocalTreeSchemaZod.omit({ id: true });
 const updateMasterTreeLocalSchema = z.array(
   z.object({
     id: z.number().int().positive().optional(),
@@ -55,6 +55,49 @@ export const masterTreeRoute = new Hono()
   .use(authMiddleware)
 
   .get('/', async (c) => {
+    const sortBy = c.req.query('sortBy') ?? 'createdAt';
+    const order = c.req.query('order') ?? 'desc';
+
+    if (!(sortBy in masterLocalTreeSchema)) {
+      return c.json({ error: 'Invalid sortBy column' }, 400);
+    }
+
+    if (order !== 'asc' && order !== 'desc') {
+      return c.json({ error: 'Invalid order' }, 400);
+    }
+
+    const returnData = await getPaginationDataObject({
+      c,
+      table: masterLocalTreeSchema,
+      searchBy: 'latinName',
+      relations: relationsLocal,
+      withData: 'masterTreeId',
+    });
+
+    const data = returnData.data.map(
+      (
+        item: MasterLocalTree & {
+          masterTree?: MasterTree | null;
+        }
+      ) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { masterTree, ...rest } = item;
+        return {
+          ...rest,
+          latinName: item.masterTree?.latinName ?? '',
+        };
+      }
+    );
+
+    const returnDataWithLatinName = {
+      ...returnData,
+      data,
+    };
+
+    return c.json(returnDataWithLatinName);
+  })
+
+  .get('/actual', async (c) => {
     return await getPaginationData({
       c,
       table: masterTreeSchema,
@@ -130,4 +173,41 @@ export const masterTreeRoute = new Hono()
       searchBy: 'localName',
       relations: relationsLocal,
     });
+  })
+
+  .post('local', zValidator('json', createMasterLocalTreeSchema), async (c) => {
+    const localTree = c.req.valid('json');
+    const created = await db.insert(masterLocalTreeSchema).values(localTree);
+    return c.json({ message: 'Local tree created', localTreeId: created[0].insertId }, 201);
+  })
+
+  .get('local/:id{[0-9]+}', async (c) => {
+    return await getDataBy({
+      c,
+      table: masterLocalTreeSchema,
+      relations: relationsLocal,
+      id: parseInt(c.req.param('id')),
+    });
+  })
+
+  .put('local/:id{[0-9]+}', zValidator('json', masterLocalTreeSchemaZod), async (c) => {
+    const id = parseInt(c.req.param('id'));
+    const localTree = c.req.valid('json');
+    const updated = await db
+      .update(masterLocalTreeSchema)
+      .set(localTree)
+      .where(eq(masterLocalTreeSchema.id, id));
+    if (!updated) {
+      return c.notFound();
+    }
+    return c.json({ message: 'Local tree updated', localTreeId: id });
+  })
+
+  .delete('local/:id{[0-9]+}', async (c) => {
+    const id = parseInt(c.req.param('id'));
+    const deleted = await db.delete(masterLocalTreeSchema).where(eq(masterLocalTreeSchema.id, id));
+    if (!deleted) {
+      return c.notFound();
+    }
+    return c.json({ message: 'Local tree deleted' });
   });

@@ -1,6 +1,5 @@
 'use client';
 
-import { MasterTree } from '@server/routes/masterTree';
 import { useQuery } from '@tanstack/react-query';
 import { Check, ChevronsUpDown, RefreshCcw, Search } from 'lucide-react';
 import * as React from 'react';
@@ -16,6 +15,7 @@ import { getUsers } from '@/lib/api/userApi';
 import { cn } from '@/lib/utils';
 import { handleOnRefresh, handleResponseData, onEndReached } from '@/lib/utils/paginationConfig';
 import { KelompokKomunitasType } from '@/types/kelompokKomunitas.type';
+import { MasterTreeType } from '@/types/masterTree.type';
 import { UserType } from '@/types/user.type';
 
 import { Input } from './ui/input';
@@ -244,8 +244,8 @@ export function DropdownMasterTreeList({
   setValue,
   defaultParams,
 }: PaginationDropdownProps) {
-  const { page, setPage, limit, search, tempSearch, setTempSearch, data, setData } =
-    usePaginationFilter<MasterTree>(defaultParams);
+  const { page, setPage, tempSearch, setTempSearch, data, setData, paginationParams } =
+    usePaginationFilter<MasterTreeType>(defaultParams);
 
   const {
     isPending,
@@ -253,8 +253,8 @@ export function DropdownMasterTreeList({
     data: responseData,
     refetch,
   } = useQuery({
-    queryKey: ['get-master-tree', search, page, limit],
-    queryFn: () => getMasterTrees({ search, page, limit }),
+    queryKey: ['get-master-tree', paginationParams],
+    queryFn: () => getMasterTrees(paginationParams),
   });
 
   React.useEffect(() => {
@@ -277,9 +277,9 @@ export function DropdownMasterTreeList({
     <Dropdown
       label={label}
       data={data.map((item) => ({
-        label: item.localName,
+        label: item.latinName,
         value: item.id.toString(),
-        secondaryLabel: item.latinName,
+        secondaryLabel: item.masterLocalTree?.map((local) => local.localName).join(', ') ?? '',
       }))}
       value={value}
       setValue={setValue}

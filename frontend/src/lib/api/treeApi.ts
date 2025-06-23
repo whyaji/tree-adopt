@@ -30,17 +30,7 @@ export async function getTrees(paginationParams: PaginationParams) {
   const res = await treeApi.$get({
     query: { ...params, with: withData },
   });
-  if (!res.ok)
-    return (await res.json()) as unknown as {
-      success: boolean;
-      error: {
-        issues: {
-          code: string;
-          message: string;
-          path: string[];
-        }[];
-      };
-    };
+  if (!res.ok) throw new Error(res.statusText);
   return await res.json();
 }
 

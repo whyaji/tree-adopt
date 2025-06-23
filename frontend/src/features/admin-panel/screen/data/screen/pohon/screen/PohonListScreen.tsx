@@ -11,7 +11,8 @@ import { PohonTable } from '../components/pohon-table/PohonTable';
 export function PohonListScreen() {
   const user = useUserStore((state) => state.user);
   const { setPage, setLimit, tempSearch, setTempSearch, paginationParams } = usePaginationFilter({
-    withData: 'masterTreeId,kelompokKomunitasId,adopter,adopter.userId,survey,survey.userId',
+    withData:
+      'masterTreeId,masterLocalTree,kelompokKomunitasId,adopter,adopter.userId,survey,survey.userId',
     sortBy: 'id',
     order: 'desc',
     filter: user?.groupId ? `kelompokKomunitasId:${user.groupId}:eq` : undefined,

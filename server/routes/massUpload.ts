@@ -7,7 +7,7 @@ import {
   boundaryMarkerCodeSchema,
   boundaryMarkerSchema,
   checkBoundaryMarkerHistorySchema,
-  masterTreeSchema,
+  masterLocalTreeSchema,
   surveyHistorySchema,
   treeCodeSchema,
   treeSchema,
@@ -78,11 +78,13 @@ export const massUploadRoute = new Hono()
     try {
       const masterTreesSelected = await db
         .select({
-          id: masterTreeSchema.id,
-          localName: masterTreeSchema.localName,
+          id: masterLocalTreeSchema.id,
+          masterTreeId: masterLocalTreeSchema.masterTreeId,
+          localName: masterLocalTreeSchema.localName,
         })
-        .from(masterTreeSchema)
-        .where(inArray(masterTreeSchema.localName, treeLocalNameList));
+        .from(masterLocalTreeSchema)
+        .where(inArray(masterLocalTreeSchema.localName, treeLocalNameList));
+
       await db.transaction(async (tx) => {
         const sortedTrees = [...trees].sort((a, b) => a.id - b.id);
         for (const tree of sortedTrees) {

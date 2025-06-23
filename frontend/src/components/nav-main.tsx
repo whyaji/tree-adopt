@@ -79,7 +79,7 @@ export function NavMain({
                             <SidebarMenuSubItem key={subItem.title}>
                               <SidebarMenuSubButton
                                 asChild
-                                isActive={pathname.includes(subItem.url)}>
+                                isActive={(pathname + '/').includes(subItem.url + '/')}>
                                 <button
                                   type="button"
                                   onClick={() => navigate({ to: subItem.url })}

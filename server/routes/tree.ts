@@ -63,14 +63,12 @@ const relations: RelationsType = {
     type: 'one-to-one',
     table: masterTreeSchema,
     on: 'id',
-    child: {
-      'masterTreeId.masterLocalTree': {
-        type: 'one-to-many',
-        table: masterLocalTreeSchema,
-        on: 'masterTreeId',
-        from: 'id',
-      },
-    },
+  },
+  masterLocalTree: {
+    type: 'one-to-many',
+    table: masterLocalTreeSchema,
+    on: 'masterTreeId',
+    from: 'masterTreeId',
   },
   surveyHistory: {
     type: 'one-to-many',

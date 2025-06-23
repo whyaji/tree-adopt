@@ -8,8 +8,8 @@ import { Button } from '@/components/ui/button';
 import { FieldInfo } from '@/components/ui/field-info';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { createMasterTree, updateMasterTree } from '@/lib/api/masterTreeApi';
-import { updateMasterTreeLocal } from '@/lib/api/masterTreeApi';
+import { createMasterTree, updateMasterTree, updateMasterTreeLocal } from '@/lib/api/masterTreeApi';
+import { assertAndHandleFormErrors } from '@/lib/utils/setErrorForms';
 import { MasterTreeType } from '@/types/masterTree.type';
 
 export const FormMasterPohon: FC<{
@@ -39,17 +39,21 @@ export const FormMasterPohon: FC<{
     defaultValues: {
       latinName: masterTree?.latinName ?? '',
     },
-    onSubmit: async ({ value }) => {
+    onSubmit: async ({ value, formApi }) => {
       try {
         let id = masterTree?.id;
 
         if (masterTree && id) {
-          await updateMasterTree({ id, ...value });
+          const res = await updateMasterTree({ id, ...value });
+          assertAndHandleFormErrors<typeof value>(res, formApi.setFieldMeta);
           toast('Master pohon updated successfully');
         } else {
           const res = await createMasterTree(value);
-          id = res.masterTreeId;
-          toast('Master pohon added successfully');
+          assertAndHandleFormErrors<typeof value>(res, formApi.setFieldMeta);
+          if (res && 'masterTreeId' in res) {
+            id = res.masterTreeId;
+            toast('Master pohon added successfully');
+          }
         }
 
         // 👇 Sync local names if update
@@ -145,7 +149,7 @@ export const FormMasterPohon: FC<{
             </div>
           ) : null
         )}
-        <Button type="button" onClick={addLocalName} className="mt-2">
+        <Button variant="secondary" type="button" onClick={addLocalName} className="mt-2">
           + Tambah Nama Lokal
         </Button>
       </div>

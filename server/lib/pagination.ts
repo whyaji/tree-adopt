@@ -25,6 +25,7 @@ export async function getPaginationData({
   relations,
   primaryKey = 'id',
   selectObject,
+  withData = null,
 }: {
   c: Context<object, any, BlankInput>;
   table: MySqlTableWithColumns<any>;
@@ -32,13 +33,55 @@ export async function getPaginationData({
   relations?: RelationsType;
   primaryKey?: string;
   selectObject?: Record<string, any>;
+  withData?: string | null;
+}) {
+  const sortBy = c.req.query('sortBy') ?? 'createdAt';
+  const order = c.req.query('order') ?? 'desc';
+
+  if (!(sortBy in table)) {
+    return c.json({ error: 'Invalid sortBy column' }, 400);
+  }
+
+  if (order !== 'asc' && order !== 'desc') {
+    return c.json({ error: 'Invalid order' }, 400);
+  }
+
+  const returnData = await getPaginationDataObject({
+    c,
+    table,
+    searchBy,
+    relations,
+    primaryKey,
+    selectObject,
+    withData,
+  });
+
+  return c.json(returnData);
+}
+
+export async function getPaginationDataObject({
+  c,
+  table,
+  searchBy,
+  relations,
+  primaryKey = 'id',
+  selectObject,
+  withData,
+}: {
+  c: Context<object, any, BlankInput>;
+  table: MySqlTableWithColumns<any>;
+  searchBy: string;
+  relations?: RelationsType;
+  primaryKey?: string;
+  selectObject?: Record<string, any>;
+  withData?: string | null;
 }) {
   const search = c.req.query('search') ?? '';
   const page = parseInt(c.req.query('page') ?? '1');
   const limit = parseInt(c.req.query('limit') ?? '10');
   const offset = (page - 1) * limit;
   const reqSearchBy = c.req.query('searchBy') ?? searchBy;
-  const withString = c.req.query('with') ?? null;
+  const withString = c.req.query('with') ? c.req.query('with') + `,${withData}` : withData ?? null;
 
   const sortBy = c.req.query('sortBy') ?? 'createdAt';
   const order = c.req.query('order') ?? 'desc';
@@ -50,14 +93,6 @@ export async function getPaginationData({
         return acc;
       }, {} as Record<string, any>)
     : null;
-
-  if (!(sortBy in table)) {
-    return c.json({ error: 'Invalid sortBy column' }, 400);
-  }
-
-  if (order !== 'asc' && order !== 'desc') {
-    return c.json({ error: 'Invalid order' }, 400);
-  }
 
   const filters = parseFilterQuery(c.req.query('filter') ?? null);
   const conditions = getAllConditions(filters, table);
@@ -91,16 +126,14 @@ export async function getPaginationData({
     (key) => relations?.[key].type === 'one-to-one' && withArray?.includes(key)
   );
 
-  query = generateQueryOneToOne(query, table, oneToOneRelation, relations, withArray);
+  query = generateQueryOneToOne(query, table, oneToOneRelation, relations, withArray)
+    .where(whereClause)
+    .orderBy(getSortDirection(sortBy, order, table))
+    .offset(offset)
+    .limit(limit);
 
-  const [rawData, totalData] = await Promise.all([
-    (query as any)
-      .where(whereClause)
-      .orderBy(getSortDirection(sortBy, order, table))
-      .offset(offset)
-      .limit(limit),
-    db.select({ count: count() }).from(table).where(whereClause),
-  ]);
+  const totalData = await db.select({ count: count() }).from(table).where(whereClause);
+  const rawData = await query;
 
   let data =
     withArray && relations && oneToOneRelation.length > 0
@@ -131,11 +164,11 @@ export async function getPaginationData({
 
   const total = totalData[0]?.count ?? 0;
 
-  return c.json({
+  return {
     data,
     total,
     totalPage: Math.ceil(total / limit),
     page,
     limit,
-  });
+  };
 }

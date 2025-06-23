@@ -105,6 +105,7 @@ export function FieldForm<T>({ item, field }: { item: FieldItemType<T>; field: A
                   label={item.label}
                   value={field.state.value}
                   setValue={(value) => field.handleChange(value)}
+                  defaultParams={item.paginationParams}
                 />
               )
             );

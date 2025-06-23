@@ -22,21 +22,11 @@ export const FormPohon: FC<{
   const user = useUserStore((state) => state.user);
   const navigate = useNavigate();
 
-  const getTreeLocalName = (tree?: TreeType | null) => {
-    if (tree?.masterTree?.localName) {
-      return tree.masterTree.localName;
-    }
-    if (tree?.localTreeName) {
-      return tree.localTreeName;
-    }
-    return '';
-  };
-
   const form = useForm({
     defaultValues: {
       code: tree?.code ?? '',
       masterTreeId: tree?.masterTreeId ? String(tree.masterTreeId) : '',
-      localTreeName: getTreeLocalName(tree),
+      localTreeName: tree?.localTreeName ?? '',
       kelompokKomunitasId: tree?.kelompokKomunitasId ? String(tree.kelompokKomunitasId) : '',
       surveyorId: tree?.surveyorId ? String(tree.surveyorId) : '',
       status: tree?.status ? String(tree.status) : '',
@@ -92,7 +82,12 @@ export const FormPohon: FC<{
 
   const formItem: FieldItemType<keyof (typeof form)['state']['values']>[] = [
     { name: 'code', label: 'Code', type: 'text', required: true },
-    { name: 'masterTreeId', label: 'Tree', type: 'dropdown-master-tree' },
+    {
+      name: 'masterTreeId',
+      label: 'Tree',
+      type: 'dropdown-master-tree',
+      paginationParams: { withData: 'masterLocalTree', limit: 9999 },
+    },
     { name: 'localTreeName', label: 'Local Tree Name', type: 'text', required: true },
     {
       name: 'kelompokKomunitasId',

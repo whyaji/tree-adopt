@@ -59,7 +59,9 @@ export function PohonTable({ data, isPending }: { data?: TreeType[]; isPending: 
                   )}
                   <div>
                     <strong>Lokal:</strong>{' '}
-                    {tree.masterTree?.localName ?? tree.localTreeName ?? '-'}
+                    {(tree.masterLocalTree?.map((localTree) => localTree.localName).join(', ') ||
+                      tree.localTreeName) ??
+                      '-'}
                   </div>
                 </TableCell>
                 <TableCell>{tree.kelompokKomunitas?.name}</TableCell>

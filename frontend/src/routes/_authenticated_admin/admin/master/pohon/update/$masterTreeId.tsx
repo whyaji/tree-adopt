@@ -8,7 +8,7 @@ export const Route = createFileRoute(
 )({
   loader: async ({ params }) => {
     try {
-      const res = await getMasterTree(params.masterTreeId);
+      const res = await getMasterTree(params.masterTreeId, 'masterLocalTree');
       return { masterTree: res.data };
     } catch {
       return { masterTree: null };

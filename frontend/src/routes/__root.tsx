@@ -126,7 +126,10 @@ const Root = () => {
     {
       title: 'Master',
       icon: Database,
-      items: [{ title: 'Pohon', url: '/admin/master/pohon' }],
+      items: [
+        { title: 'Pohon', url: '/admin/master/pohon' },
+        { title: 'Pohon Lokal', url: '/admin/master/pohon-lokal' },
+      ],
     },
     {
       title: 'Tentang Kami',

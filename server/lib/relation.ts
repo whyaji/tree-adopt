@@ -107,8 +107,17 @@ export async function getDataQueryOneToMany(
         (relationObj.type !== 'one-to-many' && relationObj.type !== 'many-to-many')
       )
         continue;
+
+      const idsFromRelation = relationObj.from
+        ? dataInFunction
+            .map((row: { [s: string]: unknown } | ArrayLike<unknown>) => {
+              return relationObj.from ? ((row as any)[relationObj.from] as string) : undefined;
+            })
+            .join(',')
+        : undefined;
+
       const queryOneToMany = db.select().from(relationObj.table);
-      const filterDataOneToManyString = `${relationObj.on}:${idsString}:in`;
+      const filterDataOneToManyString = `${relationObj.on}:${idsFromRelation ?? idsString}:in`;
       const filterDataOneToMany = parseFilterQuery(filterDataOneToManyString);
       const conditionsOneToMany = getAllConditions(filterDataOneToMany, relationObj.table);
       const whereClauseOneToMany = and(...(conditionsOneToMany || []));
@@ -118,7 +127,7 @@ export async function getDataQueryOneToMany(
       }
       const dataOneToManyResult = await recursionDataRelationChild(
         dataOneToManyQuery,
-        primaryKey,
+        relationObj.from ?? primaryKey,
         relationObj,
         withArray
       );
@@ -127,7 +136,7 @@ export async function getDataQueryOneToMany(
           ...row,
           [relationObj.alias ?? relation]: dataOneToManyResult.filter(
             (item: { [s: string]: unknown } | ArrayLike<unknown>) => {
-              return (row as any)[primaryKey] === (item as any)[relationObj.on];
+              return (row as any)[relationObj.from ?? primaryKey] === (item as any)[relationObj.on];
             }
           ),
         };

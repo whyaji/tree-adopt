@@ -11,7 +11,10 @@ export const Route = createFileRoute(
   loader: async ({ params }) => {
     if (params.kelompokKomunitasId) {
       try {
-        const res = await getKelompokKomunitasById(params.kelompokKomunitasId);
+        const res = await getKelompokKomunitasById(
+          params.kelompokKomunitasId,
+          'groupCoordinateArea'
+        );
         const resTrees = await getTrees({
           limit: 9999,
           page: 1,

@@ -176,6 +176,11 @@ const Root = () => {
         },
       ],
     },
+    {
+      title: 'Pemeteaan',
+      icon: Map,
+      url: '/admin/pemetaan',
+    },
   ];
 
   const navSecondaryAdmin = [

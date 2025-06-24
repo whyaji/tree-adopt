@@ -1,7 +1,7 @@
 import { useNavigate } from '@tanstack/react-router';
 import { icon, LatLngTuple } from 'leaflet';
 import { FC } from 'react';
-import { Marker, Popup } from 'react-leaflet';
+import { Marker, Polygon, Popup } from 'react-leaflet';
 
 import { baseUrl } from '@/lib/api/api';
 import { getCenterCoordAndZoom } from '@/lib/utils/maps';
@@ -23,6 +23,11 @@ export const DetailGroupScreenComponent: FC<{
   const centerAndZoom = getCenterCoordAndZoom(
     [
       [kelompokKomunitas.latitude, kelompokKomunitas.longitude],
+      ...(
+        kelompokKomunitas.groupCoordinateArea?.map(
+          (coordinateArea) => coordinateArea.coordinates
+        ) ?? []
+      ).flat(),
       ...(kelompokKomunitas.trees?.map((tree) => [tree.latitude, tree.longitude]) ?? []),
       ...(kelompokKomunitas.groupActivities?.map((activity) => [
         activity.latitude,
@@ -163,6 +168,11 @@ export const DetailGroupScreenComponent: FC<{
                       </Marker>
                     )
                 )}
+                {kelompokKomunitas.groupCoordinateArea?.map((coordinateArea, index) => (
+                  <Polygon key={coordinateArea.id} positions={coordinateArea.coordinates}>
+                    <Popup>{'Area ' + (index + 1)}</Popup>
+                  </Polygon>
+                ))}
               </MapsLocation>
             )}
           </div>

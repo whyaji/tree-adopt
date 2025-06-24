@@ -1,10 +1,16 @@
+import { zValidator } from '@hono/zod-validator';
 import { count, eq, type InferSelectModel } from 'drizzle-orm';
 import { Hono } from 'hono';
 import path from 'path';
 import { z } from 'zod';
 
 import { db } from '../db/database.js';
-import { groupActivitySchema, kelompokKomunitasSchema, treeSchema } from '../db/schema/schema.js';
+import {
+  groupActivitySchema,
+  groupCoordinateAreaSchema,
+  kelompokKomunitasSchema,
+  treeSchema,
+} from '../db/schema/schema.js';
 import { getDataBy } from '../lib/dataBy.js';
 import { validateImage } from '../lib/image.js';
 import { getPaginationData } from '../lib/pagination.js';
@@ -26,8 +32,38 @@ const kelompokKomunitasSchemaZod = z.object({
   image: z.string().min(1),
 });
 
+const groupCoordinateAreaSchemaZod = z.object({
+  id: z.number().int().positive(),
+  kelompokKomunitasId: z.number().int().positive(),
+  coordinates: z.array(z.tuple([z.number(), z.number()])),
+  createdAt: z.string().datetime().optional(),
+  updatedAt: z.string().datetime().optional(),
+  deletedAt: z.string().datetime().nullable().optional(),
+});
+
 const createPostSchema = kelompokKomunitasSchemaZod.omit({ id: true, image: true });
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const createGroupCoordinateAreaSchema = groupCoordinateAreaSchemaZod.omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  deletedAt: true,
+});
+const updateGroupCoordinateAreaSchema = z.array(
+  z.object({
+    id: z.number().int().positive().optional(),
+    coordinates: z.array(z.tuple([z.number(), z.number()])),
+    status: z.enum(['create', 'update', 'delete']),
+  })
+);
+
 export type KelompokKomunitas = InferSelectModel<typeof kelompokKomunitasSchema>;
+export type GroupCoordinateArea = Omit<
+  InferSelectModel<typeof groupCoordinateAreaSchema>,
+  'coordinates'
+> & {
+  coordinates: [number, number][];
+};
 
 // === RELATIONS ===
 const relations: RelationsType = {
@@ -39,6 +75,11 @@ const relations: RelationsType = {
   groupActivities: {
     type: 'one-to-many',
     table: groupActivitySchema,
+    on: 'kelompokKomunitasId',
+  },
+  groupCoordinateArea: {
+    type: 'one-to-many',
+    table: groupCoordinateAreaSchema,
     on: 'kelompokKomunitasId',
   },
 };
@@ -59,13 +100,15 @@ export const kelompokKomunitasRoute = new Hono()
   .get('/by-name/:name', async (c) => {
     const name = c.req.param('name');
     const data = await db
-      .select()
+      .select({
+        id: kelompokKomunitasSchema.id,
+      })
       .from(kelompokKomunitasSchema)
       .where(eq(kelompokKomunitasSchema.name, name));
 
     if (data.length === 0) return c.notFound();
 
-    return c.json({ data: data[0] });
+    return await getDataBy({ id: data[0].id, c, table: kelompokKomunitasSchema, relations });
   })
 
   .get('/total', async (c) => {
@@ -85,7 +128,14 @@ export const kelompokKomunitasRoute = new Hono()
     const imageErrors = validateImage(image);
 
     if (!validation.success || imageErrors.length > 0) {
-      return c.json({ errors: [...(validation.error?.errors || []), ...imageErrors] }, 400);
+      return c.json(
+        {
+          error: {
+            issues: [...(validation.error?.errors || []), ...imageErrors],
+          },
+        },
+        400
+      );
     }
 
     const dir = 'uploads/kelompok-komunitas';
@@ -97,8 +147,11 @@ export const kelompokKomunitasRoute = new Hono()
         latitude: parseFloat(validation.data.latitude),
         longitude: parseFloat(validation.data.longitude),
       };
-      await db.insert(kelompokKomunitasSchema).values(data);
-      return c.json({ message: 'Kelompok Komunitas created' }, 201);
+      const res = await db.insert(kelompokKomunitasSchema).values(data);
+      return c.json(
+        { message: 'Kelompok Komunitas created', kelompokKomunitasId: res[0].insertId },
+        201
+      );
     } catch (err) {
       console.error('Error uploading image:', err);
       return c.json({ error: 'Failed to upload image' }, 500);
@@ -114,7 +167,14 @@ export const kelompokKomunitasRoute = new Hono()
     const imageErrors = typeof image !== 'string' ? validateImage(image) : [];
 
     if (!validation.success || imageErrors.length > 0) {
-      return c.json({ errors: [...(validation.error?.errors || []), ...imageErrors] }, 400);
+      return c.json(
+        {
+          error: {
+            issues: [...(validation.error?.errors || []), ...imageErrors],
+          },
+        },
+        400
+      );
     }
 
     const existing = await db
@@ -125,30 +185,36 @@ export const kelompokKomunitasRoute = new Hono()
 
     if (!existing[0]) return c.notFound();
 
-    let newImagePath = existing[0].image;
+    try {
+      let newImagePath = existing[0].image;
 
-    if (image instanceof File) {
-      const dir = 'uploads/kelompok-komunitas';
-      try {
-        const uploadedPath = await uploadFile(image, dir, {
-          withTimeMilis: true,
-          withThumbnail: true,
-        });
-        newImagePath = `/${dir}/${path.basename(uploadedPath)}`;
-        if (existing[0].image && existing[0].image !== newImagePath) deleteImage(existing[0].image);
-      } catch {
-        return c.json({ error: 'Failed to upload image' }, 500);
+      if (image instanceof File) {
+        const dir = 'uploads/kelompok-komunitas';
+        try {
+          const uploadedPath = await uploadFile(image, dir, {
+            withTimeMilis: true,
+            withThumbnail: true,
+          });
+          newImagePath = `/${dir}/${path.basename(uploadedPath)}`;
+          if (existing[0].image && existing[0].image !== newImagePath)
+            deleteImage(existing[0].image);
+        } catch {
+          return c.json({ error: 'Failed to upload image' }, 500);
+        }
       }
-    }
 
-    const data = {
-      ...validation.data,
-      image: newImagePath,
-      latitude: parseFloat(validation.data.latitude),
-      longitude: parseFloat(validation.data.longitude),
-    };
-    await db.update(kelompokKomunitasSchema).set(data).where(eq(kelompokKomunitasSchema.id, id));
-    return c.json({ message: 'Kelompok Komunitas updated' });
+      const data = {
+        ...validation.data,
+        image: newImagePath,
+        latitude: parseFloat(validation.data.latitude),
+        longitude: parseFloat(validation.data.longitude),
+      };
+      await db.update(kelompokKomunitasSchema).set(data).where(eq(kelompokKomunitasSchema.id, id));
+      return c.json({ message: 'Kelompok Komunitas updated' });
+    } catch (err) {
+      console.error('Error updating Kelompok Komunitas:', err);
+      return c.json({ error: 'Failed to update Kelompok Komunitas' }, 500);
+    }
   })
 
   .delete('/:id{[0-9]+}', async (c) => {
@@ -165,4 +231,38 @@ export const kelompokKomunitasRoute = new Hono()
 
     await db.delete(kelompokKomunitasSchema).where(eq(kelompokKomunitasSchema.id, id));
     return c.json({ message: 'Kelompok Komunitas deleted' });
-  });
+  })
+
+  .post(
+    '/:id{[0-9]+}/update-group-coordinate-area',
+    zValidator('json', updateGroupCoordinateAreaSchema),
+    async (c) => {
+      const id = parseInt(c.req.param('id'));
+
+      // body is an array of local trees with status 1: create, 2: update, 3: delete
+      const groupCoordinatesAreas = c.req.valid('json');
+
+      // process each local tree based on status
+      for (const groupCoordinateArea of groupCoordinatesAreas) {
+        if (groupCoordinateArea.status === 'create') {
+          // create
+          await db.insert(groupCoordinateAreaSchema).values({
+            coordinates: groupCoordinateArea.coordinates,
+            kelompokKomunitasId: id,
+          });
+        } else if (groupCoordinateArea.status === 'update' && groupCoordinateArea.id) {
+          // update
+          await db
+            .update(groupCoordinateAreaSchema)
+            .set({ coordinates: groupCoordinateArea.coordinates })
+            .where(eq(groupCoordinateAreaSchema.id, groupCoordinateArea.id));
+        } else if (groupCoordinateArea.status === 'delete' && groupCoordinateArea.id) {
+          // delete
+          await db
+            .delete(groupCoordinateAreaSchema)
+            .where(eq(groupCoordinateAreaSchema.id, groupCoordinateArea.id));
+        }
+      }
+      return c.json({ message: 'Group coordinate updated successfully' });
+    }
+  );

@@ -21,7 +21,7 @@ const Component = () => {
     const fetchKelompokKomunitas = async () => {
       if (kelompokKomunitasId) {
         try {
-          const res = await getKelompokKomunitasById(kelompokKomunitasId);
+          const res = await getKelompokKomunitasById(kelompokKomunitasId, 'groupCoordinateArea');
           if (res.data) {
             setKelompokKomunitas(res.data);
           } else {

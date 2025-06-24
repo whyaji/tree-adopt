@@ -64,6 +64,13 @@
       "when": 1750477216640,
       "tag": "0008_secret_black_queen",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1750734992011,
+      "tag": "0009_windy_starfox",
+      "breakpoints": true
     }
   ]
 }

@@ -1,4 +1,3 @@
-import { KelompokKomunitas } from '@server/routes/kelompokkomunitas';
 import { useForm, useStore } from '@tanstack/react-form';
 import { useNavigate } from '@tanstack/react-router';
 import L from 'leaflet';
@@ -6,6 +5,7 @@ import { FC, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 import { ConfirmationDialog } from '@/components/confimation-dialog';
+import { MapsCoorForm } from '@/components/maps-coor-form';
 import { MapsForm } from '@/components/maps-form';
 import { Button } from '@/components/ui/button';
 import { FieldInfo } from '@/components/ui/field-info';
@@ -13,10 +13,16 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { MAPS_CENTER } from '@/constants/maps';
-import { createKelompokKomunitas, updateKelompokKomunitas } from '@/lib/api/kelompokKomunitasApi';
+import {
+  createKelompokKomunitas,
+  updateGroupCoordinateAreas,
+  updateKelompokKomunitas,
+} from '@/lib/api/kelompokKomunitasApi';
+import { assertAndHandleFormErrors } from '@/lib/utils/setErrorForms';
+import { KelompokKomunitasType } from '@/types/kelompokKomunitas.type';
 
 export const FormKelompokKomunitas: FC<{
-  kelompokKomunitas?: KelompokKomunitas | null;
+  kelompokKomunitas?: KelompokKomunitasType | null;
 }> = ({ kelompokKomunitas }) => {
   const navigate = useNavigate();
   const mapRef = useRef<L.Map | null>(null);
@@ -26,6 +32,61 @@ export const FormKelompokKomunitas: FC<{
       ? [kelompokKomunitas.latitude, kelompokKomunitas.longitude]
       : MAPS_CENTER.DEFAULT
   );
+
+  const mapCenterCoor: [number, number] = kelompokKomunitas
+    ? [kelompokKomunitas.latitude, kelompokKomunitas.longitude]
+    : MAPS_CENTER.DEFAULT;
+
+  const [markerCoordinateAreas, setMarkerCoordinateAreas] = useState<
+    { id?: number; coordinates: [number, number][]; status: 'create' | 'update' | 'delete' }[]
+  >([]);
+
+  // 👇 Populate from props
+  useEffect(() => {
+    if (kelompokKomunitas?.groupCoordinateArea) {
+      setMarkerCoordinateAreas(
+        kelompokKomunitas.groupCoordinateArea.map((lt) => ({
+          id: lt.id,
+          coordinates: lt.coordinates,
+          status: 'update',
+        }))
+      );
+    }
+  }, [kelompokKomunitas]);
+
+  // add coordinate
+  const addGroupCoordinateArea = () => {
+    setMarkerCoordinateAreas((prev) => [...prev, { coordinates: [], status: 'create' }]);
+  };
+
+  // update coordinate
+  const updateGroupCoordinateArea = (index: number, value: [number, number][]) => {
+    setMarkerCoordinateAreas((prev) =>
+      prev.map((item, i) =>
+        i === index
+          ? {
+              ...item,
+              coordinates: value,
+              status: item.status === 'update' ? 'update' : 'create',
+            }
+          : item
+      )
+    );
+  };
+
+  // remove coordinate
+  const removeGroupCoordinateArea = (index: number) => {
+    setMarkerCoordinateAreas((prev) => {
+      const item = prev[index];
+      if (item.id) {
+        // mark for deletion
+        return [...prev.slice(0, index), { ...item, status: 'delete' }, ...prev.slice(index + 1)];
+      } else {
+        // remove unsaved
+        return [...prev.slice(0, index), ...prev.slice(index + 1)];
+      }
+    });
+  };
 
   const [file, setFile] = useState<File | null>(null);
   const imageUrl = kelompokKomunitas?.image;
@@ -41,8 +102,10 @@ export const FormKelompokKomunitas: FC<{
       longitude: kelompokKomunitas?.longitude ? String(kelompokKomunitas?.longitude) : '',
       address: kelompokKomunitas?.address ?? '',
     },
-    onSubmit: async ({ value }) => {
+    onSubmit: async ({ value, formApi }) => {
+      console.log('Form submitted with values:', value);
       try {
+        let id = kelompokKomunitas?.id;
         const formData = new FormData();
         Object.entries(value).forEach(([key, value]) => {
           formData.append(key, String(value));
@@ -53,12 +116,23 @@ export const FormKelompokKomunitas: FC<{
           formData.append('image', kelompokKomunitas.image);
         }
         if (kelompokKomunitas) {
-          await updateKelompokKomunitas(kelompokKomunitas.id, formData);
+          const result = await updateKelompokKomunitas(kelompokKomunitas.id, formData);
+          assertAndHandleFormErrors<typeof value>(result, formApi.setFieldMeta);
           toast('Komunitas updated successfully');
         } else {
-          await createKelompokKomunitas(formData);
-          toast('Komunitas added successfully');
+          const result = await createKelompokKomunitas(formData);
+          assertAndHandleFormErrors<typeof value>(result, formApi.setFieldMeta);
+          if (result && 'kelompokKomunitasId' in result) {
+            id = Number(result.kelompokKomunitasId);
+            toast('Komunitas added successfully');
+          }
         }
+
+        if (id) {
+          const payload = markerCoordinateAreas.filter((lt) => lt.status !== 'delete' || lt.id);
+          await updateGroupCoordinateAreas(String(id), payload);
+        }
+
         form.reset();
         setMarkerPosition(null);
         setMapCenter(MAPS_CENTER.DEFAULT);
@@ -156,6 +230,33 @@ export const FormKelompokKomunitas: FC<{
         markerPosition={markerPosition}
         handleLocationSelect={handleLocationSelect}
       />
+
+      {/* 👇 Dynamic Local Name List */}
+      <div className="flex flex-col gap-2 mt-4">
+        <Label>Kelompok Komunitas Koordinat Area</Label>
+        {markerCoordinateAreas.map((lt, index) =>
+          lt.status !== 'delete' ? (
+            <div key={index} className="flex flex-col gap-2">
+              <MapsCoorForm
+                required
+                label={'Pilih Area Koordinat' + ` ${index + 1}`}
+                mapCenter={mapCenterCoor}
+                markerCoordinates={markerCoordinateAreas[index].coordinates}
+                onSaveCoordinates={(coords) => updateGroupCoordinateArea(index, coords)}
+              />
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={() => removeGroupCoordinateArea(index)}>
+                Hapus
+              </Button>
+            </div>
+          ) : null
+        )}
+        <Button variant="secondary" type="button" onClick={addGroupCoordinateArea} className="mt-2">
+          + Area Koordinat Baru
+        </Button>
+      </div>
 
       <div className="mt-4">
         <Label>Upload Image</Label>

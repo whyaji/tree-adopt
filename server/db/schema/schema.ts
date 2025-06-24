@@ -109,6 +109,29 @@ export const kelompokKomunitasSchema = mysqlTable('kelompok_komunitas', {
   deletedAt: timestamp('deleted_at'),
 });
 
+export const groupCoordinateAreaSchema = mysqlTable(
+  'group_coordinate_area',
+  {
+    id: bigint('id', { mode: 'number', unsigned: true }).autoincrement().notNull().primaryKey(),
+    kelompokKomunitasId: bigint('kelompok_komunitas_id', {
+      mode: 'number',
+      unsigned: true,
+    }).notNull(),
+    coordinates: json('coordinates').notNull(), // JSON array of coordinates
+    createdAt: timestamp('created_at').defaultNow(),
+    updatedAt: timestamp('updated_at').defaultNow(),
+    deletedAt: timestamp('deleted_at'),
+  },
+  (table) => [
+    foreignKey({
+      name: 'kk_gca_id_fk',
+      columns: [table.kelompokKomunitasId],
+      foreignColumns: [kelompokKomunitasSchema.id],
+    }),
+    index('kelompok_komunitas_id_idx_group_coordinate_area').on(table.kelompokKomunitasId),
+  ]
+);
+
 export const groupActivitySchema = mysqlTable(
   'group_activity',
   {

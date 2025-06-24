@@ -17,8 +17,18 @@ export async function createKelompokKomunitas(formData: FormData) {
       Authorization: authToken ? `Bearer ${authToken}` : '',
     },
   });
-  if (!res.ok) throw new Error(res.statusText);
-  return res.json();
+  if (!res.ok)
+    return (await res.json()) as unknown as {
+      success: boolean;
+      error: {
+        issues: {
+          code: string;
+          message: string;
+          path: string[];
+        }[];
+      };
+    };
+  return await res.json();
 }
 
 export async function getKelompokKomunitas({
@@ -37,17 +47,19 @@ export async function getKelompokKomunitas({
   return res.json();
 }
 
-export async function getKelompokKomunitasById(id: string) {
+export async function getKelompokKomunitasById(id: string, withData?: string) {
   const res = await kelompokKomunitasApi[':id{[0-9]+}'].$get({
     param: { id },
+    ...(withData ? { query: { with: withData } } : {}),
   });
   if (!res.ok) throw new Error(res.statusText);
   return res.json() as Promise<{ data: KelompokKomunitas }>;
 }
 
-export async function getKelompokKomunitasByName(name: string) {
+export async function getKelompokKomunitasByName(name: string, withData?: string) {
   const res = await kelompokKomunitasApi['by-name'][':name'].$get({
     param: { name },
+    ...(withData ? { query: { with: withData } } : {}),
   });
   if (!res.ok) throw new Error(res.statusText);
   return res.json() as Promise<{ data: KelompokKomunitas }>;
@@ -61,8 +73,18 @@ export async function updateKelompokKomunitas(id: number, formData: FormData) {
       Authorization: authToken ? `Bearer ${authToken}` : '',
     },
   });
-  if (!res.ok) throw new Error(res.statusText);
-  return res.json();
+  if (!res.ok)
+    return (await res.json()) as unknown as {
+      success: boolean;
+      error: {
+        issues: {
+          code: string;
+          message: string;
+          path: string[];
+        }[];
+      };
+    };
+  return await res.json();
 }
 
 export async function deleteKelompokKomunitas(id: string) {
@@ -71,4 +93,30 @@ export async function deleteKelompokKomunitas(id: string) {
   });
   if (!res.ok) throw new Error(res.statusText);
   return res.json();
+}
+
+export async function updateGroupCoordinateAreas(
+  id: string,
+  groupCoordinateArea: {
+    id?: number;
+    coordinates: [number, number][];
+    status: 'create' | 'update' | 'delete';
+  }[]
+) {
+  const res = await kelompokKomunitasApi[':id{[0-9]+}']['update-group-coordinate-area'].$post({
+    json: groupCoordinateArea,
+    param: { id },
+  });
+  if (!res.ok)
+    return (await res.json()) as unknown as {
+      success: boolean;
+      error: {
+        issues: {
+          code: string;
+          message: string;
+          path: string[];
+        }[];
+      };
+    };
+  return await res.json();
 }

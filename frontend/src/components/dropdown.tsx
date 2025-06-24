@@ -238,6 +238,7 @@ type PaginationDropdownProps = {
   value: string;
   setValue: (value: string) => void;
   defaultParams?: PaginationParamsOptional;
+  withNullValue?: boolean;
 };
 
 export function DropdownMasterTreeList({
@@ -245,6 +246,7 @@ export function DropdownMasterTreeList({
   value,
   setValue,
   defaultParams,
+  withNullValue = false,
 }: PaginationDropdownProps) {
   const { page, setPage, tempSearch, setTempSearch, data, setData, paginationParams } =
     usePaginationFilter<MasterTreeType>(defaultParams);
@@ -278,11 +280,14 @@ export function DropdownMasterTreeList({
   return (
     <Dropdown
       label={label}
-      data={data.map((item) => ({
-        label: item.latinName,
-        value: item.id.toString(),
-        secondaryLabel: item.masterLocalTree?.map((local) => local.localName).join(', ') ?? '',
-      }))}
+      data={[
+        ...(withNullValue ? [{ label: 'Belum diketahui', value: 'null', secondaryLabel: '' }] : []),
+        ...data.map((item) => ({
+          label: item.latinName,
+          value: item.id.toString(),
+          secondaryLabel: item.masterLocalTree?.map((local) => local.localName).join(', ') ?? '',
+        })),
+      ]}
       value={value}
       setValue={setValue}
       search={tempSearch}

@@ -1,5 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
 
+import { DropdownMasterTreeList } from '@/components/dropdown';
 import { TableData } from '@/components/table-data';
 import { usePaginationFilter } from '@/hooks/use-pagination-filter';
 import { getTrees } from '@/lib/api/treeApi';
@@ -10,13 +12,14 @@ import { PohonTable } from '../components/pohon-table/PohonTable';
 
 export function PohonListScreen() {
   const user = useUserStore((state) => state.user);
-  const { setPage, setLimit, tempSearch, setTempSearch, paginationParams } = usePaginationFilter({
-    withData:
-      'masterTreeId,masterLocalTree,kelompokKomunitasId,adopter,adopter.userId,survey,survey.userId',
-    sortBy: 'id',
-    order: 'desc',
-    filter: user?.groupId ? `kelompokKomunitasId:${user.groupId}:eq` : undefined,
-  });
+  const { setPage, setLimit, tempSearch, setTempSearch, paginationParams, setFilter, filter } =
+    usePaginationFilter({
+      withData:
+        'masterTreeId,masterLocalTree,kelompokKomunitasId,adopter,adopter.userId,survey,survey.userId',
+      sortBy: 'id',
+      order: 'desc',
+      filter: user?.groupId ? `kelompokKomunitasId:${user.groupId}:eq` : undefined,
+    });
 
   const { isPending, error, data } = useQuery({
     queryKey: ['get-tree', paginationParams],
@@ -24,6 +27,22 @@ export function PohonListScreen() {
   });
 
   const totalPage = data?.totalPage ?? 0;
+
+  const [filterMasterTree, setFilterMasterTree] = useState<string>('');
+
+  useEffect(() => {
+    if (filterMasterTree) {
+      const newFilter = filter.replace(/(;)?masterTreeId:[^;]*/g, '').replace(/;$/, '');
+      if (filterMasterTree !== 'null') {
+        setFilter(newFilter + (newFilter !== '' ? ';' : '') + `masterTreeId:${filterMasterTree}`);
+      } else if (filterMasterTree === 'null') {
+        setFilter(newFilter + (newFilter !== '' ? ';' : '') + `masterTreeId::null`);
+      }
+      setPage(1);
+    } else {
+      setFilter(filter.replace(/(;)?masterTreeId:[^;]*/g, '').replace(/;$/, ''));
+    }
+  }, [filterMasterTree]);
 
   if (error) return <div>Error: {error.message}</div>;
 
@@ -38,6 +57,14 @@ export function PohonListScreen() {
       limit={paginationParams.limit}
       setLimit={setLimit}
       addUrl="/admin/data/pohon/add"
+      elementsHeader={[
+        <DropdownMasterTreeList
+          value={filterMasterTree}
+          setValue={setFilterMasterTree}
+          withNullValue
+          key="master-tree-dropdown"
+        />,
+      ]}
       table={<PohonTable data={data?.data as TreeType[]} isPending={isPending} />}
     />
   );

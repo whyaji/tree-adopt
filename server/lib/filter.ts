@@ -102,10 +102,14 @@ function applyDrizzleFilters(filters: FilterCondition, table: any): SQL[] {
           conditions.push(like(column, `%${values[0]}%`));
           break;
         case 'null':
-          conditions.push(isNull(column));
+          if (!values.length || values[0] === 'true' || values[0] === '') {
+            conditions.push(isNull(column));
+          }
           break;
         case 'notnull':
-          conditions.push(isNotNull(column));
+          if (!values.length || values[0] === 'true' || values[0] === '') {
+            conditions.push(isNotNull(column));
+          }
           break;
         default:
           conditions.push(inArray(column, values));

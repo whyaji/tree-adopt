@@ -31,6 +31,7 @@ export function MapsCoorForm(props: {
   const [mapCenter, setMapCenter] = useState<[number, number]>(props.mapCenter);
   const [isEditing, setIsEditing] = useState(false);
   const [editingCoordinates, setEditingCoordinates] = useState<[number, number][]>([]);
+  const [followNewCoords, setFollowNewCoords] = useState(false);
 
   const handleStartEdit = () => {
     setEditingCoordinates([...props.markerCoordinates]);
@@ -71,6 +72,7 @@ export function MapsCoorForm(props: {
         </Label>
         <div className="h-92 w-full rounded-md overflow-hidden relative z-0">
           <MapsLocation
+            autoRecenter={followNewCoords}
             ref={mapCoorRef}
             center={mapCenter}
             zoom={5}
@@ -106,20 +108,48 @@ export function MapsCoorForm(props: {
           )}
 
           {isEditing && (
-            <>
-              <Button type="button" variant="outline" onClick={handleUndo}>
+            <div className="flex gap-2 items-center w-full flex-wrap sm:flex-nowrap">
+              <Button
+                type="button"
+                variant={followNewCoords ? 'secondary' : 'outline'}
+                onClick={() => setFollowNewCoords(!followNewCoords)}
+                className="flex-1 min-w-[120px]">
+                {followNewCoords ? 'Stop Follow' : 'Follow'}
+              </Button>
+              {/* separator with max width, hide on mobile */}
+              <span className="hidden sm:flex flex-grow h-px bg-muted mx-2" />
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleUndo}
+                className="flex-1 min-w-[120px]">
                 Undo Titik
               </Button>
-              <Button type="button" variant="outline" onClick={handleReset}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleReset}
+                className="flex-1 min-w-[120px]">
                 Reset Semua
               </Button>
-              <Button type="button" variant="default" onClick={handleSave} disabled={!isEditValid}>
-                Simpan Area
-              </Button>
-              <Button type="button" variant="destructive" onClick={handleCancel}>
+              {/* separator with max width, hide on mobile */}
+              <span className="hidden sm:flex flex-grow h-px bg-muted mx-2" />
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={handleCancel}
+                className="flex-1 min-w-[120px]">
                 Batal
               </Button>
-            </>
+              <Button
+                type="button"
+                variant="default"
+                onClick={handleSave}
+                disabled={!isEditValid}
+                className="flex-1 min-w-[120px]">
+                Simpan Area
+              </Button>
+            </div>
           )}
         </div>
       </div>

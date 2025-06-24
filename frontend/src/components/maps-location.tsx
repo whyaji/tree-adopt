@@ -1,13 +1,28 @@
 import { LatLngTuple } from 'leaflet';
-import { ComponentProps, useRef, useState } from 'react';
-import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
+import { ComponentProps, useEffect, useRef, useState } from 'react';
+import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet';
 
 import { markerDefaultIcon } from '@/lib/utils/markerIcons';
+
+const RecenterAutomatically = ({ center, zoom }: { center?: [number, number]; zoom?: number }) => {
+  const map = useMap();
+  useEffect(() => {
+    if (center !== undefined) {
+      map.setView(center, zoom);
+    }
+    if (zoom !== undefined) {
+      map.setZoom(zoom);
+    }
+  }, [center, map, zoom]);
+  return null;
+};
 
 export function MapsLocation(
   props: ComponentProps<typeof MapContainer> & {
     position?: LatLngTuple;
     popupContent?: string;
+    autoRecenter?: boolean;
+    autoReZoom?: boolean;
   }
 ) {
   const listUrl = [
@@ -49,6 +64,8 @@ export function MapsLocation(
     };
   }
 
+  const zoom = props.zoom ?? 12; // Default zoom level if not provided
+
   return (
     <div
       ref={mapContainerRef}
@@ -77,8 +94,8 @@ export function MapsLocation(
       </button>
       {/* Map */}
       <MapContainer
-        center={props.position}
-        zoom={props.zoom ?? 12}
+        center={props.position ?? props.center}
+        zoom={zoom}
         scrollWheelZoom={true}
         zoomControl={true}
         className="w-full h-full"
@@ -88,6 +105,12 @@ export function MapsLocation(
           <Marker position={props.position} icon={markerDefaultIcon}>
             {props.popupContent && <Popup>{props.popupContent}</Popup>}
           </Marker>
+        )}
+        {props.center && (
+          <RecenterAutomatically
+            center={props.autoRecenter ? (props.center as [number, number]) : undefined}
+            zoom={props.autoReZoom ? zoom : undefined}
+          />
         )}
         {props.children}
       </MapContainer>

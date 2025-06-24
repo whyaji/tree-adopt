@@ -63,14 +63,14 @@ export function FormCheckBmHistory({
                   <TableCell>
                     {getConditionsLabelIsTrue(checkBmHistory.conditions).map((condition, index) => (
                       <div key={condition}>
-                        {index}. {condition}
+                        {index + 1}. {condition}
                       </div>
                     ))}
                   </TableCell>
                   <TableCell>
                     {getActionsLabelIsTrue(checkBmHistory.actions).map((action, index) => (
                       <div key={action}>
-                        {index}. {action}
+                        {index + 1}. {action}
                       </div>
                     ))}
                   </TableCell>

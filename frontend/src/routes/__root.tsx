@@ -148,7 +148,7 @@ const Root = () => {
       title: 'Tentang Kami',
       icon: Info,
       items: [
-        { title: 'Apa itu Adopsi Pohon', url: '/admin/tentang-kami/apa-itu-adopsi-pohon' },
+        // { title: 'Apa itu Adopsi Pohon', url: '/admin/tentang-kami/apa-itu-adopsi-pohon' },
         {
           title: 'Kelompok komunitas',
           url: '/admin/tentang-kami/kelompok-komunitas',
@@ -157,7 +157,7 @@ const Root = () => {
             PERMISSION.COMUNITY_GROUP_VIEW_LEVEL_GROUP,
           ]),
         },
-        { title: 'Laporan-laporan', url: '/admin/tentang-kami/laporan-laporan' },
+        // { title: 'Laporan-laporan', url: '/admin/tentang-kami/laporan-laporan' },
       ],
     },
     {

@@ -1,15 +1,21 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router';
+
+import { DetailBoundaryMarkerScreen } from '@/features/admin-panel/screen/data/screen/check-bm-history/screen/DetailBoundaryMarkerScreen';
+import { getBoundaryMarker } from '@/lib/api/boundaryMarkerApi';
 
 export const Route = createFileRoute(
-  '/_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/',
+  '/_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/'
 )({
-  component: RouteComponent,
-})
-
-function RouteComponent() {
-  return (
-    <div>
-      Hello "/_authenticated_admin/admin/data/patok-batas/$boundaryMarkerId/"!
-    </div>
-  )
-}
+  loader: async ({ params }) => {
+    try {
+      const res = await getBoundaryMarker(
+        params.boundaryMarkerId,
+        'kelompokKomunitasId,checkerId,checkBoundaryMarkerHistory'
+      );
+      return { boundaryMarker: res.data };
+    } catch {
+      return { boundaryMarker: null };
+    }
+  },
+  component: DetailBoundaryMarkerScreen,
+});

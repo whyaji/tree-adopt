@@ -8,6 +8,7 @@ import { UserType } from './user.type';
 export type BoundaryMarkerType = BoundaryMarker & {
   checker?: UserType | null;
   kelompokKomunitas?: KelompokKomunitasType | null;
+  checkBoundaryMarkerHistory?: CheckBoundaryMarkerHistory[] | null;
 };
 
 export type BoundarymarkerCodeType = BoundaryMarkerCode & {

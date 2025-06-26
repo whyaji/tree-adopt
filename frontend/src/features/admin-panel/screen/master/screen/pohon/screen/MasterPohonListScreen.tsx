@@ -11,6 +11,8 @@ export function MasterPohonListScreen() {
   const { page, setPage, limit, setLimit, tempSearch, setTempSearch, paginationParams } =
     usePaginationFilter({
       withData: 'masterLocalTree',
+      sortBy: 'id',
+      order: 'desc',
     });
 
   const { isPending, error, data } = useQuery({

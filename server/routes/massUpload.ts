@@ -13,6 +13,7 @@ import {
   treeSchema,
 } from '../db/schema/schema.js';
 import { getYearMonthInNameImage, massUploadFiles } from '../lib/upload.js';
+import { fixCaseLocalTreeName } from '../lib/utils.js';
 import authMiddleware from '../middleware/jwt.js';
 import type { BoundaryMarker } from './boundary-marker/boundaryMarker.js';
 import type { CheckBoundaryMarkerHistory } from './boundary-marker/boundaryMarkerCheckHistory.js';
@@ -73,7 +74,7 @@ export const massUploadRoute = new Hono()
 
     const treeCodeListUpdate = treeCodesUpdate.map((treeCode) => treeCode.code);
 
-    const treeLocalNameList = trees.map((tree) => tree.localTreeName);
+    const treeLocalNameList = trees.map((tree) => fixCaseLocalTreeName(tree.localTreeName));
 
     try {
       const masterTreesSelected = await db
@@ -89,14 +90,19 @@ export const massUploadRoute = new Hono()
         const sortedTrees = [...trees].sort((a, b) => a.id - b.id);
         for (const tree of sortedTrees) {
           try {
+            const { id, localTreeName, ...rest } = tree;
+            const valueLocalTreeName = fixCaseLocalTreeName(localTreeName);
+
             const masterTree = masterTreesSelected.find(
-              (masterTree) => masterTree.localName === tree.localTreeName
+              (masterTree) => masterTree.localName === valueLocalTreeName
             );
 
-            const { id, ...rest } = tree;
-            const upload = await tx
-              .insert(treeSchema)
-              .values({ ...rest, masterTreeId: masterTree?.masterTreeId ?? null });
+            const upload = await tx.insert(treeSchema).values({
+              ...rest,
+              localTreeName: valueLocalTreeName,
+              masterTreeId: masterTree?.masterTreeId ?? null,
+            });
+
             if (upload) {
               resultTrees.push({ id: id, status: STATUS_RECORD.UPLOADED });
             } else {

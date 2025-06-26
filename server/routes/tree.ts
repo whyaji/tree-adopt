@@ -16,6 +16,7 @@ import {
 import { getDataBy } from '../lib/dataBy.js';
 import { getPaginationData } from '../lib/pagination.js';
 import type { RelationsType } from '../lib/relation.js';
+import { fixCaseLocalTreeName } from '../lib/utils.js';
 import authMiddleware from '../middleware/jwt.js';
 
 // === ZOD SCHEMAS ===
@@ -281,4 +282,28 @@ export const treeRoute = new Hono()
       data: treesWithMasterTreeId,
       kelompokKomunitasId: kelompokKomunitasId ? Number(kelompokKomunitasId) : null,
     });
+  })
+
+  .put('/capitalize-local-tree', async (c) => {
+    const trees = await db
+      .select({ id: treeSchema.id, localTreeName: treeSchema.localTreeName })
+      .from(treeSchema);
+
+    const filteredTrees = trees.filter((tree) => {
+      return tree.localTreeName && tree.localTreeName !== fixCaseLocalTreeName(tree.localTreeName);
+    });
+
+    if (filteredTrees.length === 0) {
+      return c.json({ message: 'No local tree names to capitalize' });
+    }
+
+    const updatedTrees = filteredTrees.map((tree) => {
+      const capitalizedLocalName = fixCaseLocalTreeName(tree.localTreeName);
+      return db
+        .update(treeSchema)
+        .set({ localTreeName: capitalizedLocalName })
+        .where(eq(treeSchema.id, tree.id));
+    });
+    await Promise.all(updatedTrees);
+    return c.json({ message: 'Local tree names capitalized' });
   });

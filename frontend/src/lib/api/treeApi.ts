@@ -62,6 +62,33 @@ export async function updateTree(tree: Tree) {
   return await res.json();
 }
 
+export async function updateTreeLocalName(id: string, localTreeName: string) {
+  const res = await treeApi[':id{[0-9]+}']['update-local-name'].$put({
+    json: { localTreeName },
+    param: { id },
+  });
+  if (!res.ok)
+    return (await res.json()) as unknown as {
+      success: boolean;
+      error: {
+        issues: {
+          code: string;
+          message: string;
+          path: string[];
+        }[];
+      };
+    };
+  return await res.json();
+}
+
+export async function massAssignMasterTree(kelompokKomunitasId?: string) {
+  const res = await treeApi['mass-assign-master-tree'].$put({
+    query: { kelompokKomunitasId },
+  });
+  if (!res.ok) throw new Error(res.statusText);
+  return res.json();
+}
+
 export async function deleteTree(id: string) {
   const res = await treeApi[':id{[0-9]+}'].$delete({
     param: { id },

@@ -3,14 +3,17 @@ import { useQuery } from '@tanstack/react-query';
 import { TableData } from '@/components/table-data';
 import { usePaginationFilter } from '@/hooks/use-pagination-filter';
 import { getBoundaryMarkerCodes } from '@/lib/api/boundaryMarkerApi';
+import { useUserStore } from '@/lib/stores/userStore';
 import { BoundarymarkerCodeType } from '@/types/boundaryMarker.type';
 
 import { BoundaryMarkerCodeTable } from '../components/boundary-marker-code-table/BoundaryMarkerCodeTable';
 
 export function BoundaryMarkerCodeListScreen() {
+  const user = useUserStore((state) => state.user);
   const { page, setPage, limit, setLimit, tempSearch, setTempSearch, paginationParams } =
     usePaginationFilter({
       withData: 'kelompokKomunitasId,marker',
+      filter: user?.groupId ? `kelompokKomunitasId:${user.groupId}:eq` : undefined,
     });
 
   const { isPending, error, data, refetch } = useQuery({

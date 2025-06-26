@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 
 import { ConfirmationDialog } from '@/components/confimation-dialog';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogTrigger } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
@@ -18,7 +19,19 @@ import { TreeCategoryLabel } from '@/enum/treeCategory.enum';
 import { deleteTree } from '@/lib/api/treeApi';
 import { TreeType } from '@/types/tree.type';
 
-export function PohonTable({ data, isPending }: { data?: TreeType[]; isPending: boolean }) {
+import { DialogFormLocalTreeName } from '../dialog-form-local-tree-name/DialogFormLocalTreeName';
+
+export function PohonTable({
+  data,
+  isPending,
+  assignMasterTree = false,
+  refetch,
+}: {
+  data?: TreeType[];
+  isPending: boolean;
+  assignMasterTree?: boolean;
+  refetch?: () => void;
+}) {
   const navigate = useNavigate();
 
   if (!data && !isPending) {
@@ -29,11 +42,19 @@ export function PohonTable({ data, isPending }: { data?: TreeType[]; isPending: 
     <Table>
       <TableHeader>
         <TableRow>
-          {['ID', 'Kode', 'Nama Pohon', 'Komunitas', 'Deskripsi', 'Adopter', 'Action'].map(
-            (head) => (
+          {[
+            'ID',
+            'Kode',
+            'Nama Pohon',
+            !assignMasterTree ? 'Komunitas' : null,
+            !assignMasterTree ? 'Deskripsi' : null,
+            !assignMasterTree ? 'Adopter' : null,
+            'Action',
+          ]
+            .filter((value) => value !== null)
+            .map((head) => (
               <TableHead key={head}>{head}</TableHead>
-            )
-          )}
+            ))}
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -64,26 +85,30 @@ export function PohonTable({ data, isPending }: { data?: TreeType[]; isPending: 
                       '-'}
                   </div>
                 </TableCell>
-                <TableCell>{tree.kelompokKomunitas?.name}</TableCell>
-                <TableCell>
-                  {tree.survey && (
-                    <div>
+                {!assignMasterTree && (
+                  <>
+                    <TableCell>{tree.kelompokKomunitas?.name}</TableCell>
+                    <TableCell>
+                      {tree.survey && (
+                        <div>
+                          <div>
+                            <strong>Kategori:</strong> {TreeCategoryLabel[tree.survey.category]}
+                          </div>
+                          <div>
+                            <strong>Circumference:</strong> {tree.survey.circumference} cm
+                          </div>
+                          <div>
+                            <strong>Serapan Karbon (CO2):</strong> {tree.survey.serapanCo2} kg
+                          </div>
+                        </div>
+                      )}
                       <div>
-                        <strong>Kategori:</strong> {TreeCategoryLabel[tree.survey.category]}
+                        <strong>Jenis Tanah:</strong> {LandCoverLabel[tree.landCover]}
                       </div>
-                      <div>
-                        <strong>Circumference:</strong> {tree.survey.circumference} cm
-                      </div>
-                      <div>
-                        <strong>Serapan Karbon (CO2):</strong> {tree.survey.serapanCo2} kg
-                      </div>
-                    </div>
-                  )}
-                  <div>
-                    <strong>Jenis Tanah:</strong> {LandCoverLabel[tree.landCover]}
-                  </div>
-                </TableCell>
-                <TableCell>{tree.adopter?.user?.name ?? '-'}</TableCell>
+                    </TableCell>
+                    <TableCell>{tree.adopter?.user?.name ?? '-'}</TableCell>
+                  </>
+                )}
                 <TableCell>
                   <div className="flex gap-2">
                     <Button
@@ -96,48 +121,62 @@ export function PohonTable({ data, isPending }: { data?: TreeType[]; isPending: 
                       <Eye className="h-4 w-4" />
                       Detail
                     </Button>
-                    <Button
-                      variant="outline"
-                      disabled={tree.surveyorId === null}
-                      onClick={() =>
-                        navigate({
-                          to: `/admin/data/pohon/${tree.id}/survey-history`,
-                        })
-                      }>
-                      <FileText className="h-4 w-4" />
-                      Survey
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() =>
-                        navigate({
-                          to: `/admin/data/pohon/${tree.id}/update`,
-                        })
-                      }>
-                      <Pen className="h-4 w-4" />
-                      Edit
-                    </Button>
-                    <ConfirmationDialog
-                      title="Apakah anda yakin untuk menghapus?"
-                      message="Data yang dihapus tidak dapat dikembalikan."
-                      confirmText="Delete"
-                      onConfirm={async () => {
-                        try {
-                          await deleteTree(String(tree.id));
-                          window.location.reload();
-                        } catch (error) {
-                          console.error(error);
-                          toast.error('Failed to delete komunitas');
-                        }
-                      }}
-                      confirmVarriant="destructive"
-                      triggerButton={
-                        <Button variant="destructive">
-                          <Trash className="h-4 w-4" />
-                          Delete
+                    {assignMasterTree ? (
+                      <Dialog key="edit-local-name">
+                        <DialogTrigger asChild>
+                          <Button variant="outline">
+                            <Pen className="h-4 w-4" />
+                            Edit Nama Lokal
+                          </Button>
+                        </DialogTrigger>
+                        <DialogFormLocalTreeName tree={tree} refetch={refetch} />
+                      </Dialog>
+                    ) : (
+                      <>
+                        <Button
+                          variant="outline"
+                          disabled={tree.surveyorId === null}
+                          onClick={() =>
+                            navigate({
+                              to: `/admin/data/pohon/${tree.id}/survey-history`,
+                            })
+                          }>
+                          <FileText className="h-4 w-4" />
+                          Survey
                         </Button>
-                      }
-                    />
+                        <Button
+                          variant="outline"
+                          onClick={() =>
+                            navigate({
+                              to: `/admin/data/pohon/${tree.id}/update`,
+                            })
+                          }>
+                          <Pen className="h-4 w-4" />
+                          Edit
+                        </Button>
+                        <ConfirmationDialog
+                          title="Apakah anda yakin untuk menghapus?"
+                          message="Data yang dihapus tidak dapat dikembalikan."
+                          confirmText="Delete"
+                          onConfirm={async () => {
+                            try {
+                              await deleteTree(String(tree.id));
+                              refetch?.();
+                            } catch (error) {
+                              console.error(error);
+                              toast.error('Failed to delete komunitas');
+                            }
+                          }}
+                          confirmVarriant="destructive"
+                          triggerButton={
+                            <Button variant="destructive">
+                              <Trash className="h-4 w-4" />
+                              Delete
+                            </Button>
+                          }
+                        />
+                      </>
+                    )}
                   </div>
                 </TableCell>
               </TableRow>

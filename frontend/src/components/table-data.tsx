@@ -14,6 +14,7 @@ export function TableData({
   addUrl,
   table,
   elementsHeader,
+  className,
 }: {
   title: string;
   tempSearch: string;
@@ -26,9 +27,10 @@ export function TableData({
   addUrl?: string;
   table: React.ReactNode;
   elementsHeader?: React.ReactNode[];
+  className?: string;
 }) {
   return (
-    <Card className="p-4 m-auto mt-6 max-w-7xl">
+    <Card className={className ?? 'p-4 m-auto mt-6 max-w-7xl'}>
       <TableHeadbar
         title={title}
         tempSearch={tempSearch}

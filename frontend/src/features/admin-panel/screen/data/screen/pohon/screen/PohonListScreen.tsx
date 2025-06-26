@@ -3,11 +3,14 @@ import { useEffect, useState } from 'react';
 
 import { DropdownMasterTreeList } from '@/components/dropdown';
 import { TableData } from '@/components/table-data';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogTrigger } from '@/components/ui/dialog';
 import { usePaginationFilter } from '@/hooks/use-pagination-filter';
 import { getTrees } from '@/lib/api/treeApi';
 import { useUserStore } from '@/lib/stores/userStore';
 import { TreeType } from '@/types/tree.type';
 
+import { DialogAssignMasterTree } from '../components/dialog-assign-master-tree/DialogAssignMasterTree';
 import { PohonTable } from '../components/pohon-table/PohonTable';
 
 export function PohonListScreen() {
@@ -21,7 +24,7 @@ export function PohonListScreen() {
       filter: user?.groupId ? `kelompokKomunitasId:${user.groupId}:eq` : undefined,
     });
 
-  const { isPending, error, data } = useQuery({
+  const { isPending, error, data, refetch } = useQuery({
     queryKey: ['get-tree', paginationParams],
     queryFn: () => getTrees(paginationParams),
   });
@@ -58,6 +61,12 @@ export function PohonListScreen() {
       setLimit={setLimit}
       addUrl="/admin/data/pohon/add"
       elementsHeader={[
+        <Dialog key="dialog-assign-master-tree">
+          <DialogTrigger asChild>
+            <Button variant="default">Set Master Pohon Otomatis</Button>
+          </DialogTrigger>
+          <DialogAssignMasterTree refetchList={refetch} />
+        </Dialog>,
         <DropdownMasterTreeList
           value={filterMasterTree}
           setValue={setFilterMasterTree}
@@ -65,7 +74,7 @@ export function PohonListScreen() {
           key="master-tree-dropdown"
         />,
       ]}
-      table={<PohonTable data={data?.data as TreeType[]} isPending={isPending} />}
+      table={<PohonTable data={data?.data as TreeType[]} isPending={isPending} refetch={refetch} />}
     />
   );
 }

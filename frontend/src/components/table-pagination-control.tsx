@@ -56,7 +56,7 @@ export function TablePaginationControls({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-18">
-            {[10, 20, 50, 100].map((item) => (
+            {[5, 10, 20, 50, 100].map((item) => (
               <DropdownMenuItem key={item} onClick={() => setLimit(item)}>
                 {item}
               </DropdownMenuItem>

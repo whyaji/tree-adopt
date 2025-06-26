@@ -55,7 +55,7 @@ export const FormMasterLocalTree: FC<{
   const formItem: FieldItemType<keyof (typeof form)['state']['values']>[] = [
     {
       name: 'masterTreeId',
-      label: 'Master Pohon Lokal',
+      label: 'Master Pohon',
       type: 'dropdown-master-tree',
       required: true,
       paginationParams: {
@@ -80,7 +80,7 @@ export const FormMasterLocalTree: FC<{
         form.handleSubmit();
       }}>
       <h2 className="text-2xl font-bold">
-        {masterLocalTree ? 'Update Master Tree' : 'Add Master Tree'}
+        {masterLocalTree ? 'Update Master Pohon Lokal' : 'Add Master Pohon Lokal'}
       </h2>
 
       {formItem.map((item) => (

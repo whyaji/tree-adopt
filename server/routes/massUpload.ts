@@ -96,7 +96,7 @@ export const massUploadRoute = new Hono()
             const { id, ...rest } = tree;
             const upload = await tx
               .insert(treeSchema)
-              .values({ ...rest, masterTreeId: masterTree?.id ?? null });
+              .values({ ...rest, masterTreeId: masterTree?.masterTreeId ?? null });
             if (upload) {
               resultTrees.push({ id: id, status: STATUS_RECORD.UPLOADED });
             } else {

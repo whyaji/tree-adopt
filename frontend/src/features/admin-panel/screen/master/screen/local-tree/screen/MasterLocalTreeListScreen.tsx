@@ -11,6 +11,8 @@ export function MasterLocalTreeListScreen() {
   const { page, setPage, limit, setLimit, tempSearch, setTempSearch, paginationParams } =
     usePaginationFilter({
       withData: 'masterTreeId',
+      sortBy: 'id',
+      order: 'desc',
     });
 
   const { isPending, error, data, refetch } = useQuery({

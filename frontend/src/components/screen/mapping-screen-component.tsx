@@ -105,7 +105,7 @@ export function MappingScreenComponent() {
   }, []);
 
   return (
-    <div className="flex h-full w-full items-center justify-center">
+    <div className="flex h-full w-full items-center justify-center overflow-hidden relative z-0">
       <MapsLocation
         autoReZoom
         autoRecenter

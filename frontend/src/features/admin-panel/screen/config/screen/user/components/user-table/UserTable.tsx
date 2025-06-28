@@ -33,7 +33,7 @@ export function UserTable({
 
   return (
     <Table>
-      <TableHeader>
+      <TableHeader className="sticky top-0 z-10 bg-background">
         <TableRow>
           {['ID', 'Nama', 'Email', 'Tipe User', 'Action'].map((head) => (
             <TableHead key={head}>{head}</TableHead>

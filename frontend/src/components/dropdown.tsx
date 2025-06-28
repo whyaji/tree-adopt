@@ -34,6 +34,7 @@ export function Dropdown({
   refreshing,
   onRefresh,
   totalData,
+  className,
 }: {
   label?: string;
   data: {
@@ -49,6 +50,7 @@ export function Dropdown({
   refreshing?: boolean;
   onRefresh?: () => void;
   totalData?: number;
+  className?: string;
 }) {
   const [open, setOpen] = React.useState(false);
   const [loadingMore, setLoadingMore] = React.useState(false);
@@ -64,7 +66,7 @@ export function Dropdown({
   };
 
   return (
-    <div className="w-full">
+    <div className={className ?? 'w-full'}>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
@@ -239,6 +241,7 @@ type PaginationDropdownProps = {
   setValue: (value: string) => void;
   defaultParams?: PaginationParamsOptional;
   withNullValue?: boolean;
+  className?: string;
 };
 
 export function DropdownMasterTreeList({
@@ -247,6 +250,7 @@ export function DropdownMasterTreeList({
   setValue,
   defaultParams,
   withNullValue = false,
+  className,
 }: PaginationDropdownProps) {
   const { page, setPage, tempSearch, setTempSearch, data, setData, paginationParams } =
     usePaginationFilter<MasterTreeType>(defaultParams);
@@ -279,6 +283,7 @@ export function DropdownMasterTreeList({
 
   return (
     <Dropdown
+      className={className}
       label={label}
       data={[
         ...(withNullValue ? [{ label: 'Belum diketahui', value: 'null', secondaryLabel: '' }] : []),

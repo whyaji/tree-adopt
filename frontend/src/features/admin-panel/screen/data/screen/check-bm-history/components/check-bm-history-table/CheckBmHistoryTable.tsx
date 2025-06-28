@@ -34,7 +34,7 @@ export function FormCheckBmHistory({
 
   return (
     <Table>
-      <TableHeader>
+      <TableHeader className="sticky top-0 z-10 bg-background">
         <TableRow>
           {['ID', 'Tanggal Check', 'Kondisi', 'Aksi', 'Action'].map((head) => (
             <TableHead key={head}>{head}</TableHead>

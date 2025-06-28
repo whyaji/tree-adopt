@@ -1,5 +1,6 @@
 'use client';
 
+import { Link } from '@tanstack/react-router';
 import { ArrowUpCircleIcon, LucideIcon } from 'lucide-react';
 import * as React from 'react';
 
@@ -10,7 +11,10 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from '@/components/ui/sidebar';
+import { ROLE } from '@/enum/role.enum';
+import { useUserStore } from '@/lib/stores/userStore';
 
 import { NavMain } from './nav-main';
 import { NavSecondary } from './nav-secondary';
@@ -37,22 +41,32 @@ export function AppSidebar({
     icon?: LucideIcon;
   }[];
 }) {
+  const user = useUserStore((state) => state.user);
+
+  const homeUrl = user?.role === ROLE.ADMIN ? '/admin' : '/';
+
+  const { setOpenMobile } = useSidebar();
+
+  const closeMobileSidebar = () => {
+    setOpenMobile(false);
+  };
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:!p-1.5">
-              <a href="/">
+              <Link to={homeUrl}>
                 <ArrowUpCircleIcon className="h-5 w-5" />
                 <span className="text-base font-semibold">Tree Adopt</span>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent className="overflow-y-auto scrollbar-hidden">
-        <NavMain items={navItem} />
+        <NavMain items={navItem} closeMobileSidebar={closeMobileSidebar} />
         {navSecondary !== undefined && <NavSecondary items={navSecondary} className="mt-auto" />}
       </SidebarContent>
     </Sidebar>

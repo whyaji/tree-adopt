@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
 
-import { DropdownMasterTreeList } from '@/components/dropdown';
+import { DropdownComunityGroupList, DropdownMasterTreeList } from '@/components/dropdown';
 import { TableData } from '@/components/table-data';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogTrigger } from '@/components/ui/dialog';
+import { FILTER_NAME } from '@/enum/filter-name.enum';
 import { usePaginationFilter } from '@/hooks/use-pagination-filter';
 import { getTrees } from '@/lib/api/treeApi';
 import { useUserStore } from '@/lib/stores/userStore';
@@ -15,14 +15,24 @@ import { PohonTable } from '../components/pohon-table/PohonTable';
 
 export function PohonListScreen() {
   const user = useUserStore((state) => state.user);
-  const { setPage, setLimit, tempSearch, setTempSearch, paginationParams, setFilter, filter } =
-    usePaginationFilter({
+  const {
+    setPage,
+    setLimit,
+    tempSearch,
+    setTempSearch,
+    paginationParams,
+    tempFilterState,
+    handleApplyFilter,
+  } = usePaginationFilter(
+    {
       withData:
         'masterTreeId,masterLocalTree,kelompokKomunitasId,adopter,adopter.userId,survey,survey.userId',
       sortBy: 'id',
       order: 'desc',
       filter: user?.groupId ? `kelompokKomunitasId:${user.groupId}:eq` : undefined,
-    });
+    },
+    [FILTER_NAME.MASTER_TREE, FILTER_NAME.GROUP]
+  );
 
   const { isPending, error, data, refetch } = useQuery({
     queryKey: ['get-tree', paginationParams],
@@ -31,21 +41,19 @@ export function PohonListScreen() {
 
   const totalPage = data?.totalPage ?? 0;
 
-  const [filterMasterTree, setFilterMasterTree] = useState<string>('');
-
-  useEffect(() => {
-    if (filterMasterTree) {
-      const newFilter = filter.replace(/(;)?masterTreeId:[^;]*/g, '').replace(/;$/, '');
-      if (filterMasterTree !== 'null') {
-        setFilter(newFilter + (newFilter !== '' ? ';' : '') + `masterTreeId:${filterMasterTree}`);
-      } else if (filterMasterTree === 'null') {
-        setFilter(newFilter + (newFilter !== '' ? ';' : '') + `masterTreeId::null`);
-      }
-      setPage(1);
-    } else {
-      setFilter(filter.replace(/(;)?masterTreeId:[^;]*/g, '').replace(/;$/, ''));
-    }
-  }, [filterMasterTree]);
+  // useEffect(() => {
+  //   if (filterMasterTree) {
+  //     const newFilter = filter.replace(/(;)?masterTreeId:[^;]*/g, '').replace(/;$/, '');
+  //     if (filterMasterTree !== 'null') {
+  //       setFilter(newFilter + (newFilter !== '' ? ';' : '') + `masterTreeId:${filterMasterTree}`);
+  //     } else if (filterMasterTree === 'null') {
+  //       setFilter(newFilter + (newFilter !== '' ? ';' : '') + `masterTreeId::null`);
+  //     }
+  //     setPage(1);
+  //   } else {
+  //     setFilter(filter.replace(/(;)?masterTreeId:[^;]*/g, '').replace(/;$/, ''));
+  //   }
+  // }, [filterMasterTree]);
 
   if (error) return <div>Error: {error.message}</div>;
 
@@ -63,15 +71,27 @@ export function PohonListScreen() {
       elementsHeader={[
         <Dialog key="dialog-assign-master-tree">
           <DialogTrigger asChild>
-            <Button variant="default">Set Master Pohon Otomatis</Button>
+            <Button className="w-full" variant="default">
+              Set Master Pohon Otomatis
+            </Button>
           </DialogTrigger>
           <DialogAssignMasterTree refetchList={refetch} />
         </Dialog>,
         <DropdownMasterTreeList
-          value={filterMasterTree}
-          setValue={setFilterMasterTree}
+          value={tempFilterState[FILTER_NAME.MASTER_TREE]}
+          setValue={(value) => {
+            handleApplyFilter(FILTER_NAME.MASTER_TREE, value);
+          }}
           withNullValue
           key="master-tree-dropdown"
+        />,
+        <DropdownComunityGroupList
+          value={tempFilterState[FILTER_NAME.GROUP]}
+          setValue={(value) => {
+            handleApplyFilter(FILTER_NAME.GROUP, value);
+          }}
+          withNullValue
+          key="group-dropdown"
         />,
       ]}
       table={<PohonTable data={data?.data as TreeType[]} isPending={isPending} refetch={refetch} />}

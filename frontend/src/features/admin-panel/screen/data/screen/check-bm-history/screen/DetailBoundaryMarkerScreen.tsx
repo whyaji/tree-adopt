@@ -151,7 +151,7 @@ export function DetailBoundaryMarkerScreen() {
       {/* Check History Table */}
       <h2 className="text-xl font-bold mt-8 mb-4">Riwayat Cek Patok Batas</h2>
       <Table>
-        <TableHeader>
+        <TableHeader className="sticky top-0 z-10 bg-background">
           <TableRow>
             {['ID', 'Tanggal Check', 'Kondisi', 'Aksi'].map((head) => (
               <TableHead key={head}>{head}</TableHead>

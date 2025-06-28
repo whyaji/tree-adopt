@@ -34,7 +34,7 @@ const RoleTable: FC<{
 
   return (
     <Table>
-      <TableHeader>
+      <TableHeader className="sticky top-0 z-10 bg-background">
         <TableRow>
           {['ID', 'Nama', 'Kode', 'Action'].map((head) => (
             <TableHead key={head}>{head}</TableHead>

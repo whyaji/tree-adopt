@@ -32,7 +32,7 @@ export function MasterLocalTreeTable({
 
   return (
     <Table>
-      <TableHeader>
+      <TableHeader className="sticky top-0 z-10 bg-background">
         <TableRow>
           {['ID', 'Local Name', 'Latin Name', 'Action'].map((head) => (
             <TableHead key={head}>{head}</TableHead>

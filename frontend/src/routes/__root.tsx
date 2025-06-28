@@ -14,7 +14,7 @@ import {
 
 import { AppSidebar } from '@/components/app-sidebar';
 import { SiteHeader } from '@/components/site-header';
-import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import { SidebarProvider } from '@/components/ui/sidebar';
 import { Toaster } from '@/components/ui/sonner';
 import { PERMISSION } from '@/enum/permission.enum';
 import { ROLE } from '@/enum/role.enum';
@@ -196,9 +196,9 @@ const Root = () => {
         <AppSidebar navItem={navMainAdmin} navSecondary={navSecondaryAdmin} />
       )}
       {user?.role === ROLE.USER && <AppSidebar navItem={navMain} navSecondary={navSecondary} />}
-      <SidebarInset>
+      <main className="flex flex-col w-full flex-1 h-screen overflow-hidden">
         {user && (
-          <div className="sticky top-0 z-10 bg-background">
+          <div className="sticky top-0 bg-background z-20">
             <SiteHeader />
           </div>
         )}
@@ -207,7 +207,7 @@ const Root = () => {
           {/* <TanStackRouterDevtools /> */}
           <Toaster />
         </div>
-      </SidebarInset>
+      </main>
     </SidebarProvider>
   );
 };

@@ -32,7 +32,7 @@ export function BoundaryMarkerCodeTable({
 
   return (
     <Table>
-      <TableHeader>
+      <TableHeader className="sticky top-0 z-10 bg-background">
         <TableRow>
           {['ID', 'Kode', 'Kelompok Komunitas', 'Marker', 'Action'].map((head) => (
             <TableHead key={head}>{head}</TableHead>

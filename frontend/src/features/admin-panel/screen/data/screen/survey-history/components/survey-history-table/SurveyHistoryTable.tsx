@@ -32,7 +32,7 @@ export function SurveyHistoryTable({
 
   return (
     <Table>
-      <TableHeader>
+      <TableHeader className="sticky top-0 z-10 bg-background">
         <TableRow>
           {[
             'ID',

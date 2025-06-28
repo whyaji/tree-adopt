@@ -29,29 +29,13 @@ export function TablePaginationControls({
   setLimit: (limit: number) => void;
 }) {
   return (
-    <div className="flex flex-col items-center gap-4">
-      <Pagination className="flex flex-row items-center justify-between">
-        <PaginationContent className="w-40 justify-start">
-          {page > 1 && (
-            <PaginationItem>
-              <PaginationPrevious href="#" onClick={() => setPage(page - 1)} />
-            </PaginationItem>
-          )}
-        </PaginationContent>
-        <TablePaginationContent page={page} totalPage={totalPage} setPage={setPage} />
-        <PaginationContent className="w-40 justify-end">
-          {page < totalPage && (
-            <PaginationItem>
-              <PaginationNext href="#" onClick={() => setPage(page + 1)} />
-            </PaginationItem>
-          )}
-        </PaginationContent>
-      </Pagination>
-      <div className="flex flex-row gap-4 items-center">
-        <h2>Items per page:</h2>
+    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 w-full">
+      {/* Items per page selector */}
+      <div className="flex flex-row flex-1 items-center gap-2 md:gap-4">
+        <h2 className="text-sm md:text-base">Items per page:</h2>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="w-12">
+            <Button variant="outline" className="w-12 px-0 md:px-2">
               {limit}
             </Button>
           </DropdownMenuTrigger>
@@ -64,6 +48,28 @@ export function TablePaginationControls({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+      {/* Pagination controls */}
+      <Pagination className="flex flex-row items-center w-full md:w-auto justify-end">
+        <PaginationContent className="w-24 md:w-30">
+          {page > 1 && (
+            <PaginationItem>
+              <PaginationPrevious
+                href="#"
+                onClick={() => setPage(page - 1)}
+                className="px-2 md:px-3"
+              />
+            </PaginationItem>
+          )}
+        </PaginationContent>
+        <TablePaginationContent page={page} totalPage={totalPage} setPage={setPage} />
+        <PaginationContent className="w-24 md:w-30 justify-end">
+          {page < totalPage && (
+            <PaginationItem>
+              <PaginationNext href="#" onClick={() => setPage(page + 1)} className="px-2 md:px-3" />
+            </PaginationItem>
+          )}
+        </PaginationContent>
+      </Pagination>
     </div>
   );
 }

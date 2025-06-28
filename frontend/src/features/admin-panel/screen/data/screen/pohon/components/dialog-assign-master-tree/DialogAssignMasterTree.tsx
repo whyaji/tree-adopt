@@ -81,25 +81,26 @@ export function DialogAssignMasterTree({ refetchList }: { refetchList?: () => vo
         {error ? (
           <div className="text-red-500 text-center mt-4">Error: {error.message}</div>
         ) : (
-          <TableData
-            className="max-h-[60vh] overflow-y-auto w-full p-4"
-            title="Pohon"
-            tempSearch={tempSearch}
-            setTempSearch={setTempSearch}
-            page={paginationParams.page}
-            setPage={setPage}
-            totalPage={totalPage}
-            limit={paginationParams.limit}
-            setLimit={setLimit}
-            table={
-              <PohonTable
-                data={data?.data as TreeType[]}
-                isPending={isPending}
-                assignMasterTree
-                refetch={refetch}
-              />
-            }
-          />
+          <div className="max-h-[60vh] overflow-y-auto w-full">
+            <TableData
+              title="Pohon"
+              tempSearch={tempSearch}
+              setTempSearch={setTempSearch}
+              page={paginationParams.page}
+              setPage={setPage}
+              totalPage={totalPage}
+              limit={paginationParams.limit}
+              setLimit={setLimit}
+              table={
+                <PohonTable
+                  data={data?.data as TreeType[]}
+                  isPending={isPending}
+                  assignMasterTree
+                  refetch={refetch}
+                />
+              }
+            />
+          </div>
         )}
         <DialogFooter>
           <DialogClose asChild>

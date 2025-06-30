@@ -16,6 +16,7 @@ export function TableData({
   table,
   elementsHeader,
   className,
+  sticky = true,
 }: {
   title: string;
   tempSearch: string;
@@ -29,10 +30,11 @@ export function TableData({
   table: React.ReactNode;
   elementsHeader?: JSX.Element[];
   className?: string;
+  sticky?: boolean;
 }) {
   return (
-    <div className={className ?? 'flex flex-col w-full h-full relative'}>
-      <div className="sticky top-0 z-10 bg-background">
+    <div className={className ?? 'flex flex-col w-full relative' + (sticky ? ' h-full' : '')}>
+      <div className={'bg-background' + (sticky ? ' sticky top-0 z-10' : '')}>
         <TableHeadbar
           title={title}
           tempSearch={tempSearch}
@@ -42,7 +44,7 @@ export function TableData({
         />
       </div>
       <div className="flex w-full flex-1 overflow-auto mb-2 mt-2">{table}</div>
-      <div className="sticky bottom-0 z-10 bg-background">
+      <div className={'bg-background' + (sticky ? ' sticky bottom-0 z-10' : '')}>
         <TablePaginationControls
           page={page}
           setPage={setPage}

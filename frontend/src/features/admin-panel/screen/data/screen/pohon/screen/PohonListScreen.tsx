@@ -41,20 +41,6 @@ export function PohonListScreen() {
 
   const totalPage = data?.totalPage ?? 0;
 
-  // useEffect(() => {
-  //   if (filterMasterTree) {
-  //     const newFilter = filter.replace(/(;)?masterTreeId:[^;]*/g, '').replace(/;$/, '');
-  //     if (filterMasterTree !== 'null') {
-  //       setFilter(newFilter + (newFilter !== '' ? ';' : '') + `masterTreeId:${filterMasterTree}`);
-  //     } else if (filterMasterTree === 'null') {
-  //       setFilter(newFilter + (newFilter !== '' ? ';' : '') + `masterTreeId::null`);
-  //     }
-  //     setPage(1);
-  //   } else {
-  //     setFilter(filter.replace(/(;)?masterTreeId:[^;]*/g, '').replace(/;$/, ''));
-  //   }
-  // }, [filterMasterTree]);
-
   if (error) return <div>Error: {error.message}</div>;
 
   return (

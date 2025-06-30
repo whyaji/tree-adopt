@@ -12,6 +12,7 @@ const envSchema = z.object({
   DB_PASSWORD: z.string(),
   DB_NAME: z.string(),
   HASH_SALT: z.string().default('10'),
+  RECAPTCHA_SECRET_KEY: z.string().optional(),
 });
 
 export default envSchema.parse(process.env);

@@ -29,18 +29,41 @@ export const userQueryOptions = queryOptions({
   staleTime: Infinity,
 });
 
-export const login = async (email: string, password: string) => {
-  const res = await api.login.$post({ json: { email, password } });
-  if (!res.ok) {
-    throw new Error('invalid email or password');
-  }
-  return res.json();
+export const login = async (email: string, password: string, recaptchaToken: string) => {
+  const res = await api['login-with-recaptcha'].$post({
+    json: { email, password, recaptchaToken },
+  });
+  if (!res.ok)
+    return (await res.json()) as unknown as {
+      success: boolean;
+      error: {
+        issues: {
+          code: string;
+          message: string;
+          path: string[];
+        }[];
+      };
+    };
+  return await res.json();
 };
 
-export const register = async (name: string, email: string, password: string) => {
-  const res = await api.register.$post({ json: { name, email, password } });
-  if (!res.ok) {
-    throw new Error('email already exists or invalid data');
-  }
-  return res.json();
+export const register = async (
+  name: string,
+  email: string,
+  password: string,
+  recaptchaToken: string
+) => {
+  const res = await api.register.$post({ json: { name, email, password, recaptchaToken } });
+  if (!res.ok)
+    return (await res.json()) as unknown as {
+      success: boolean;
+      error: {
+        issues: {
+          code: string;
+          message: string;
+          path: string[];
+        }[];
+      };
+    };
+  return await res.json();
 };

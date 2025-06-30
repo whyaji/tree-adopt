@@ -2,6 +2,7 @@ import { useForm } from '@tanstack/react-form';
 import Cookies from 'js-cookie';
 import { Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
@@ -10,17 +11,29 @@ import { Label } from '@/components/ui/label';
 import { ROLE } from '@/enum/role.enum';
 import { getCurrentUserWithToken, login } from '@/lib/api/authApi';
 import { cn } from '@/lib/utils';
+import { assertAndHandleFormErrors } from '@/lib/utils/setErrorForms';
+
 export function LoginScreen() {
+  const { executeRecaptcha } = useGoogleReCaptcha();
+
   const [showPassword, setShowPassword] = useState(false);
   const form = useForm({
     defaultValues: {
       email: '',
       password: '',
     },
-    onSubmit: async ({ value }) => {
+    onSubmit: async ({ value, formApi }) => {
+      if (!executeRecaptcha) {
+        toast('Recaptcha not ready');
+        return;
+      }
+
+      const recaptchaToken = await executeRecaptcha('login');
+
       try {
         console.log('value', value);
-        const res = await login(value.email, value.password);
+        const res = await login(value.email, value.password, recaptchaToken);
+        assertAndHandleFormErrors<typeof value>(res, formApi.setFieldMeta);
         toast('Login successfully');
         Cookies.set('auth_token', res.data.token, { expires: 7, secure: true });
         try {

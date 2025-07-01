@@ -14,6 +14,7 @@ export function TableData({
   setLimit,
   addUrl,
   table,
+  infiniteScrollMobile,
   elementsHeader,
   className,
   sticky = true,
@@ -29,6 +30,7 @@ export function TableData({
   setLimit: (limit: number) => void;
   addUrl?: string;
   table: React.ReactNode;
+  infiniteScrollMobile?: React.ReactNode;
   elementsHeader?: JSX.Element[];
   className?: string;
   sticky?: boolean;
@@ -49,8 +51,24 @@ export function TableData({
           elementsHeader={elementsHeader}
         />
       </div>
-      <div className="flex w-full flex-1 overflow-auto mb-2 mt-2">{table}</div>
-      <div className={'bg-background' + (sticky ? ' sticky bottom-0 z-10' : '')}>
+      <div
+        className={
+          (infiniteScrollMobile !== undefined ? 'hidden sm:flex' : 'flex') +
+          ' w-full flex-1 overflow-auto mb-2 mt-2'
+        }>
+        {table}
+      </div>
+      {infiniteScrollMobile && (
+        <div className="sm:hidden flex w-full flex-1 overflow-auto mt-2">
+          {infiniteScrollMobile}
+        </div>
+      )}
+      <div
+        className={
+          (infiniteScrollMobile !== undefined ? 'hidden sm:block ' : '') +
+          'bg-background' +
+          (sticky ? ' sticky bottom-0 z-10' : '')
+        }>
         <TablePaginationControls
           page={page}
           setPage={setPage}

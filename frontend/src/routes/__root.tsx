@@ -217,4 +217,10 @@ interface MyRouteContext {
 
 export const Route = createRootRouteWithContext<MyRouteContext>()({
   component: Root,
+  notFoundComponent: NotFound,
 });
+
+function NotFound() {
+  window.location.replace('/not-found');
+  return null;
+}

@@ -21,7 +21,7 @@ const Component = () => {
   setUser(user.data);
 
   if (user.data.role !== ROLE.ADMIN) {
-    return <OnboardingScreen />;
+    window.location.replace('/not-found');
   }
 
   return <Outlet />;

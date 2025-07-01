@@ -21,11 +21,11 @@ const Component = () => {
   setUser(user.data);
 
   if (user.data.role === ROLE.ADMIN) {
-    window.location.href = '/admin';
+    window.location.replace('/admin');
   }
 
-  if (user.data.role !== ROLE.USER) {
-    return <OnboardingScreen />;
+  if (user.data.role !== ROLE.USER && user.data.role !== ROLE.ADMIN) {
+    window.location.replace('/not-found');
   }
 
   return <Outlet />;

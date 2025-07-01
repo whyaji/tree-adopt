@@ -157,7 +157,7 @@ export function LoginScreen() {
           </div>
         </div>
       </div>
-      <div className="bg-muted relative hidden lg:block rounded-3xl overflow-hidden">
+      <div className="bg-muted relative hidden lg:block rounded-bl-3xl rounded-tl-3xl overflow-hidden">
         <img
           src="/images/auth/login-bg.jpg"
           alt="Login background"

@@ -202,7 +202,7 @@ const Root = () => {
             <SiteHeader />
           </div>
         )}
-        <div className="flex-1 p-4 overflow-auto">
+        <div className="flex-1 overflow-auto">
           <Outlet />
           {/* <TanStackRouterDevtools /> */}
           <Toaster />

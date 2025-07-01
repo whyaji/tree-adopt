@@ -1,24 +1,10 @@
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 import Cookies from 'js-cookie';
 
-import { Button } from '@/components/ui/button';
 import { ROLE } from '@/enum/role.enum';
+import { OnboardingScreen } from '@/features/onboarding/screen/OnboardingScreen';
 import { userQueryOptions } from '@/lib/api/authApi';
 import { useUserStore } from '@/lib/stores/userStore';
-
-const Onboard = () => {
-  return (
-    <div className="flex flex-col gap-y-2 items-center mt-6">
-      <p>You have to login or register</p>
-      <Button asChild>
-        <a href="/login">Login!</a>
-      </Button>
-      <Button asChild>
-        <a href="/register">Register!</a>
-      </Button>
-    </div>
-  );
-};
 
 const Component = () => {
   const { user } = Route.useRouteContext();
@@ -29,7 +15,7 @@ const Component = () => {
     clearUser();
     Cookies.remove('auth_token');
     Cookies.remove('user');
-    return <Onboard />;
+    return <OnboardingScreen />;
   }
 
   setUser(user.data);
@@ -39,7 +25,7 @@ const Component = () => {
   }
 
   if (user.data.role !== ROLE.USER) {
-    return <Onboard />;
+    return <OnboardingScreen />;
   }
 
   return <Outlet />;

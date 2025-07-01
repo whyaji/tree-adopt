@@ -43,7 +43,7 @@ export function SiteHeader() {
   return (
     <header className="flex h-16 shrink-0 items-center gap-2 border-b px-2 sm:px-4">
       <SidebarTrigger className="-ml-1" />
-      <Separator orientation="vertical" className="mr-2 h-4 hidden sm:block" />
+      <Separator orientation="vertical" className="mr-2 h-4" />
       <div className="flex-1 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-0">
         <Breadcrumb className="w-full">
           <BreadcrumbList className="flex items-center gap-2 text-xs sm:text-sm">
@@ -54,7 +54,7 @@ export function SiteHeader() {
                   type="button"
                   onClick={() => navigate({ to: homeUrl })}
                   className="flex items-center">
-                  <HomeIcon className="mr-1" />
+                  <HomeIcon className="mr-1" size={20} />
                 </button>
                 {pathSegments.length > 0 && <BreadcrumbSeparator />}
               </BreadcrumbItem>
@@ -84,15 +84,6 @@ export function SiteHeader() {
             </div>
             {/* Show only last segment on mobile */}
             <div className="flex sm:hidden items-center gap-2">
-              <BreadcrumbItem>
-                <button
-                  type="button"
-                  onClick={() => navigate({ to: homeUrl })}
-                  className="flex items-center">
-                  <HomeIcon className="mr-1" />
-                </button>
-                {pathSegments.length > 0 && <BreadcrumbSeparator />}
-              </BreadcrumbItem>
               {pathSegments.length > 0 && (
                 <BreadcrumbItem>
                   <BreadcrumbPage>

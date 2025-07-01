@@ -4,7 +4,6 @@ const partnerItems = [
   { src: '/images/mitra-kth-mawar-bersemi.png', alt: 'Mitra KTH Mawar Bersemi' },
   { src: '/images/mitra-masoraian.png', alt: 'Mitra Masoraian' },
   { src: '/images/mitra-ssms.png', alt: 'Mitra SSMS' },
-  { src: '/images/mitra-usaid.png', alt: 'Mitra USAID' },
 ];
 
 export function HomePartner() {

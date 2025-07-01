@@ -73,6 +73,7 @@ export function RolePermissionScreen() {
       <div className="flex flex-col lg:flex-row gap-6">
         <div className="flex-1">
           <TableData
+            withPadding={false}
             sticky={false}
             title="Role"
             tempSearch={tempSearch}

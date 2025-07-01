@@ -17,6 +17,7 @@ export function TableData({
   elementsHeader,
   className,
   sticky = true,
+  withPadding = true,
 }: {
   title: string;
   tempSearch: string;
@@ -31,9 +32,14 @@ export function TableData({
   elementsHeader?: JSX.Element[];
   className?: string;
   sticky?: boolean;
+  withPadding?: boolean;
 }) {
   return (
-    <div className={className ?? 'flex flex-col w-full relative' + (sticky ? ' h-full' : '')}>
+    <div
+      className={
+        className ??
+        'flex flex-col w-full relative' + (sticky ? ' h-full' : '') + (withPadding ? ' p-4' : '')
+      }>
       <div className={'bg-background' + (sticky ? ' sticky top-0 z-10' : '')}>
         <TableHeadbar
           title={title}

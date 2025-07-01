@@ -44,7 +44,7 @@ export const adoptHistoryRoute = new Hono()
     return await getPaginationData({
       c,
       table: adoptHistorySchema,
-      searchBy: 'latinName,localName',
+      searchBy: 'treeId',
       relations,
     });
   })

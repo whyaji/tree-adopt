@@ -108,7 +108,9 @@ export function SiteHeader() {
                 className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground px-2 sm:px-3">
                 <Avatar className="h-8 w-8 rounded-lg grayscale">
                   <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                  <AvatarFallback className="rounded-lg">
+                    {user.name ? user.name[0] : 'U'}
+                  </AvatarFallback>
                 </Avatar>
                 {/* Hide name/email on mobile, show on sm+ */}
                 <div className="hidden sm:grid flex-1 text-left text-sm leading-tight ml-2">
@@ -127,7 +129,9 @@ export function SiteHeader() {
                 <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                   <Avatar className="h-8 w-8 rounded-lg">
                     <AvatarImage src={user.avatar ?? '/avatars/shadcn.jpg'} alt={user.name} />
-                    <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                    <AvatarFallback className="rounded-lg">
+                      {user.name ? user.name[0] : 'U'}
+                    </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
                     <span className="truncate font-medium">{user.name}</span>

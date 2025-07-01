@@ -52,7 +52,6 @@ const Root = () => {
     {
       title: 'Program Kami',
       icon: Users,
-      url: '/program-kami',
       items: [
         { title: 'Adopsi Pohon', url: '/program-kami/adopsi-pohon' },
         { title: 'Pemberdayaan Masyarakat', url: '/program-kami/pemberdayaan-masyarakat' },

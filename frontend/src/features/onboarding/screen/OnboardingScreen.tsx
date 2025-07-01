@@ -265,7 +265,9 @@ export function OnboardingScreen({ isInHomescreen = false }: OnboardingScreenPro
               size="lg"
               variant="secondary"
               className="text-lg px-8 py-4 bg-secondary text-secondary-foreground hover:bg-secondary/90 drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]"
-              onClick={() => (window.location.href = '/adopt')}>
+              onClick={() =>
+                (window.location.href = isInHomescreen ? '/program-kami/adopsi-pohon' : '/adopt')
+              }>
               Adopsi Pohon Sekarang
             </Button>
           </div>

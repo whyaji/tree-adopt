@@ -9,71 +9,93 @@ export const uploadFile = async (
   options?: {
     withTimeMilis?: boolean;
     withoutDir?: boolean;
-    withThumbnail?: boolean; // thumbnail with max height 150px, dynamic width
+    withThumbnail?: boolean;
   }
 ) => {
   const sharp = await import('sharp');
   const fs = await import('fs/promises');
   const path = await import('path');
-  const uploadsDir = path.resolve(`server/public/${dir ?? ''}`);
-  await fs.mkdir(uploadsDir, { recursive: true });
 
-  // Extract file extension
-  const fileName = `${options?.withTimeMilis ? Date.now() + '-' : ''}${file.name}`;
-  const filePath = path.join(uploadsDir, fileName);
-  const fileBuffer = Buffer.from(await file.arrayBuffer());
-  // Check image height and only resize if greater than 960px
-  const image = sharp.default(fileBuffer);
-  const metadata = await image.metadata();
-  if (metadata.height && metadata.height > 960) {
-    await image
-      .resize({
-        height: 960,
-        fit: 'inside',
-        withoutEnlargement: true,
-      })
-      .toFile(filePath);
-  } else {
-    await fs.writeFile(filePath, fileBuffer);
+  try {
+    // Resolve the real path of the symlinked directory
+    const publicDir = path.resolve('server/public');
+    const realPublicDir = await fs.realpath(publicDir);
+    const uploadsDir = path.join(realPublicDir, dir ?? '');
+
+    await fs.mkdir(uploadsDir, { recursive: true });
+
+    const fileName = `${options?.withTimeMilis ? Date.now() + '-' : ''}${file.name}`;
+    const filePath = path.join(uploadsDir, fileName);
+    const fileBuffer = Buffer.from(await file.arrayBuffer());
+
+    const image = sharp.default(fileBuffer);
+    const metadata = await image.metadata();
+
+    if (metadata.height && metadata.height > 960) {
+      await image
+        .resize({
+          height: 960,
+          fit: 'inside',
+          withoutEnlargement: true,
+        })
+        .toFile(filePath);
+    } else {
+      await fs.writeFile(filePath, fileBuffer);
+    }
+
+    if (options?.withThumbnail) {
+      const thumbnailDir = path.join(realPublicDir, 'thumbnails', dir ?? '');
+      await fs.mkdir(thumbnailDir, { recursive: true });
+      const thumbnailPath = path.join(thumbnailDir, fileName);
+
+      await sharp
+        .default(filePath)
+        .resize({
+          height: 150,
+          fit: 'inside',
+          withoutEnlargement: true,
+        })
+        .toFile(thumbnailPath);
+      console.log(`Thumbnail created at: ${thumbnailPath}`);
+    }
+
+    const relativeDir = path.join('/', dir ?? '');
+    const relativePath = path.join(relativeDir, fileName);
+
+    return relativePath.replace(/\\/g, '/');
+  } catch (error) {
+    console.error('Upload failed:', error);
+    throw error;
   }
-
-  if (options?.withThumbnail) {
-    const thumbnailDir = path.resolve(`server/public/thumbnails/${dir ?? ''}`);
-    // Ensure the thumbnail directory exists
-    await fs.mkdir(thumbnailDir, { recursive: true });
-    const thumbnailPath = path.join(thumbnailDir, fileName);
-
-    await sharp
-      .default(filePath)
-      .resize({
-        height: 150,
-        fit: 'inside',
-        withoutEnlargement: true,
-      })
-      .toFile(thumbnailPath);
-    console.log(`Thumbnail created at: ${thumbnailPath}`);
-  }
-
-  const relativeDir = path.join('/', dir ?? '');
-  const relativePath = path.join(relativeDir, fileName);
-
-  return relativePath.replace(/\\/g, '/');
 };
 
 export const deleteImage = async (dir: string) => {
   const fs = await import('fs/promises');
+  const path = await import('path');
+
   try {
-    await fs.unlink(`server/public/${dir}`);
-    // check if the thumbnail exists and delete it
-    const thumbnailPath = `server/public/thumbnails/${dir}`;
+    // Resolve the real path of the symlinked directory
+    const publicDir = path.resolve('server/public');
+    const realPublicDir = await fs.realpath(publicDir);
+
+    // Construct the full file path
+    const filePath = path.join(realPublicDir, dir);
+
+    // Delete the main file
+    await fs.unlink(filePath);
+
+    // Check if the thumbnail exists and delete it
+    const thumbnailPath = path.join(realPublicDir, 'thumbnails', dir);
     const thumbnailExists = await fs
       .access(thumbnailPath)
       .then(() => true)
       .catch(() => false);
+
     if (thumbnailExists) {
       await fs.unlink(thumbnailPath);
       console.log(`Deleted thumbnail: ${thumbnailPath}`);
     }
+
     console.log(`Deleted file: ${dir}`);
   } catch (error) {
     console.error(`Error deleting file: ${dir}`, error);

@@ -95,6 +95,8 @@ export function OnboardingScreen({ isInHomescreen = false }: OnboardingScreenPro
     { src: '/images/mitra-kph.png', alt: 'Mitra KPH' },
     { src: '/images/mitra-kth-mawar-bersemi.png', alt: 'Mitra KTH Mawar Bersemi' },
     { src: '/images/mitra-masoraian.png', alt: 'Mitra Masoraian' },
+    { src: '/images/mitra-petak-puti.jpg', alt: 'Mitra Petak Puti' },
+    { src: '/images/mitra-tani-sejati.jpg', alt: 'Mitra Tani Sejati' },
     { src: '/images/mitra-ssms.png', alt: 'Mitra SSMS' },
   ];
 

@@ -43,7 +43,6 @@ const apiRoutes = app
 // Serve files from public directory
 app.get('/uploads/*', serveStatic({ root: './server/public' }));
 app.get('/thumbnails/uploads/*', serveStatic({ root: './server/public' }));
-app.get('/onboard/*', serveStatic({ root: './server/public' }));
 
 // Serve static files from the built frontend
 app.get('*', serveStatic({ root: './frontend/dist' }));

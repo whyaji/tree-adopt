@@ -26,23 +26,23 @@ export function OnboardingScreen({ isInHomescreen = false }: OnboardingScreenPro
   const logoImage = '/images/tree-adopt-logo.png';
 
   const heroImages = [
-    '/onboard/forest-from-top.jpg',
-    '/onboard/forest.jpg',
-    '/onboard/forest-with-orang-utan.jpg',
-    '/onboard/forest-with-river.jpg',
+    '/images/onboard/forest-from-top.jpg',
+    '/images/onboard/forest.jpg',
+    '/images/onboard/forest-with-orang-utan.jpg',
+    '/images/onboard/forest-with-river.jpg',
   ];
 
   const adoptTreeImages = [
-    '/onboard/adopt-tree-01.jpg',
-    '/onboard/adopt-tree-02.jpg',
-    '/onboard/adopt-tree-03.jpg',
+    '/images/onboard/adopt-tree-01.jpg',
+    '/images/onboard/adopt-tree-02.jpg',
+    '/images/onboard/adopt-tree-03.jpg',
   ];
 
   const treeImages = [
-    '/onboard/tree-01.jpg',
-    '/onboard/tree-02.jpg',
-    '/onboard/tree-03.jpg',
-    '/onboard/tree-04.jpg',
+    '/images/onboard/tree-01.jpg',
+    '/images/onboard/tree-02.jpg',
+    '/images/onboard/tree-03.jpg',
+    '/images/onboard/tree-04.jpg',
   ];
 
   const carouselItems = [
